@@ -6,7 +6,6 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/UnnoTed/fileb0x v1.1.4
 	github.com/bmatcuk/doublestar v1.2.2 // indirect
-	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/karrick/godirwalk v1.15.3 // indirect
 	github.com/labstack/echo v3.3.10+incompatible // indirect
@@ -21,8 +20,7 @@ require (
 	golang.org/x/crypto v0.0.0-20200221170553-0f24fbd83dfb // indirect
 	golang.org/x/net v0.0.0-20200219183655-46282727080f
 	golang.org/x/sys v0.0.0-20200219091948-cb0a6d8edb6c // indirect
-	golang.org/x/tools v0.0.0-20200221191710-57f3fb51f507 // indirect
-	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 // indirect
+	golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e
 	google.golang.org/appengine v1.6.5 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
