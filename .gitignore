@@ -1,0 +1,7 @@
+# Generated files
+static
+models/*_generated.go
+
+# Database
+kjudge.db
+

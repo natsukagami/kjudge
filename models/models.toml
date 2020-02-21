@@ -1,0 +1,75 @@
+[contests]
+id = "int"
+name = "string"
+start_time = "time.Time"
+end_time = "time.Time"
+contest_type = "ContestType"
+
+[problems]
+id = "int"
+contest_id = "int"
+name = "string"
+display_name = "string"
+time_limit = "int"
+memory_limit = "int"
+scoring_mode = "ScoringMode"
+penalty_policy = "PenaltyPolicy"
+grader = "[]byte"
+compare = "[]byte"
+
+[test_groups]
+id = "int"
+problem_id = "int"
+name = "string"
+time_limit = "sql.NullInt64"
+memory_limit = "sql.NullInt64"
+score = "float64"
+scoring_mode = "TestScoringMode"
+
+[tests]
+id = "int"
+test_group_id = "int"
+name = "string"
+input = "[]byte"
+output = "[]byte"
+
+[users]
+id = "string"
+password = "string"
+
+[submissions]
+id = "int"
+problem_id = "int"
+user_id = "int"
+submitted_at = "time.Time"
+language = "Language"
+source = "[]byte"
+compiled_source = "[]byte"
+verdict = "string"
+score = "sql.NullFloat64"
+penalty = "sql.NullFloat64"
+
+[test_results]
+submission_id = "int"
+test_id = "int"
+verdict = "string"
+score = "float64"
+running_time = "int"
+memory_used = "int"
+
+[problem_results]
+user_id = "int"
+problem_id = "int"
+solved = "bool"
+score = "float64"
+penalty = "float64"
+best_submission_id = "sql.NullInt64"
+
+[jobs]
+id = "int"
+priority = "int"
+type = "JobType"
+user_id = "sql.NullInt64"
+problem_id = "sql.NullInt64"
+submission_id = "sql.NullInt64"
+test_id = "sql.NullInt64"
