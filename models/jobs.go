@@ -33,7 +33,7 @@ func NewJobCompile(subID int) *Job {
 	return &Job{
 		Priority:     compilePriority,
 		Type:         JobTypeCompile,
-		SubmissionID: sql.NullInt64{Int64: int64(subID), Valid: true},
+		SubmissionID: subID,
 	}
 }
 
@@ -42,42 +42,28 @@ func NewJobRun(subID int, testID int) *Job {
 	return &Job{
 		Priority:     runPriority,
 		Type:         JobTypeRun,
-		SubmissionID: sql.NullInt64{Int64: int64(subID), Valid: true},
+		SubmissionID: subID,
 		TestID:       sql.NullInt64{Int64: int64(testID), Valid: true},
 	}
 }
 
 // NewJobScore creates a new Score job.
-func NewJobScore(userID int, problemID int) *Job {
+func NewJobScore(subID int) *Job {
 	return &Job{
-		Priority:  scorePriority,
-		Type:      JobTypeScore,
-		UserID:    sql.NullInt64{Int64: int64(userID), Valid: true},
-		ProblemID: sql.NullInt64{Int64: int64(problemID), Valid: true},
+		Priority:     scorePriority,
+		Type:         JobTypeScore,
+		SubmissionID: subID,
 	}
 }
 
 // Verify verifies whether a job is a legit job.
 func (r *Job) Verify() error {
 	switch r.Type {
-	case JobTypeCompile:
-		if !r.SubmissionID.Valid {
-			return errors.New("compile submission_id: missing")
-		}
 	case JobTypeRun:
-		if !r.SubmissionID.Valid {
-			return errors.New("test submission_id: missing")
-		}
 		if !r.TestID.Valid {
 			return errors.New("test test_id: missing")
 		}
-	case JobTypeScore:
-		if !r.ProblemID.Valid {
-			return errors.New("score problem_id: missing")
-		}
-		if !r.UserID.Valid {
-			return errors.New("score user_id: missing")
-		}
+	case JobTypeCompile, JobTypeScore:
 	default:
 		return errors.New("type: invalid value")
 	}
@@ -101,16 +87,16 @@ func BatchInsertJobs(db db.DBContext, jobs ...*Job) error {
 	if len(jobs) == 0 {
 		return nil // No inserts needed
 	}
-	rowMarks := "(?, ?, ?, ?, ?, ?)"
+	rowMarks := "(?, ?, ?, ?)"
 	command := strings.Builder{}
-	command.WriteString("INSERT INTO jobs(priority, problem_id, submission_id, test_id, type, user_id) VALUES ")
+	command.WriteString("INSERT INTO jobs(priority, submission_id, test_id, type) VALUES ")
 	var values []interface{}
 	for id, r := range jobs {
 		if id > 0 {
 			command.WriteString(", ")
 		}
 		command.WriteString(rowMarks)
-		values = append(values, r.Priority, r.ProblemID, r.SubmissionID, r.TestID, r.Type, r.UserID)
+		values = append(values, r.Priority, r.SubmissionID, r.TestID, r.Type)
 	}
 	res, err := db.Exec(command.String(), values...)
 	if err != nil {
