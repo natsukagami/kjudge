@@ -128,6 +128,17 @@ type Table struct {
 	ForeignKeys map[string]string
 }
 
+// FieldsWithoutID returns a map of fields excluding the ID row.
+func (t *Table) FieldsWithoutID() map[string]string {
+    res := make(map[string]string)
+    for field, typ := range t.Fields {
+        if field != "id" {
+            res[field] = typ
+        }
+    }
+    return res
+}
+
 // TableFromToml parses out a Table from its TOML.
 func TableFromToml(tables TomlTables, name string, t TomlTable) *Table {
 	pks := make(map[string]string)
@@ -181,7 +192,7 @@ type {{$name}} struct {
 {{/* Primary Key getter */}}
 {{$fn_name := print "Get" $name}}
 // {{$fn_name}} gets a {{$name}} from the Database.
-func {{$fn_name}}(db *db.DB {{- range $field, $type := .PrimaryKeys -}} , {{param $field}} {{$type}} {{- end}}) (*{{$name}}, error) {
+func {{$fn_name}}(db db.DBContext {{- range $field, $type := .PrimaryKeys -}} , {{param $field}} {{$type}} {{- end}}) (*{{$name}}, error) {
     var result *{{$name}}
     if err := db.Get(result, "SELECT * FROM {{.Name}} WHERE {{condition .PrimaryKeys " AND "}}", {{args .PrimaryKeys ""}}); err != nil {
         return nil, errors.WithStack(err)
@@ -194,7 +205,7 @@ func {{$fn_name}}(db *db.DB {{- range $field, $type := .PrimaryKeys -}} , {{para
 {{ with $ }}
 {{$fn_name = print "Get" ($fk | fkey) $name "s"}}
 // {{$fn_name}} gets a list of {{$name}} belonging to a {{$fk | fkey}}.
-func {{$fn_name}}(db *db.DB, {{param $fk}} {{$fktype}}) ([]*{{$name}}, error) {
+func {{$fn_name}}(db db.DBContext, {{param $fk}} {{$fktype}}) ([]*{{$name}}, error) {
     var result []*{{$name}}
     if err := db.Select(result, "SELECT * FROM {{.Name}} WHERE {{$fk}} = ?", {{param $fk}}); err != nil {
         return nil, errors.WithStack(err)
@@ -213,7 +224,7 @@ func {{$fn_name}}(db *db.DB, {{param $fk}} {{$fktype}}) ([]*{{$name}}, error) {
 
 {{/* Delete */}}
 // Delete deletes the {{$name}} from the Database.
-func (r *{{$name}}) Delete(db *db.DB) error {
+func (r *{{$name}}) Delete(db db.DBContext) error {
     _, err := db.Exec("DELETE FROM {{.Name}} WHERE {{condition .PrimaryKeys " AND "}}", {{args .PrimaryKeys "r"}})
     return errors.WithStack(err)
 }
@@ -222,7 +233,7 @@ const UpsertTemplate = `
 {{$name := .Name | struct}}
 {{$tick := "` + "`" + `"}}
 // Write writes the change to the Database. This happens as an UPSERT statement.
-func (r *{{$name}}) Write(db *db.DB) error {
+func (r *{{$name}}) Write(db db.DBContext) error {
     if err := r.Verify(); err != nil {
         return err
     }
@@ -237,13 +248,14 @@ const UpdateOrInsertTemplate = `
 {{$tick := "` + "`" + `"}}
 // Write writes the change to the Database.
 // If the ID of the {{$name}} is 0, then an INSERT is performed. Else, an UPDATE is triggered.
-func (r *{{$name}}) Write(db *db.DB) error {
+func (r *{{$name}}) Write(db db.DBContext) error {
     if err := r.Verify(); err != nil {
         return err
     }
     {{if eq (index .Fields "id") "int"}}
     if r.ID == 0 {
-        res, err := db.Exec("INSERT INTO {{.Name}}({{args .Fields "-"}}) VALUES ({{marks .Fields}})", {{args .Fields "r"}})
+        {{ $fields := .FieldsWithoutID }}
+        res, err := db.Exec("INSERT INTO {{.Name}}({{args $fields "-"}}) VALUES ({{marks $fields}})", {{args $fields "r"}})
         if err != nil {
             return errors.WithStack(err)
         }
