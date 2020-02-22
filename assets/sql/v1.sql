@@ -123,6 +123,7 @@ CREATE TABLE jobs (
 );
 
 CREATE INDEX jobs_by_priority ON jobs (priority DESC, id ASC);
+CREATE INDEX jobs_by_type ON jobs (type); -- Just to run SELECT count(id) FROM jobs GROUP BY type;
 
 -- Files for use within a problem (mostly graders)
 CREATE TABLE files (
