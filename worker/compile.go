@@ -19,14 +19,14 @@ import (
 	"strings"
 	"time"
 
-	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
 
 // CompileContext is the information needed to perform compilation.
 type CompileContext struct {
-	DB      *db.DB
+	DB      *sqlx.Tx
 	Sub     *models.Submission
 	Problem *models.Problem
 }
@@ -85,7 +85,7 @@ func (c *CompileContext) Compile() (bool, error) {
 		c.Sub.CompiledSource = output
 	} else {
 		c.Sub.CompiledSource = nil
-		c.Sub.Verdict = "CE"
+		c.Sub.Verdict = "Compile Error"
 	}
 	log.Printf("[WORKER] Compiling submission %v succeeded (result = %v).", c.Sub.ID, result)
 
