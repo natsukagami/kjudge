@@ -24,7 +24,6 @@ CREATE TABLE problems (
 	memory_limit INTEGER NOT NULL,
 	scoring_mode VARCHAR NOT NULL,
     penalty_policy VARCHAR NOT NULL,
-	grader BLOB DEFAULT NULL,
 	compare BLOB DEFAULT NULL,
 
 	FOREIGN KEY(contest_id) REFERENCES contests(id) ON DELETE CASCADE
@@ -72,6 +71,7 @@ CREATE TABLE submissions (
 	source BLOB NOT NULL,
 	-- Judge cache
 	compiled_source BLOB DEFAULT NULL,
+    compiler_output BLOB DEFAULT NULL,
 	-- Results
 	verdict VARCHAR NOT NULL DEFAULT "...",
 	score   REAL DEFAULT NULL,
@@ -125,3 +125,12 @@ CREATE TABLE jobs (
 
 CREATE INDEX jobs_by_priority ON jobs (priority DESC, id ASC);
 
+-- Files for use within a problem (mostly graders)
+CREATE TABLE files (
+    id INTEGER PRIMARY KEY NOT NULL,
+    problem_id INTEGER NOT NULL,
+    filename VARCHAR NOT NULL,
+    content BLOB NOT NULL,
+
+    FOREIGN KEY (problem_id) REFERENCES problems(id)
+);
