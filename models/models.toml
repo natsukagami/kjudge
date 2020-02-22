@@ -14,7 +14,6 @@ time_limit = "int"
 memory_limit = "int"
 scoring_mode = "ScoringMode"
 penalty_policy = "PenaltyPolicy"
-compare = "[]byte"
 
 [test_groups]
 id = "int"

@@ -24,7 +24,6 @@ CREATE TABLE problems (
 	memory_limit INTEGER NOT NULL,
 	scoring_mode VARCHAR NOT NULL,
     penalty_policy VARCHAR NOT NULL,
-	compare BLOB DEFAULT NULL,
 
 	FOREIGN KEY(contest_id) REFERENCES contests(id) ON DELETE CASCADE
 );
