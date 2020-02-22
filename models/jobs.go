@@ -64,7 +64,7 @@ func (r *Job) Verify() error {
 		if !r.SubmissionID.Valid {
 			return errors.New("compile submission_id: missing")
 		}
-	case JobTypeTest:
+	case JobTypeRun:
 		if !r.SubmissionID.Valid {
 			return errors.New("test submission_id: missing")
 		}
