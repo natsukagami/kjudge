@@ -22,7 +22,7 @@ CREATE TABLE problems (
 	display_name VARCHAR NOT NULL,
 	time_limit INTEGER NOT NULL,
 	memory_limit INTEGER NOT NULL,
-	scoring_mode VARCHAR NOT NULL,
+	scoring_mode INTEGER NOT NULL,
     penalty_policy VARCHAR NOT NULL,
 
 	FOREIGN KEY(contest_id) REFERENCES contests(id) ON DELETE CASCADE
@@ -74,7 +74,7 @@ CREATE TABLE submissions (
 	-- Results
 	verdict VARCHAR NOT NULL DEFAULT "...",
 	score   REAL DEFAULT NULL,
-	penalty REAL DEFAULT NULL,
+	penalty INTEGER DEFAULT NULL,
 	
 	FOREIGN KEY(problem_id) REFERENCES problems(id) ON DELETE CASCADE,
 	FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -97,7 +97,7 @@ CREATE TABLE problem_results (
 	-- meaningful values
     solved INTEGER NOT NULL DEFAULT 0,
 	score REAL NOT NULL DEFAULT 0,
-	penalty REAL NOT NULL DEFAULT 0,
+	penalty INTEGER NOT NULL DEFAULT 0,
 	best_submission_id INTEGER DEFAULT NULL,
 	
 	PRIMARY KEY (user_id, problem_id),

@@ -46,7 +46,7 @@ compiled_source = "[]byte"
 compiler_output = "[]byte"
 verdict = "string"
 score = "sql.NullFloat64"
-penalty = "sql.NullFloat64"
+penalty = "sql.NullInt64"
 
 [test_results]
 submission_id = "int"
@@ -61,7 +61,7 @@ user_id = "string"
 problem_id = "int"
 solved = "bool"
 score = "float64"
-penalty = "float64"
+penalty = "int"
 best_submission_id = "sql.NullInt64"
 
 [jobs]

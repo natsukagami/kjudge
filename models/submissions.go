@@ -4,6 +4,7 @@ import (
 	"log"
 	"os/exec"
 
+	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models/verify"
 	"github.com/pkg/errors"
 )
@@ -51,8 +52,17 @@ func (r *Submission) Verify() error {
 		"Verdict":  verify.StringNonEmpty(r.Verdict),
 	}
 	if r.Penalty.Valid {
-		m["Penalty"] = verify.Float(r.Penalty.Float64, verify.FloatMin(0))
+		m["Penalty"] = verify.NullInt(r.Penalty, verify.IntMin(0))
 		m["Score"] = verify.Float(r.Score.Float64, verify.FloatMin(0))
 	}
 	return verify.All(m)
+}
+
+// GetUserProblemSubmissions gets all submissions belonging to an user on a problem.
+func GetUserProblemSubmissions(db db.DBContext, userID string, problemID int) ([]*Submission, error) {
+	var result []*Submission
+	if err := db.Select(&result, "SELECT * FROM submissions WHERE problem_id = ? AND user_id = ?", problemID, userID); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return result, nil
 }
