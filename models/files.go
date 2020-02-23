@@ -8,11 +8,11 @@ import (
 
 // GetFileWithName returns a file with a given name.
 func GetFileWithName(db db.DBContext, problemID int, filename string) (*File, error) {
-	var f *File
-	if err := db.Get(f, "SELECT * FROM files WHERE problem_id = ? AND filename = ?", problemID, filename); err != nil {
+	var f File
+	if err := db.Get(&f, "SELECT * FROM files WHERE problem_id = ? AND filename = ?", problemID, filename); err != nil {
 		return nil, errors.WithStack(err)
 	}
-	return f, nil
+	return &f, nil
 }
 
 // Verify verifies a file's content.
