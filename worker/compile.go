@@ -33,7 +33,7 @@ type CompileContext struct {
 
 // Compile performs compilation.
 // Returns whether the compilation succeeds.
-func (c *CompileContext) Compile() (bool, error) {
+func Compile(c *CompileContext) (bool, error) {
 	// First we gotta know which compilation scheme we will be taking.
 	files, err := models.GetProblemFiles(c.DB, c.Problem.ID)
 	if err != nil {
