@@ -130,13 +130,13 @@ type Table struct {
 
 // FieldsWithoutID returns a map of fields excluding the ID row.
 func (t *Table) FieldsWithoutID() map[string]string {
-    res := make(map[string]string)
-    for field, typ := range t.Fields {
-        if field != "id" {
-            res[field] = typ
-        }
-    }
-    return res
+	res := make(map[string]string)
+	for field, typ := range t.Fields {
+		if field != "id" {
+			res[field] = typ
+		}
+	}
+	return res
 }
 
 // TableFromToml parses out a Table from its TOML.
@@ -193,11 +193,11 @@ type {{$name}} struct {
 {{$fn_name := print "Get" $name}}
 // {{$fn_name}} gets a {{$name}} from the Database.
 func {{$fn_name}}(db db.DBContext {{- range $field, $type := .PrimaryKeys -}} , {{param $field}} {{$type}} {{- end}}) (*{{$name}}, error) {
-    var result *{{$name}}
-    if err := db.Get(result, "SELECT * FROM {{.Name}} WHERE {{condition .PrimaryKeys " AND "}}", {{args .PrimaryKeys ""}}); err != nil {
+    var result {{$name}}
+    if err := db.Get(&result, "SELECT * FROM {{.Name}} WHERE {{condition .PrimaryKeys " AND "}}", {{args .PrimaryKeys ""}}); err != nil {
         return nil, errors.WithStack(err)
     }
-    return result, nil
+    return &result, nil
 }
 
 {{/* All foreign key getters */}}
@@ -207,7 +207,7 @@ func {{$fn_name}}(db db.DBContext {{- range $field, $type := .PrimaryKeys -}} , 
 // {{$fn_name}} gets a list of {{$name}} belonging to a {{$fk | fkey}}.
 func {{$fn_name}}(db db.DBContext, {{param $fk}} {{$fktype}}) ([]*{{$name}}, error) {
     var result []*{{$name}}
-    if err := db.Select(result, "SELECT * FROM {{.Name}} WHERE {{$fk}} = ?", {{param $fk}}); err != nil {
+    if err := db.Select(&result, "SELECT * FROM {{.Name}} WHERE {{$fk}} = ?", {{param $fk}}); err != nil {
         return nil, errors.WithStack(err)
     }
     return result, nil
