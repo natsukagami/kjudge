@@ -2,6 +2,7 @@ package worker
 
 import (
 	"database/sql"
+	"log"
 	"math"
 	"strconv"
 	"strings"
@@ -117,8 +118,11 @@ func Run(sandbox Sandbox, r *RunContext) error {
 	compiled, source := r.CompiledSource()
 	if !compiled {
 		// Add a compilation job and re-add ourselves.
+		log.Printf("[WORKER] Submission %v not compiled, creating Compile job.\n", r.Sub.ID)
 		return models.BatchInsertJobs(r.DB, models.NewJobCompile(r.Sub.ID), models.NewJobRun(r.Sub.ID, r.Test.ID))
 	}
+
+	log.Printf("[WORKER] Running submission %v on [test `%v`, group `%v`]\n", r.Sub.ID, r.Test.Name, r.TestGroup.Name)
 
 	// First, use the sandbox to run the submission itself.
 	input, err := r.RunInput(source)
@@ -145,6 +149,9 @@ func Run(sandbox Sandbox, r *RunContext) error {
 	if err := parseComparatorOutput(output, result, useComparator); err != nil {
 		return err
 	}
+
+	log.Printf("[WORKER] Done running submission %v on [test `%v`, group `%v`]: %.1f (t = %v, m = %v)\n",
+		r.Sub.ID, r.Test.Name, r.TestGroup.Name, result.Score, result.RunningTime, result.MemoryUsed)
 
 	return result.Write(r.DB)
 }
