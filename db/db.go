@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/mattn/go-sqlite3"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 )
@@ -22,16 +23,24 @@ type DBContext interface {
 // DB is an implementation of the underlying DB.
 type DB struct {
 	*sqlx.DB
+
+	PersistentConn *sqlite3.SQLiteConn
 }
 
 // New creates a new DB object from the given filename.
 func New(filename string) (*DB, error) {
-	sqlxdb, err := sqlx.Open("sqlite3", fmt.Sprintf("%s?_fk=1&mode=rw", filename))
+	dsn := fmt.Sprintf("%s?_fk=1&mode=rw", filename)
+	sqlxdb, err := sqlx.Open("sqlite3", dsn)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	conn, err := sqlxdb.Driver().Open(dsn)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 	db := &DB{
-		DB: sqlxdb,
+		DB:             sqlxdb,
+		PersistentConn: conn.(*sqlite3.SQLiteConn),
 	}
 	// Perform migrations, if needed.
 	if err := db.migrate(); err != nil {
