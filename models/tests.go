@@ -35,16 +35,16 @@ func GetProblemTests(db db.DBContext, problemID int) ([]*TestGroupWithTests, err
 	}
 	var tests []*Test
 	if err := db.Select(&tests, query, params...); err != nil {
-	turn nil, errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 	for _, test := range tests {
-	 := tgMap[test.TestGroupID]
-	.Tests = append(tg.Tests, test)
+		tg := tgMap[test.TestGroupID]
+		tg.Tests = append(tg.Tests, test)
 	}
 	// Collect the map into a slice.
 	var res []*TestGroupWithTests
 	for _, tg := range tgMap {
-	s = append(res, tg)
+		res = append(res, tg)
 	}
 	return res, nil
 }

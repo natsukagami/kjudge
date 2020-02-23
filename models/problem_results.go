@@ -11,7 +11,7 @@ func (r *ProblemResult) Verify() error {
 		return errors.New("best submission: must be there when result is not zero")
 	}
 	return verify.All(map[string]error{
-		"Penalty": verify.Float(r.Penalty, verify.FloatMin(0)),
+		"Penalty": verify.Int(r.Penalty, verify.IntMin(0)),
 		"Score":   verify.Float(r.Score, verify.FloatMin(0)),
 	})
 }
