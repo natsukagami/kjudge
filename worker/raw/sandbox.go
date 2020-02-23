@@ -15,7 +15,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"time"
 
 	"git.nkagami.me/natsukagami/kjudge/worker"
@@ -44,17 +43,8 @@ func (s *Sandbox) Run(input *worker.SandboxInput) (*worker.SandboxOutput, error)
 //   - THE PROGRAM DOES NOT MESS WITH THE COMPUTER. LMAO
 //   - The folder will be thrown away later.
 func (s *Sandbox) RunFrom(cwd string, input *worker.SandboxInput) (*worker.SandboxOutput, error) {
-	// Copy all the files into "cwd"
-	for name, file := range input.Files {
-		if err := ioutil.WriteFile(filepath.Join(cwd, name), file, 0666); err != nil {
-			return nil, errors.Wrapf(err, "writing file %s", name)
-		}
-	}
-	// Copy and set chmod the "code" file
-	if input.CompiledSource != nil {
-		if err := ioutil.WriteFile(filepath.Join(cwd, "code"), input.CompiledSource, 0777); err != nil {
-			return nil, errors.WithStack(err)
-		}
+	if err := input.CopyTo(cwd); err != nil {
+		return nil, err
 	}
 
 	// Prepare the command
