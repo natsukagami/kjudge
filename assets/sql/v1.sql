@@ -114,8 +114,6 @@ CREATE TABLE jobs (
   submission_id INTEGER NOT NULL,
   test_id INTEGER DEFAULT NULL,
   
-  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY(problem_id) REFERENCES problems(id) ON DELETE CASCADE,
   FOREIGN KEY(submission_id) REFERENCES submissions(id) ON DELETE CASCADE,
   FOREIGN KEY(test_id) REFERENCES tests(id) ON DELETE CASCADE
 );
