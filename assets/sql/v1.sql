@@ -22,10 +22,8 @@ CREATE TABLE problems (
 	display_name VARCHAR NOT NULL,
 	time_limit INTEGER NOT NULL,
 	memory_limit INTEGER NOT NULL,
-	scoring_mode VARCHAR NOT NULL,
+	scoring_mode INTEGER NOT NULL,
     penalty_policy VARCHAR NOT NULL,
-	grader BLOB DEFAULT NULL,
-	compare BLOB DEFAULT NULL,
 
 	FOREIGN KEY(contest_id) REFERENCES contests(id) ON DELETE CASCADE
 );
@@ -72,10 +70,11 @@ CREATE TABLE submissions (
 	source BLOB NOT NULL,
 	-- Judge cache
 	compiled_source BLOB DEFAULT NULL,
+    compiler_output BLOB DEFAULT NULL,
 	-- Results
 	verdict VARCHAR NOT NULL DEFAULT "...",
 	score   REAL DEFAULT NULL,
-	penalty REAL DEFAULT NULL,
+	penalty INTEGER DEFAULT NULL,
 	
 	FOREIGN KEY(problem_id) REFERENCES problems(id) ON DELETE CASCADE,
 	FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -98,7 +97,7 @@ CREATE TABLE problem_results (
 	-- meaningful values
     solved INTEGER NOT NULL DEFAULT 0,
 	score REAL NOT NULL DEFAULT 0,
-	penalty REAL NOT NULL DEFAULT 0,
+	penalty INTEGER NOT NULL DEFAULT 0,
 	best_submission_id INTEGER DEFAULT NULL,
 	
 	PRIMARY KEY (user_id, problem_id),
@@ -112,16 +111,22 @@ CREATE TABLE jobs (
   id INTEGER PRIMARY KEY NOT NULL,
   priority INTEGER NOT NULL,
   type VARCHAR NOT NULL,
-  user_id INTEGER DEFAULT NULL,
-  problem_id INTEGER DEFAULT NULL,
-  submission_id INTEGER DEFAULT NULL,
+  submission_id INTEGER NOT NULL,
   test_id INTEGER DEFAULT NULL,
   
-  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY(problem_id) REFERENCES problems(id) ON DELETE CASCADE,
   FOREIGN KEY(submission_id) REFERENCES submissions(id) ON DELETE CASCADE,
   FOREIGN KEY(test_id) REFERENCES tests(id) ON DELETE CASCADE
 );
 
 CREATE INDEX jobs_by_priority ON jobs (priority DESC, id ASC);
+CREATE INDEX jobs_by_type ON jobs (type); -- Just to run SELECT count(id) FROM jobs GROUP BY type;
 
+-- Files for use within a problem (mostly graders)
+CREATE TABLE files (
+    id INTEGER PRIMARY KEY NOT NULL,
+    problem_id INTEGER NOT NULL,
+    filename VARCHAR NOT NULL,
+    content BLOB NOT NULL,
+
+    FOREIGN KEY (problem_id) REFERENCES problems(id)
+);
