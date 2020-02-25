@@ -1,7 +1,7 @@
 pkg: static
 dest: "./static"
 fmt: true
-# debug: true
+debug: true
 
 compression:
     compress: true
@@ -10,3 +10,7 @@ custom:
     - files:
       - "./assets/"
       base: "assets/"
+    - files:
+      - "./templates/dist/"
+      base: "templates/"
+
