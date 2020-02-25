@@ -14,8 +14,6 @@ time_limit = "int"
 memory_limit = "int"
 scoring_mode = "ScoringMode"
 penalty_policy = "PenaltyPolicy"
-grader = "[]byte"
-compare = "[]byte"
 
 [test_groups]
 id = "int"
@@ -40,14 +38,15 @@ password = "string"
 [submissions]
 id = "int"
 problem_id = "int"
-user_id = "int"
+user_id = "string"
 submitted_at = "time.Time"
 language = "Language"
 source = "[]byte"
 compiled_source = "[]byte"
+compiler_output = "[]byte"
 verdict = "string"
 score = "sql.NullFloat64"
-penalty = "sql.NullFloat64"
+penalty = "sql.NullInt64"
 
 [test_results]
 submission_id = "int"
@@ -58,18 +57,22 @@ running_time = "int"
 memory_used = "int"
 
 [problem_results]
-user_id = "int"
+user_id = "string"
 problem_id = "int"
 solved = "bool"
 score = "float64"
-penalty = "float64"
+penalty = "int"
 best_submission_id = "sql.NullInt64"
 
 [jobs]
 id = "int"
 priority = "int"
 type = "JobType"
-user_id = "sql.NullInt64"
-problem_id = "sql.NullInt64"
-submission_id = "sql.NullInt64"
+submission_id = "int"
 test_id = "sql.NullInt64"
+
+[files]
+id = "int"
+problem_id = "int"
+filename = "string"
+content = "[]byte"
