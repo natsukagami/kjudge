@@ -1,0 +1,22 @@
+{
+  "name": "templates",
+  "version": "1.0.0",
+  "description": "Templates and others for kjudge.",
+  "main": "index.js",
+  "repository": "https://git.nkagami.me/natsukagami/kjudge",
+  "author": "Natsu Kagami",
+  "license": "MIT ",
+  "private": true,
+  "devDependencies": {
+    "autoprefixer": "^9.7.4",
+    "parcel-bundler": "^1.12.4",
+    "parcel-plugin-purgecss": "^2.1.3",
+    "postcss-modules": "^1.5.0",
+    "tailwindcss": "^1.2.0",
+    "typescript": "^3.8.2"
+  },
+  "scripts": {
+    "dev": "parcel watch \"html/**/*.html\"",
+    "build": "rm -rf dist && parcel build \"html/**/*.html\""
+  }
+}

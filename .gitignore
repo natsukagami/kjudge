@@ -5,3 +5,4 @@ models/*_generated.go
 # Database
 kjudge.db
 
+kjudge
