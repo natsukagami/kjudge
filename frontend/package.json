@@ -16,7 +16,7 @@
     "typescript": "^3.8.2"
   },
   "scripts": {
-    "dev": "parcel watch \"html/**/*.html\"",
-    "build": "rm -rf dist && parcel build \"html/**/*.html\""
+    "dev": "parcel watch -d ../templates \"html/**/*.html\"",
+    "build": "rm -rf ../templates && parcel build -d ../templates \"html/**/*.html\""
   }
 }
