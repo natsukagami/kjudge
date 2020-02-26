@@ -130,3 +130,8 @@ CREATE TABLE files (
 
     FOREIGN KEY (problem_id) REFERENCES problems(id)
 );
+
+-- Configurations
+CREATE TABLE config (
+    session_key BLOB NOT NULL
+);
