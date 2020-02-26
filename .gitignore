@@ -6,3 +6,4 @@ models/*_generated.go
 kjudge.db
 
 kjudge
+templates

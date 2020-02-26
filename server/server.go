@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
 )
 
@@ -41,6 +42,8 @@ func New(db *db.DB) (*Server, error) {
 	// ...
 	s.echo.HideBanner = true
 	s.echo.Use(session.Middleware(sessions.NewCookieStore(config.SessionKey)))
+	s.echo.Use(middleware.Recover())
+	s.echo.Use(middleware.Gzip())
 
 	return &s, nil
 }
