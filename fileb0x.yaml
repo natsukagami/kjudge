@@ -9,8 +9,4 @@ compression:
 custom:
     - files:
       - "./assets/"
-      base: "assets/"
-    - files:
       - "./templates/dist/"
-      base: "templates/"
-

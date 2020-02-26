@@ -1,10 +1,15 @@
 package server
 
 import (
+	"database/sql"
 	"fmt"
 
 	"git.nkagami.me/natsukagami/kjudge/db"
+	"git.nkagami.me/natsukagami/kjudge/models"
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 )
 
 // Server this the root entry of the server.
@@ -20,9 +25,22 @@ func New(db *db.DB) (*Server, error) {
 		echo: echo.New(),
 	}
 
+	// Load the configuration
+	config, err := models.GetConfig(db)
+	if errors.Is(err, sql.ErrNoRows) {
+		config, err = models.GenerateConfig()
+	}
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	if err := config.Write(db); err != nil {
+		return nil, err
+	}
+
 	// Perform linking for Echo here
 	// ...
 	s.echo.HideBanner = true
+	s.echo.Use(session.Middleware(sessions.NewCookieStore(config.SessionKey)))
 
 	return &s, nil
 }
