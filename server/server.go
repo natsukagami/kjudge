@@ -45,6 +45,8 @@ func New(db *db.DB) (*Server, error) {
 	s.echo.Use(middleware.Recover())
 	s.echo.Use(middleware.Gzip())
 
+	s.echo.GET("*", StaticFiles)
+
 	return &s, nil
 }
 

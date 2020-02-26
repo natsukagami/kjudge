@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-    log.Println("Development environment detected. Templates will be re-parsed on every render")
+	log.Println("Development environment detected. Templates will be re-parsed on every render")
 }
 
 // Render renders a template available in the compiled binary.
