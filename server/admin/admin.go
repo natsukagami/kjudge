@@ -2,6 +2,8 @@
 package admin
 
 import (
+	"net/http"
+
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"github.com/labstack/echo/v4"
 )
@@ -13,7 +15,16 @@ type Group struct {
 }
 
 // New creates a new group.
-func New(db *db.DB) *Group {
+func New(g *echo.Group, db *db.DB) *Group {
+	grp := &Group{
+		Group: g,
+		db:    db,
+	}
+	g.GET("/", grp.Home)
+	return grp
 }
 
-func (g *Group) 
+// Home renders the home page.
+func (g *Group) Home(c echo.Context) error {
+	return c.Render(http.StatusOK, "admin/home", nil)
+}
