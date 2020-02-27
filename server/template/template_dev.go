@@ -1,6 +1,6 @@
 // +build !production
 
-package server
+package template
 
 import (
 	"io"
@@ -15,9 +15,13 @@ func init() {
 
 // Render renders a template available in the compiled binary.
 func Render(w io.Writer, name string, root interface{}) error {
-	t, err := parseAllTemplates()
+	tRoot, err := parseRootTemplate()
 	if err != nil {
 		return err
 	}
-	return errors.WithStack(t.ExecuteTemplate(w, name, root))
+	t, err := parseTemplateTree(tRoot, name)
+	if err != nil {
+		return err
+	}
+	return errors.WithStack(t.Execute(w, root))
 }

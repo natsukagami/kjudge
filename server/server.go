@@ -6,6 +6,8 @@ import (
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/server/admin"
+	"git.nkagami.me/natsukagami/kjudge/server/template"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
@@ -41,10 +43,13 @@ func New(db *db.DB) (*Server, error) {
 	// Perform linking for Echo here
 	// ...
 	s.echo.HideBanner = true
+	s.echo.Renderer = template.Renderer{}
 	s.echo.Use(session.Middleware(sessions.NewCookieStore(config.SessionKey)))
 	s.echo.Use(middleware.Recover())
 	s.echo.Use(middleware.Gzip())
+	s.echo.Use(middleware.Logger())
 
+	admin.New(s.echo.Group("/admin"), s.db)
 	s.echo.GET("*", StaticFiles)
 
 	return &s, nil
