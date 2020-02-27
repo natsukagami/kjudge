@@ -1,0 +1,37 @@
+{{ define "title" }}{{block "admin-title" .}}{{end}} - Admin{{ end }}
+
+{{ define "main" }}
+<div class="flex h-screen -mx-6">
+    {{/* Sidebar */}}
+    <div class="w-1/5 mx-4 flex-shrink-0">
+        <div class="text-lg py-4 pl-4">kjudge Admin Panel</div>
+        <nav>
+            <a href="/admin">
+                <div class="bg-gray-300 rounded-sm hover:bg-gray-600 m-2 py-2 pl-4">Home</div>
+            </a>
+            <a href="/admin/contests">
+                <div class="bg-gray-300 rounded-sm hover:bg-gray-600 m-2 py-2 pl-4">Contests</div>
+            </a>
+            <a href="/admin/users">
+                <div class="bg-gray-300 rounded-sm hover:bg-gray-600 m-2 py-2 pl-4">Users</div>
+            </a>
+            <a href="/admin/jobs">
+                <div class="bg-gray-300 rounded-sm hover:bg-gray-600 m-2 py-2 pl-4">Jobs</div>
+            </a>
+            <a href="/admin/logout">
+                <div class="bg-gray-300 rounded-sm hover:bg-gray-600 m-2 py-2 pl-4">Log Out</div>
+            </a>
+        </nav>
+        {{/* Footer */}}
+        <div class="mt-5 mx-auto text-center">
+            <hr>
+            <div class="my-2">
+                <b>kjudge</b> made with ❤️ by <a href="https://github.com/natsukagami">natsukagami</a>
+            </div>
+        </div>
+    </div>
+    <div class="flex-grow overflow-auto">
+        {{ block "admin-content" . }}{{ end }}
+    </div>
+</div>
+{{ end }}

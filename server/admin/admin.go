@@ -20,7 +20,7 @@ func New(g *echo.Group, db *db.DB) *Group {
 		Group: g,
 		db:    db,
 	}
-	g.GET("/", grp.Home)
+	g.GET("", grp.Home)
 	return grp
 }
 
