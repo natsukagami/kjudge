@@ -1,4 +1,4 @@
 module.exports = {
-  content: ["html/**/*.html"],
+  content: ["html/**/*.html", "html/*.html"],
   whitelist: []
 }
