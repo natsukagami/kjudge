@@ -7,19 +7,19 @@
         <div class="text-lg py-4 pl-4">kjudge Admin Panel</div>
         <nav>
             <a href="/admin">
-                <div class="bg-gray-300 rounded-sm hover:bg-gray-600 m-2 py-2 pl-4">Home</div>
+                <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 pl-4">Home</div>
             </a>
             <a href="/admin/contests">
-                <div class="bg-gray-300 rounded-sm hover:bg-gray-600 m-2 py-2 pl-4">Contests</div>
+                <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 pl-4">Contests</div>
             </a>
             <a href="/admin/users">
-                <div class="bg-gray-300 rounded-sm hover:bg-gray-600 m-2 py-2 pl-4">Users</div>
+                <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 pl-4">Users</div>
             </a>
             <a href="/admin/jobs">
-                <div class="bg-gray-300 rounded-sm hover:bg-gray-600 m-2 py-2 pl-4">Jobs</div>
+                <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 pl-4">Jobs</div>
             </a>
             <a href="/admin/logout">
-                <div class="bg-gray-300 rounded-sm hover:bg-gray-600 m-2 py-2 pl-4">Log Out</div>
+                <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 pl-4">Log Out</div>
             </a>
         </nav>
         {{/* Footer */}}
@@ -30,7 +30,7 @@
             </div>
         </div>
     </div>
-    <div class="flex-grow overflow-auto">
+    <div class="flex-grow overflow-auto border-l pl-4">
         {{ block "admin-content" . }}{{ end }}
     </div>
 </div>
