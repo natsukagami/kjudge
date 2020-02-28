@@ -16,7 +16,8 @@ import (
 //
 // The root template "root" is always prepended at the beginning.
 var templateList = map[string][]string{
-	"admin/home": []string{"admin/root"},
+	"admin/home":     []string{"admin/root"},
+	"admin/contests": []string{"admin/root"},
 }
 
 // From a single template name, resolve the requirement tree into a list of template names.

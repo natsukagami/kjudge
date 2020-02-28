@@ -40,3 +40,12 @@ func GetContestsUnfinished(db db.DBContext) ([]*Contest, error) {
 	}
 	return res, nil
 }
+
+// GetContests returns a list of all contests.
+func GetContests(db db.DBContext) ([]*Contest, error) {
+	var res []*Contest
+	if err := db.Select(&res, "SELECT * FROM contests ORDER BY id DESC"); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return res, nil
+}

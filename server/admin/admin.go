@@ -19,5 +19,7 @@ func New(g *echo.Group, db *db.DB) *Group {
 		db:    db,
 	}
 	g.GET("", grp.Home)
+	g.GET("/contests", grp.ContestsGet)
+	g.POST("/contests", grp.ContestsPost)
 	return grp
 }
