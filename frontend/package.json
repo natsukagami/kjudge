@@ -13,6 +13,7 @@
     "parcel-plugin-purgecss": "^2.1.3",
     "postcss-modules": "^1.5.0",
     "tailwindcss": "^1.2.0",
+    "typeface-muli": "^1.1.3",
     "typescript": "^3.8.2"
   },
   "scripts": {

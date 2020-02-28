@@ -3,3 +3,11 @@
 @tailwind components;
 
 @tailwind utilities;
+
+.overflow-auto {
+    scrollbar-width: thin;
+}
+
+body {
+    font-family: "Muli", sans-serif;
+}

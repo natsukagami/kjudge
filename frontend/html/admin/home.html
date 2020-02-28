@@ -1,113 +1,61 @@
 {{ define "admin-title" }}Home{{ end }}
 
 {{ define "admin-content" }}
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
-<div>Hi</div>
+<div class="py-4 mx-auto text-4xl">Home</div>
+{{/* Contests overview */}}
+<div class="p-2">
+    <div class="text-2xl mx-2 my-4 font-bold">Active Contests</div>
+    <table class="table table-auto w-full">
+        <thead>
+            <tr>
+                <th class="border-b py-1">ID</th>
+                <th class="border-b py-1">Name</th>
+                <th class="border-b py-1">Start Time</th>
+                <th class="border-b py-1">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Contests }}
+            <tr class="border-b">
+                <td>{{.ID}}</td>
+                <td>{{.Name}}</td>
+                <td>{{.StartTime}}</td>
+                <td>{{.ID}}</td>
+            </tr>
+            {{ else }}
+            <tr class="border-b">
+                <td colspan="4" class="py-1 text-center">No contests active.</td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+    <a href="/admin/contests#new">
+        <button class="rounded bg-green-300 hover:bg-green-400 mx-2 mt-4 py-1 px-2">Create a new contest</button>
+    </a>
+</div>
+
+{{/* Queue status */}}
+<div class="p-2">
+    <div class="text-2xl mx-2 my-4 font-bold">Queue Status</div>
+    <table class="table table-auto w-full">
+        <thead>
+            <tr>
+                <th class="font-normal border-b py-1">Compile</th>
+                <th class="font-normal border-b py-1">Run</th>
+                <th class="font-normal border-b py-1">Score</th>
+                <th class="font-normal border-b py-1"><b>Total</b></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {{with .Queue}}
+                <td class="text-center border-b py-1">{{.Compile}}</td>
+                <td class="text-center border-b py-1">{{.Run}}</td>
+                <td class="text-center border-b py-1">{{.Score}}</td>
+                <td class="text-center border-b py-1"><b>{{.Total}}</b></td>
+                {{end}}
+            </tr>
+        </tbody>
+    </table>
+</div>
 {{ end }}
