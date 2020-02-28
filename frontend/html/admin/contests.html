@@ -3,38 +3,7 @@
 {{ define "admin-content" }}
 <div class="py-4 mx-auto text-4xl">Contests</div>
 <div class="p-2">
-    <table class="table table-auto w-full">
-        <thead>
-            <tr>
-                <th class="border-b py-1">ID</th>
-                <th class="border-b py-1">Name</th>
-                <th class="border-b py-1">Start Time</th>
-                <th class="border-b py-1">End Time</th>
-                <th class="border-b py-1">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{ range .Contests }}
-            {{ $link := printf "/admin/contests/%d" (.ID) }}
-            <tr class="border-b">
-                <td>{{.ID}}</td>
-                <td>{{.Name}}</td>
-                <td>{{.StartTime}}</td>
-                <td>{{.EndTime}}</td>
-                <td>
-                    <a href="{{$link}}" title="Edit Contest">[e]</a>
-                    <form method="POST" action="/admin/contests/{{ .ID }}/delete" class="inline">
-                        <input type="submit" title="Delete Contest" class="cursor-pointer" value="[r]">
-                    </form>
-                </td>
-            </tr>
-            {{ else }}
-            <tr class="border-b">
-                <td colspan="4" class="py-1 text-center">No contests.</td>
-            </tr>
-            {{ end }}
-        </tbody>
-    </table>
+    {{ template "contests-table" .Contests }}
 </div>
 
 {{/* New Contest */}}
@@ -44,26 +13,7 @@
     <div class="bg-red-400 rounded border p-4 text-center text-white">{{ .FormError.Error }}</div>
     {{ end }}
     <form method="POST" action="/admin/contests#new" class="border rounded bg-gray-200 p-4">
-        <label for="name" class="text-sm block">Name</label>
-        <input class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="name" type="text"
-            placeholder="Contest #1" value="{{ .Form.Name }}" />
-        <label for="type" class="text-sm block">Contest Type</label>
-        <select class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="type" value="{{ .Form.Type }}">
-            <option value="unweighted">Unweighted <span>[Problem Scores don't matter]</span></option>
-            <option value="weighted">Weighted</option>
-        </select>
-        <label for="start_time" class="text-sm block">Start Time</label>
-        <input class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="start_time" type="datetime-local"
-            placeholder="2020-01-01 00:00:00 +0000 UTC" value="{{ .Form.StartTime }}" />
-        <label for="name" class="text-sm block">End Time</label>
-        <input class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="end_time" type="text"
-            placeholder="2020-01-01 00:00:00 +0000 UTC" value="{{ .Form.EndTime }}" />
-        <div class="mt-2">
-            <input type="submit" class="cursor-pointer border rounded p-2 bg-green-200 hover:bg-green-300 mx-2"
-                value="Submit">
-            <input type="reset" class="cursor-pointer border rounded p-2 bg-red-200 hover:bg-red-300 mx-2"
-                value="Reset">
-        </div>
+        {{ template "contest-inputs" .Form }}
     </form>
 </div>
 {{ end }}
