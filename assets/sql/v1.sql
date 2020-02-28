@@ -9,8 +9,8 @@ INSERT INTO version VALUES ("v1");
 CREATE TABLE contests (
 	id INTEGER PRIMARY KEY NOT NULL,
 	name VARCHAR NOT NULL,
-	start_time VARCHAR NOT NULL,
-	end_time VARCHAR NOT NULL, 
+	start_time DATETIME NOT NULL,
+	end_time DATETIME NOT NULL, 
 	contest_type VARCHAR NOT NULL
 );
 
