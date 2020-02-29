@@ -3,9 +3,21 @@
 <input class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="name" type="text" placeholder="Contest #1"
     value="{{ .Name }}" />
 <label for="type" class="text-sm block">Contest Type</label>
-<select class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="type" value="{{ .Type }}">
-    <option value="unweighted">Unweighted <span>[Problem Scores don't matter]</span></option>
-    <option value="weighted">Weighted</option>
+<select class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="contest_type">
+    {{ if (eq .ContestType "unweighted") }}
+    <option selected value="unweighted">
+        {{ else }}
+    <option value="unweighted">
+        {{ end }}
+        Unweighted <span>[Problem Scores
+            don't
+            matter]</span></option>
+    {{ if (eq .ContestType "weighted") }}
+    <option selected value="weighted">
+        {{ else }}
+    <option value="weighted">
+        {{ end }}
+        Weighted</option>
 </select>
 <label for="start_time" class="text-sm block">Start Time</label>
 <input class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="start_time" type="datetime-local"
