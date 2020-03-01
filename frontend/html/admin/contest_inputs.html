@@ -52,7 +52,7 @@
             <td class="text-center">{{.EndTime}}</td>
             <td class="text-center">
                 <a href="{{$link}}" title="Edit Contest" class="hover:text-blue-600">[e]</a>
-                <form method="POST" action="/admin/contests/{{ .ID }}/delete" class="inline">
+                <form method="POST" action="/admin/contests/{{ .ID }}/delete" class="inline require-confirm">
                     <input type="submit" title="Delete Contest" class="cursor-pointer hover:text-red-600" value="[d]">
                 </form>
             </td>

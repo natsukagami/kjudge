@@ -2,14 +2,6 @@
 
 {{ define "admin-content" }}
 <div class="py-4 mx-auto text-4xl">{{.Name}}</div>
-{{/* Update */}}
-<div class="text-2xl mx-2 my-4 font-bold">Edit</div>
-{{ if .FormError }}
-<div class="bg-red-400 rounded border p-4 text-center text-white">{{ .FormError.Error }}</div>
-{{ end }}
-<form method="POST" action="/admin/contests/{{.Contest.ID}}" class="border rounded bg-gray-200 p-4">
-    {{ template "contest-inputs" .Form }}
-</form>
 
 {{/* Problem List */}}
 <div class="text-2xl mx-2 my-4 font-bold" id="problems">Problems</div>
@@ -21,8 +13,16 @@
 {{ if .ProblemFormError }}
 <div class="bg-red-400 rounded border p-4 text-center text-white">{{ .ProblemFormError.Error }}</div>
 {{ end }}
-<form method="POST" action="/admin/contests/{{.Contest.ID}}/new_problem" class="border rounded bg-gray-200 p-4">
+<form method="POST" action="/admin/contests/{{.Contest.ID}}/add_problem" class="border rounded bg-gray-200 p-4">
     {{ template "problem-inputs" .ProblemForm }}
 </form>
 
+{{/* Update */}}
+<div class="text-2xl mx-2 my-4 font-bold">Edit</div>
+{{ if .FormError }}
+<div class="bg-red-400 rounded border p-4 text-center text-white">{{ .FormError.Error }}</div>
+{{ end }}
+<form method="POST" action="/admin/contests/{{.Contest.ID}}" class="border rounded bg-gray-200 p-4">
+    {{ template "contest-inputs" .Form }}
+</form>
 {{ end }}
