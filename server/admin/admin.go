@@ -19,11 +19,15 @@ func New(g *echo.Group, db *db.DB) *Group {
 		db:    db,
 	}
 	g.GET("", grp.Home)
+	// Contest List
 	g.GET("/contests", grp.ContestsGet)
 	g.POST("/contests", grp.ContestsPost)
+	// Contest Management
 	g.GET("/contests/:id", grp.ContestGet)
 	g.POST("/contests/:id", grp.ContestEdit)
 	g.POST("/contests/:id/delete", grp.ContestDelete)
 	g.POST("/contests/:id/add_problem", grp.ContestAddProblem)
+	// Problem Management
+	g.GET("/problems/:id", grp.ProblemGet)
 	return grp
 }
