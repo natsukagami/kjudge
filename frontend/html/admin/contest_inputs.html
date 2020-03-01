@@ -1,8 +1,8 @@
 {{ define "contest-inputs" }}
 <label for="name" class="text-sm block">Name</label>
-<input class="form-input" name="name" type="text" placeholder="Contest #1" value="{{ .Name }}" />
+<input required class="form-input" name="name" type="text" placeholder="Contest #1" value="{{ .Name }}" />
 <label for="type" class="text-sm block">Contest Type</label>
-<select class="form-input" name="contest_type">
+<select required class="form-input" name="contest_type">
     {{ if (eq .ContestType "unweighted") }}
     <option selected value="unweighted">
         {{ else }}
@@ -19,14 +19,14 @@
         Weighted</option>
 </select>
 <label for="start_time" class="text-sm block">Start Time</label>
-<input class="form-input" name="start_time" type="datetime-local" placeholder="2020-01-01 00:00:00 +0000 UTC"
+<input required class="form-input" name="start_time" type="datetime-local" placeholder="2020-01-01 00:00:00 +0000 UTC"
     value="{{ .StartTime }}" />
 <label for="name" class="text-sm block">End Time</label>
-<input class="form-input" name="end_time" type="text" placeholder="2020-01-01 00:00:00 +0000 UTC"
+<input required class="form-input" name="end_time" type="text" placeholder="2020-01-01 00:00:00 +0000 UTC"
     value="{{ .EndTime }}" />
 <div class="mt-2">
-    <input type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
-    <input type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
+    <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
+    <input required type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
 </div>
 {{ end }}
 
@@ -52,7 +52,8 @@
             <td class="text-center">
                 <a href="{{$link}}" title="Edit Contest" class="hover:text-blue-600">[e]</a>
                 <form method="POST" action="/admin/contests/{{ .ID }}/delete" class="inline require-confirm">
-                    <input type="submit" title="Delete Contest" class="cursor-pointer hover:text-red-600" value="[d]">
+                    <input required type="submit" title="Delete Contest" class="cursor-pointer hover:text-red-600"
+                        value="[d]">
                 </form>
             </td>
         </tr>
