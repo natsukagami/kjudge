@@ -2,6 +2,26 @@
 
 @tailwind components;
 
+/* Utilities classes */
+.subheader {
+    @apply text-xl mx-2 mt-2 mb-4 font-bold;
+}
+
+.form-block {
+    @apply border rounded bg-gray-200 p-4;
+}
+
+.form-input {
+    @apply shadow my-1 p-1 w-2/3 rounded-sm;
+}
+.form-input:focus {
+    @apply shadow-outline;
+}
+
+.form-btn {
+    @apply cursor-pointer border rounded p-2 mx-2;
+}
+
 @tailwind utilities;
 
 .overflow-auto {

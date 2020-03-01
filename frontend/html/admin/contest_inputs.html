@@ -1,9 +1,8 @@
 {{ define "contest-inputs" }}
 <label for="name" class="text-sm block">Name</label>
-<input class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="name" type="text" placeholder="Contest #1"
-    value="{{ .Name }}" />
+<input class="form-input" name="name" type="text" placeholder="Contest #1" value="{{ .Name }}" />
 <label for="type" class="text-sm block">Contest Type</label>
-<select class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="contest_type">
+<select class="form-input" name="contest_type">
     {{ if (eq .ContestType "unweighted") }}
     <option selected value="unweighted">
         {{ else }}
@@ -20,14 +19,14 @@
         Weighted</option>
 </select>
 <label for="start_time" class="text-sm block">Start Time</label>
-<input class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="start_time" type="datetime-local"
-    placeholder="2020-01-01 00:00:00 +0000 UTC" value="{{ .StartTime }}" />
+<input class="form-input" name="start_time" type="datetime-local" placeholder="2020-01-01 00:00:00 +0000 UTC"
+    value="{{ .StartTime }}" />
 <label for="name" class="text-sm block">End Time</label>
-<input class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="end_time" type="text"
-    placeholder="2020-01-01 00:00:00 +0000 UTC" value="{{ .EndTime }}" />
+<input class="form-input" name="end_time" type="text" placeholder="2020-01-01 00:00:00 +0000 UTC"
+    value="{{ .EndTime }}" />
 <div class="mt-2">
-    <input type="submit" class="cursor-pointer border rounded p-2 bg-green-200 hover:bg-green-300 mx-2" value="Submit">
-    <input type="reset" class="cursor-pointer border rounded p-2 bg-red-200 hover:bg-red-300 mx-2" value="Reset">
+    <input type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
+    <input type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
 </div>
 {{ end }}
 

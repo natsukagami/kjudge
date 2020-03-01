@@ -1,0 +1,22 @@
+{{ define "admin-title" }}{{.Problem.Name}}. {{.Problem.DisplayName}} [e]{{ end }}
+
+{{ define "admin-content" }}
+<div class="py-4 mx-auto">
+    {{ $contest_link := printf "/admin/contests/%d" .Contest.ID }}
+    <a class="text-3xl text-gray-600 hover:text-blue-600 cursor-pointer" href="{{$contest_link}}">
+        {{.Contest.Name}}
+    </a>
+    <span>>></span>
+    <span class="text-4xl">{{.Problem.Name}}. {{.Problem.DisplayName}}</span>
+</div>
+
+{{/* Test Management */}}
+uwu
+
+{{/* Edit */}}
+<div class="subheader">Edit</div>
+{{ template "form-error" .EditFormError }}
+<form method="POST" action="/admin/problems/{{.Problem.ID}}" class="form-block">
+    {{ template "problem-inputs" .EditForm }}
+</form>
+{{ end }}

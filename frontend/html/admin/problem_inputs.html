@@ -1,18 +1,17 @@
 {{ define "problem-inputs" }}
 <label for="name" class="text-sm block">#</label>
-<input class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="name" type="text" placeholder="A or 1"
-    value="{{ .Name }}" />
+<input class="form-input" name="name" type="text" placeholder="A or 1" value="{{ .Name }}" />
 <label for="display_name" class="text-sm block">Name</label>
-<input class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="display_name" type="text"
-    placeholder="An Interesting Problem" value="{{ .DisplayName }}">
+<input class="form-input" name="display_name" type="text" placeholder="An Interesting Problem"
+    value="{{ .DisplayName }}">
 <label for="time_limit" class="text-sm block">Time Limit (ms)</label>
-<input class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="time_limit" type="number" min="100"
-    step="100" placeholder="1000" value="{{ .TimeLimit }}">
+<input class="form-input" name="time_limit" type="number" min="100" step="100" placeholder="1000"
+    value="{{ .TimeLimit }}">
 <label for="memory_limit" class="text-sm block">Memory Limit (KBs)</label>
-<input class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="memory_limit" type="number" min="1024"
-    step="1024" placeholder="262144" value="{{ .MemoryLimit }}">
+<input class="form-input" name="memory_limit" type="number" min="1024" step="1024" placeholder="262144"
+    value="{{ .MemoryLimit }}">
 <label for="scoring_mode" class="text-sm block">Scoring Mode</label>
-<select class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="scoring_mode">
+<select class="form-input" name="scoring_mode">
     {{ if (eq .ScoringMode "best") }}
     <option selected value="best">
         {{ else }}
@@ -50,7 +49,7 @@
     </ul>
 </div>
 <label for="penalty_policy" class="text-sm block">Penalty Policy</label>
-<select class="shadow focus:shadow-outline my-1 p-1 w-2/3 rounded-sm" name="penalty_policy">
+<select class="form-input" name="penalty_policy">
     {{ if (eq .PenaltyPolicy "none") }}
     <option selected value="none">
         {{ else }}
@@ -81,8 +80,8 @@
     </ul>
 </div>
 <div class="mt-2">
-    <input type="submit" class="cursor-pointer border rounded p-2 bg-green-200 hover:bg-green-300 mx-2" value="Submit">
-    <input type="reset" class="cursor-pointer border rounded p-2 bg-red-200 hover:bg-red-300 mx-2" value="Reset">
+    <input type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
+    <input type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
 </div>
 {{ end }}
 
