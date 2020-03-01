@@ -31,6 +31,18 @@ func (f *ProblemForm) Bind(p *models.Problem) {
 	p.TimeLimit = f.TimeLimit
 }
 
+// ProblemForm produces an edit form from the problem.
+func ProblemToForm(p *models.Problem) ProblemForm {
+	var f ProblemForm
+	f.DisplayName = p.DisplayName
+	f.MemoryLimit = p.MemoryLimit
+	f.Name = p.Name
+	f.PenaltyPolicy = p.PenaltyPolicy
+	f.ScoringMode = p.ScoringMode
+	f.TimeLimit = p.TimeLimit
+	return f
+}
+
 func (g *Group) getContest(c echo.Context) (*models.Contest, error) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
