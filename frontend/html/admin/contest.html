@@ -4,25 +4,21 @@
 <div class="py-4 mx-auto text-4xl">{{.Name}}</div>
 
 {{/* Problem List */}}
-<div class="text-2xl mx-2 my-4 font-bold" id="problems">Problems</div>
+<div class="subheader" id="problems">Problems</div>
 <div class="p-4">
     {{ template "problem-table" .Problems }}
 </div>
 
 <div class="text-xl mx-2 mt-2 mb-4 font-bold">Add a Problem</div>
-{{ if .ProblemFormError }}
-<div class="bg-red-400 rounded border p-4 text-center text-white">{{ .ProblemFormError.Error }}</div>
-{{ end }}
-<form method="POST" action="/admin/contests/{{.Contest.ID}}/add_problem" class="border rounded bg-gray-200 p-4">
+{{ template "form-error" .ProblemFormError }}
+<form method="POST" action="/admin/contests/{{.Contest.ID}}/add_problem" class="form-block">
     {{ template "problem-inputs" .ProblemForm }}
 </form>
 
 {{/* Update */}}
-<div class="text-2xl mx-2 my-4 font-bold">Edit</div>
-{{ if .FormError }}
-<div class="bg-red-400 rounded border p-4 text-center text-white">{{ .FormError.Error }}</div>
-{{ end }}
-<form method="POST" action="/admin/contests/{{.Contest.ID}}" class="border rounded bg-gray-200 p-4">
+<div class="subheader">Edit</div>
+{{ template "form-error" .FormError }}
+<form method="POST" action="/admin/contests/{{.Contest.ID}}" class="form-block">
     {{ template "contest-inputs" .Form }}
 </form>
 {{ end }}

@@ -12,7 +12,7 @@
     {{ if .FormError }}
     <div class="bg-red-400 rounded border p-4 text-center text-white">{{ .FormError.Error }}</div>
     {{ end }}
-    <form method="POST" action="/admin/contests#new" class="border rounded bg-gray-200 p-4">
+    <form method="POST" action="/admin/contests#new" class="form-block">
         {{ template "contest-inputs" .Form }}
     </form>
 </div>
