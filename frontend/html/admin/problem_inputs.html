@@ -101,17 +101,17 @@
     </thead>
     <tbody>
         {{ range . }}
-        {{ $link := printf "/admin/problems/{{.ID}}" }}
+        {{ $link := printf "/admin/problems/%d" .ID }}
         <tr>
-            <td class="border-b py-1">{{.Name}}</td>
+            <td class="text-center border-b py-1">{{.Name}}</td>
             <td class="border-b py-1">{{.DisplayName}}</td>
-            <td class="border-b py-1">{{.TimeLimit}}</td>
-            <td class="border-b py-1">{{.MemoryLimit}}</td>
-            <td class="border-b py-1">{{.ScoringMode}}</td>
-            <td class="border-b py-1">{{.PenaltyPolicy}}</td>
-            <td class="border-b py-1">
+            <td class="text-center border-b py-1">{{.TimeLimit}}</td>
+            <td class="text-center border-b py-1">{{.MemoryLimit}}</td>
+            <td class="text-center border-b py-1">{{.ScoringMode}}</td>
+            <td class="text-center border-b py-1">{{.PenaltyPolicy}}</td>
+            <td class="text-center border-b py-1">
                 <a class="hover:text-blue-600 cursor-pointer" href="{{$link}}" title="Edit problem">[e]</a>
-                <form class="inline" action="{{$link}}/delete" method="POST">
+                <form class="inline require-confirm" action="{{$link}}/delete" method="POST">
                     <input type="submit" class="hover:text-red-600 cursor-pointer" title="Delete problem" value="[d]">
                 </form>
             </td>

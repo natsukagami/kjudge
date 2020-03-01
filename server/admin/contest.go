@@ -11,6 +11,26 @@ import (
 	"github.com/pkg/errors"
 )
 
+// ProblemForm is a form for creating/updating a problem.
+type ProblemForm struct {
+	DisplayName   string               `form:"display_name"`
+	MemoryLimit   int                  `form:"memory_limit"`
+	Name          string               `form:"name"`
+	PenaltyPolicy models.PenaltyPolicy `form:"penalty_policy"`
+	ScoringMode   models.ScoringMode   `form:"scoring_mode"`
+	TimeLimit     int                  `form:"time_limit"`
+}
+
+// Bind binds the form's content into the Problem.
+func (f *ProblemForm) Bind(p *models.Problem) {
+	p.DisplayName = f.DisplayName
+	p.MemoryLimit = f.MemoryLimit
+	p.Name = f.Name
+	p.PenaltyPolicy = f.PenaltyPolicy
+	p.ScoringMode = f.ScoringMode
+	p.TimeLimit = f.TimeLimit
+}
+
 func (g *Group) getContest(c echo.Context) (*models.Contest, error) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -29,9 +49,12 @@ func (g *Group) getContest(c echo.Context) (*models.Contest, error) {
 // ContestCtx is the context for rendering admin/contest.
 type ContestCtx struct {
 	*models.Contest
-
 	FormError error
-	Form      *ContestForm
+	Form      ContestForm
+
+	Problems         []*models.Problem
+	ProblemForm      ProblemForm
+	ProblemFormError error
 }
 
 // ContestGet implements GET /admin/contest/:id
@@ -40,13 +63,18 @@ func (g *Group) ContestGet(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	ctx := &ContestCtx{Contest: contest, Form: ContestToForm(contest)}
+	ctx := &ContestCtx{Contest: contest, Form: *ContestToForm(contest)}
 	return g.contestGetRender(ctx, c)
 }
 
 func (g *Group) contestGetRender(ctx *ContestCtx, c echo.Context) error {
+	problems, err := models.GetContestProblems(g.db, ctx.Contest.ID)
+	if err != nil {
+		return err
+	}
+	ctx.Problems = problems
 	code := http.StatusOK
-	if ctx.FormError != nil {
+	if ctx.FormError != nil || ctx.ProblemFormError != nil {
 		code = http.StatusBadRequest
 	}
 	return c.Render(code, "admin/contest", ctx)
@@ -77,7 +105,28 @@ func (g *Group) ContestEdit(c echo.Context) error {
 	}
 	form.Bind(contest)
 	if err := contest.Write(g.db); err != nil {
-		return g.contestGetRender(&ContestCtx{Contest: &original, Form: &form, FormError: err}, c)
+		return g.contestGetRender(&ContestCtx{Contest: &original, Form: form, FormError: err}, c)
 	}
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/contests/%d", contest.ID))
+}
+
+// ContestAddProblem implements POST /admin/contest/:id/add_problem
+func (g *Group) ContestAddProblem(c echo.Context) error {
+	contest, err := g.getContest(c)
+	if err != nil {
+		return err
+	}
+	var (
+		form    ProblemForm
+		problem models.Problem
+	)
+	if err := c.Bind(&form); err != nil {
+		return err
+	}
+	problem.ContestID = contest.ID
+	form.Bind(&problem)
+	if err := problem.Write(g.db); err != nil {
+		return g.contestGetRender(&ContestCtx{Contest: contest, ProblemForm: form, ProblemFormError: err}, c)
+	}
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d", problem.ID))
 }

@@ -24,5 +24,6 @@ func New(g *echo.Group, db *db.DB) *Group {
 	g.GET("/contests/:id", grp.ContestGet)
 	g.POST("/contests/:id", grp.ContestEdit)
 	g.POST("/contests/:id/delete", grp.ContestDelete)
+	g.POST("/contests/:id/add_problem", grp.ContestAddProblem)
 	return grp
 }
