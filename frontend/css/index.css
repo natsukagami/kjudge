@@ -4,7 +4,7 @@
 
 /* Utilities classes */
 .subheader {
-    @apply text-xl mx-2 mt-2 mb-4 font-bold;
+    @apply text-xl mx-2 mt-4 mb-4 font-bold;
 }
 
 .form-block {

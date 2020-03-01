@@ -29,5 +29,7 @@ func New(g *echo.Group, db *db.DB) *Group {
 	g.POST("/contests/:id/add_problem", grp.ContestAddProblem)
 	// Problem Management
 	g.GET("/problems/:id", grp.ProblemGet)
+	g.POST("/problems/:id", grp.ProblemEdit)
+	g.POST("/problems/:id/add_test_group", grp.ProblemAddTestGroup)
 	return grp
 }

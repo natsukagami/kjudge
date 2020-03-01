@@ -11,10 +11,24 @@
 </div>
 
 {{/* Test Management */}}
-uwu
+<div class="subheader">Test Groups</div>
+<div class="p-2">
+    {{ template "test-group-table" .TestGroups }}
+</div>
+<div class="text-lg mx-2 my-4 font-bold">New Test Group</div>
+{{ template "form-error" .TestGroupFormError }}
+<form method="POST" action="/admin/problems/{{.Problem.ID}}/add_test_group" class="form-block">
+    {{ template "test-group-inputs" .TestGroupForm }}
+</form>
 
 {{/* Edit */}}
-<div class="subheader">Edit</div>
+<div class="subheader">
+    Edit
+    <span class="ml-4 text-gray-600 text-sm">
+        <b>Note: </b>
+        Changing the problem's scoring scheme requires re-scoring the entire list of submissions.
+    </span>
+</div>
 {{ template "form-error" .EditFormError }}
 <form method="POST" action="/admin/problems/{{.Problem.ID}}" class="form-block">
     {{ template "problem-inputs" .EditForm }}
