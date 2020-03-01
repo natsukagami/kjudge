@@ -1,17 +1,17 @@
 {{ define "problem-inputs" }}
 <label for="name" class="text-sm block">#</label>
-<input class="form-input" name="name" type="text" placeholder="A or 1" value="{{ .Name }}" />
+<input required class="form-input" name="name" type="text" placeholder="A or 1" value="{{ .Name }}" />
 <label for="display_name" class="text-sm block">Name</label>
-<input class="form-input" name="display_name" type="text" placeholder="An Interesting Problem"
+<input required class="form-input" name="display_name" type="text" placeholder="An Interesting Problem"
     value="{{ .DisplayName }}">
 <label for="time_limit" class="text-sm block">Time Limit (ms)</label>
-<input class="form-input" name="time_limit" type="number" min="100" step="100" placeholder="1000"
+<input required class="form-input" name="time_limit" type="number" min="100" step="100" placeholder="1000"
     value="{{ .TimeLimit }}">
 <label for="memory_limit" class="text-sm block">Memory Limit (KBs)</label>
-<input class="form-input" name="memory_limit" type="number" min="1024" step="1024" placeholder="262144"
+<input required class="form-input" name="memory_limit" type="number" min="1024" step="1024" placeholder="262144"
     value="{{ .MemoryLimit }}">
 <label for="scoring_mode" class="text-sm block">Scoring Mode</label>
-<select class="form-input" name="scoring_mode">
+<select required class="form-input" name="scoring_mode">
     {{ if (eq .ScoringMode "best") }}
     <option selected value="best">
         {{ else }}
@@ -49,7 +49,7 @@
     </ul>
 </div>
 <label for="penalty_policy" class="text-sm block">Penalty Policy</label>
-<select class="form-input" name="penalty_policy">
+<select required class="form-input" name="penalty_policy">
     {{ if (eq .PenaltyPolicy "none") }}
     <option selected value="none">
         {{ else }}
@@ -80,8 +80,8 @@
     </ul>
 </div>
 <div class="mt-2">
-    <input type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
-    <input type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
+    <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
+    <input required type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
 </div>
 {{ end }}
 
@@ -111,7 +111,8 @@
             <td class="text-center border-b py-1">
                 <a class="hover:text-blue-600 cursor-pointer" href="{{$link}}" title="Edit problem">[e]</a>
                 <form class="inline require-confirm" action="{{$link}}/delete" method="POST">
-                    <input type="submit" class="hover:text-red-600 cursor-pointer" title="Delete problem" value="[d]">
+                    <input required type="submit" class="hover:text-red-600 cursor-pointer" title="Delete problem"
+                        value="[d]">
                 </form>
             </td>
         </tr>

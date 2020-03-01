@@ -1,6 +1,8 @@
 package models
 
 import (
+	"log"
+
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models/verify"
 	"github.com/jmoiron/sqlx"
@@ -15,6 +17,16 @@ type TestGroupWithTests struct {
 
 // GetProblemTests collects test groups and tests from a problem.
 func GetProblemTests(db db.DBContext, problemID int) ([]*TestGroupWithTests, error) {
+	return getProblemTests(db, problemID, "*")
+}
+
+// GetProblemTestsMeta is like GetProblemTests, but inputs and outputs are not included.
+func GetProblemTestsMeta(db db.DBContext, problemID int) ([]*TestGroupWithTests, error) {
+	return getProblemTests(db, problemID, "id, name, test_group_id")
+}
+
+// GetProblemTests but allow us to omit rows (input, output)
+func getProblemTests(db db.DBContext, problemID int, rows string) ([]*TestGroupWithTests, error) {
 	testGroups, err := GetProblemTestGroups(db, problemID)
 	if err != nil {
 		return nil, err
@@ -28,11 +40,16 @@ func GetProblemTests(db db.DBContext, problemID int) ([]*TestGroupWithTests, err
 		IDs = append(IDs, tg.ID)
 		tgMap[tg.ID] = &TestGroupWithTests{TestGroup: tg}
 	}
+	if len(IDs) == 0 {
+		// Empty
+		return nil, nil
+	}
 	// Query the tests
-	query, params, err := sqlx.In("SELECT * FROM tests WHERE test_group_id IN ?", IDs)
+	query, params, err := sqlx.In("SELECT "+rows+" FROM tests WHERE test_group_id IN (?)", IDs)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+	log.Println(query, params)
 	var tests []*Test
 	if err := db.Select(&tests, query, params...); err != nil {
 		return nil, errors.WithStack(err)
