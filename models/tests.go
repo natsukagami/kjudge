@@ -1,7 +1,6 @@
 package models
 
 import (
-
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models/verify"
 	"github.com/jmoiron/sqlx"

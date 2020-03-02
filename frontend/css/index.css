@@ -22,6 +22,10 @@
     @apply cursor-pointer border rounded p-2 mx-2;
 }
 
+.min-w-fit-5 {
+    min-width: 14rem;
+}
+
 @tailwind utilities;
 
 .overflow-auto {
