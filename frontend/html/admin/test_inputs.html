@@ -1,64 +1,61 @@
-{{ define "test-group-table" }}
-<table class="table table-auto w-full">
-    <thead>
-        <tr>
-            <th class="py-1 border-b"><span id="toggle-all-tests" class="cursor-pointer hover:text-blue-600">[+]</span>
-            </th>
-            <th class="py-1 border-b">Name</th>
-            <th class="py-1 border-b"># Tests</th>
-            <th class="py-1 border-b">Score</th>
-            <th class="py-1 border-b">Time Limit</th>
-            <th class="py-1 border-b">Memory Limit</th>
-            <th class="py-1 border-b">Scoring Mode</th>
-            <th class="py-1 border-b">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {{ range . }}
-        {{ $link := printf "/admin/test_groups/%d" .ID }}
-        <tr class="{{ if lt .Score 0.0 }} text-gray-600 {{end}}">
-            <td class="py-1 border-b text-center">
-                <span class="toggle-tests hover:text-blue-600 cursor-pointer" title="Show tests"
-                    data-test-group="{{.ID}}">[+]</span>
-            </td>
-            <td class="py-1 border-b">
-                {{.Name}}
-            </td>
-            <td class="text-center py-1 border-b">
-                {{ len .Tests }}
-            </td>
-            <td class="text-center py-1 border-b">
-                {{if lt .Score 0.0}}hidden{{else}}{{.Score}}{{end}}
-            </td>
-            <td class="text-center py-1 border-b">
-                {{if .TimeLimit.Valid}}{{.TimeLimit.Int64}}{{else}}-{{end}}
-            </td>
-            <td class="text-center py-1 border-b">
-                {{if .MemoryLimit.Valid}}{{.MemoryLimit.Int64}}{{else}}-{{end}}
-            </td>
-            <td class="text-center py-1 border-b">{{.ScoringMode}}</td>
-            <td class="text-center py-1 border-b">
-                <a href="{{ $link }}" class="hover:text-blue-600 cursor-pointer" title="Edit Test Group">[e]</a>
-                <form class="inline require-confirm" method="POST" action="{{$link}}/delete">
-                    <input class="cursor-pointer hover:text-red-600" value="[d]" type="submit"
-                        title="Delete Test Group">
-                </form>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="8">
-                <div class="tests-list" data-test-group="{{.ID}}" style="max-height: 0; overflow-y: hidden;">
-                    <div class="p-2">{{ template "test-table" .Tests }}</div>
-                </div>
-            </td>
-        </tr>
-        {{ else }}
-        <tr>
-            <td class="border-b py-1 text-center" colspan="6">No Test Groups</td>
-        </tr>
-        {{ end }}
-    </tbody>
-</table>
+{{ define "test-upload-single" }}
+<div class="subheader">Upload a single test</div>
+<form method="POST" action="/admin/problems/{{.ID}}/upload_single" class="form-block">
+    <label class="text-sm block" for="name">Test name</label>
+    <input class="form-input" type="text" required name="name" placeholder="01">
+    <div class="p-1 text-sm text-gray-600">
+        The test name needs to be unique inside its test group.
+    </div>
+
+    <label class="text-sm block" for="input">Input file</label>
+    <input class="form-input" type="file" required name="input">
+
+    <label class="text-sm block" for="output">Output file</label>
+    <input class="form-input" type="file" required name="output">
+
+    <div class="mt-2">
+        <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
+        <input required type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
+    </div>
+</form>
+{{ end }}
+
+{{ define "test-upload-multiple" }}
+<div class="subheader">Upload multiple tests</div>
+<form method="POST" action="/admin/problems/{{.ID}}/upload_multiple" class="form-block">
+    <label class="text-sm block" for="file">Test Archive (.zip)</label>
+    <input class="form-input" type="file" accept=".zip" required name="file">
+
+    <div class="grid grid-cols-2">
+        <div class="pr-2">
+            <label class="text-sm block" for="input">Input pattern</label>
+            <input class="form-input w-full font-mono" type="text" required name="input" placeholder="input/?.txt">
+        </div>
+        <div class="pl-2">
+            <label class="text-sm block" for="input">Output pattern</label>
+            <input class="form-input w-full font-mono" type="text" required name="output" placeholder="output/?.txt">
+        </div>
+    </div>
+
+    <div class="py-1 text-sm text-gray-600">
+        kjudge will unzip the given file, look for pairs of files with the matching input/output patterns,
+        and add them as a single test with name given as the filling
+        <span class="font-mono">?</span> part.
+        <p>For example,
+            <span class="font-mono">input/a1.txt</span> and
+            <span class="font-mono">output/a1.txt</span> would create a test
+            named
+            <span class="font-mono">01</span>.</p>
+    </div>
+
+    <input id="override-{{.ID}}" type="checkbox" name="override">
+    <label for="override-{{.ID}}">Delete all tests inside the test group before adding.</label>
+
+    <div class="mt-2">
+        <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
+        <input required type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
+    </div>
+</form>
 {{ end }}
 
 {{ define "test-table" }}
@@ -76,63 +73,5 @@
     {{ else }}
     <div class="text-center p-1 col-span-3">No tests</div>
     {{ end }}
-</div>
-{{ end }}
-
-{{ define "test-group-inputs" }}
-<label for="name" class="text-sm block">Name</label>
-<input class="form-input" type="text" name="name" placeholder="main" required value="{{ .Name }}">
-<label for="score" class="text-sm block">Score</label>
-<input class="form-input" type="number" name="score" placeholder="100" min="-1" required value="{{ .Score }}">
-<div class="p-1 text-sm text-gray-600">
-    <ul class="list-disc list-inside">
-        <li>A value of <b>0</b> makes the test group have no value, but still displayed. Good for example tests.</li>
-        <li>A <b>negative</b> value makes the test group have no value <b>and</b> hidden from the contestant.</li>
-    </ul>
-    You would normally use a negative score test group to pre-run main (vs. pre-tests) tests, like on Codeforces.
-    The score can then be updated to a positive value later on.
-</div>
-<label for="scoring_mode" class="text-sm block">Scoring Mode</label>
-<select name="scoring_mode" class="form-input" required>
-    {{ if eq .ScoringMode "sum" }}
-    <option selected value="sum">
-        {{ else }}
-    <option value="sum">
-        {{ end }}
-        Sum
-    </option>
-    {{ if eq .ScoringMode "min" }}
-    <option selected value="min">
-        {{ else }}
-    <option value="min">
-        {{ end}}
-        Min</option>
-    {{ if eq .ScoringMode "product" }}
-    <option selected value="product">
-        {{ else }}
-    <option value="product">
-        {{ end }}
-        Product
-    </option>
-</select>
-<div class="p-1 text-sm text-gray-600">
-    <p>TestScoringMode determines how the score of each test in the group adds up to the total of the group.</p>
-    The schemes are:
-    <ul class="list-inside list-disc">
-        <li>Sum: Each test has an equal weight and the score of the group is (sum of test scores / # of tests) * (group
-            score)</li>
-        <li>Min: The score of the group = min(score of each test) * (group score)</li>
-        <li>Product: Score of the group = product(score of each test) * (group score)</li>
-    </ul>
-</div>
-<label for="time_limit" class="text-sm block">Time Limit (ms)</label>
-<input class="form-input" type="number" min="100" step="100" value="{{.TimeLimit}}">
-<div class="p-1 text-sm text-gray-600">Leave blank to use the problem's time limit.</div>
-<label for="memory_limit" class="text-sm block">Memory Limit (KBs)</label>
-<input class="form-input" type="number" min="1024" step="1024" value="{{.MemoryLimit}}">
-<div class="p-1 text-sm text-gray-600">Leave blank to use the problem's memory limit.</div>
-<div class="mt-2">
-    <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
-    <input required type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
 </div>
 {{ end }}

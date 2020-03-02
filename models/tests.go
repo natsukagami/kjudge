@@ -1,7 +1,6 @@
 package models
 
 import (
-	"log"
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models/verify"
@@ -45,11 +44,10 @@ func getProblemTests(db db.DBContext, problemID int, rows string) ([]*TestGroupW
 		return nil, nil
 	}
 	// Query the tests
-	query, params, err := sqlx.In("SELECT "+rows+" FROM tests WHERE test_group_id IN (?)", IDs)
+	query, params, err := sqlx.In("SELECT "+rows+" FROM tests WHERE test_group_id IN (?) ORDER BY name", IDs)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	log.Println(query, params)
 	var tests []*Test
 	if err := db.Select(&tests, query, params...); err != nil {
 		return nil, errors.WithStack(err)
@@ -60,8 +58,8 @@ func getProblemTests(db db.DBContext, problemID int, rows string) ([]*TestGroupW
 	}
 	// Collect the map into a slice.
 	var res []*TestGroupWithTests
-	for _, tg := range tgMap {
-		res = append(res, tg)
+	for _, tg := range testGroups {
+		res = append(res, tgMap[tg.ID])
 	}
 	return res, nil
 }
