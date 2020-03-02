@@ -1,6 +1,6 @@
 {{ define "test-upload-single" }}
 <div class="subheader">Upload a single test</div>
-<form method="POST" action="/admin/problems/{{.ID}}/upload_single" class="form-block">
+<form method="POST" action="/admin/test_groups/{{.ID}}/upload_single" enctype="multipart/form-data" class="form-block">
     <label class="text-sm block" for="name">Test name</label>
     <input class="form-input" type="text" required name="name" placeholder="01">
     <div class="p-1 text-sm text-gray-600">
@@ -22,7 +22,8 @@
 
 {{ define "test-upload-multiple" }}
 <div class="subheader">Upload multiple tests</div>
-<form method="POST" action="/admin/problems/{{.ID}}/upload_multiple" class="form-block">
+<form method="POST" action="/admin/test_groups/{{.ID}}/upload_multiple" enctype="multipart/form-data"
+    class="form-block">
     <label class="text-sm block" for="file">Test Archive (.zip)</label>
     <input class="form-input" type="file" accept=".zip" required name="file">
 
@@ -45,10 +46,10 @@
             <span class="font-mono">input/a1.txt</span> and
             <span class="font-mono">output/a1.txt</span> would create a test
             named
-            <span class="font-mono">01</span>.</p>
+            <span class="font-mono">a1</span>.</p>
     </div>
 
-    <input id="override-{{.ID}}" type="checkbox" name="override">
+    <input id="override-{{.ID}}" type="checkbox" name="override" value="true">
     <label for="override-{{.ID}}">Delete all tests inside the test group before adding.</label>
 
     <div class="mt-2">
@@ -59,19 +60,21 @@
 {{ end }}
 
 {{ define "test-table" }}
-<div class="grid grid-cols-3 gap-4">
+<div class="flex flex-row flex-wrap items-start justify-around">
     {{ range . }}
     {{ $link := printf "/admin/tests/%d" .ID }}
-    <div class="p-1 rounded bg-gray-200">
-        <a href="{{$link}}/input" class="cursor-pointer hover:text-green-600 my-1" title="Get the test's input">[i]</a>
-        <a href="{{$link}}/output" class="cursor-pointer hover:text-green-600 my-1"
-            title="Get the test's output">[o]</a>
-        <form class="inline require-confirm" method="POST" action="{{$link}}/delete">
-            <input class="cursor-pointer hover:text-red-600" value="[d]" title="Submit" title="Delete Test">
-        </form>
+    <div class="min-w-fit-5 m-1 text-sm font-mono rounded bg-gray-200 flex flex-row justify-between items-center p-2">
+        <div class="mx-1 px-1 bg-gray-400">{{.Name}}</div>
+        <div class="mx-1">
+            <a href="{{$link}}/input" class="cursor-pointer hover:text-green-600" title="Get the test's input">[i]</a>
+            <a href="{{$link}}/output" class="cursor-pointer hover:text-green-600" title="Get the test's output">[o]</a>
+            <form class="inline require-confirm" method="POST" action="{{$link}}/delete">
+                <input class="cursor-pointer hover:text-red-600" value="[d]" type="submit" title="Delete Test">
+            </form>
+        </div>
     </div>
     {{ else }}
-    <div class="text-center p-1 col-span-3">No tests</div>
+    <div class="text-center p-1 col-span-4">No tests</div>
     {{ end }}
 </div>
 {{ end }}
