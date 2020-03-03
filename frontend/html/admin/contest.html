@@ -1,0 +1,24 @@
+{{ define "admin-title" }}{{ .Name }} [e]{{ end }}
+
+{{ define "admin-content" }}
+<div class="py-4 mx-auto text-4xl">{{.Name}}</div>
+
+{{/* Problem List */}}
+<div class="subheader" id="problems">Problems</div>
+<div class="p-4">
+    {{ template "problem-table" .Problems }}
+</div>
+
+<div class="text-xl mx-2 mt-2 mb-4 font-bold">Add a Problem</div>
+{{ template "form-error" .ProblemFormError }}
+<form method="POST" action="/admin/contests/{{.Contest.ID}}/add_problem" class="form-block">
+    {{ template "problem-inputs" .ProblemForm }}
+</form>
+
+{{/* Update */}}
+<div class="subheader">Edit</div>
+{{ template "form-error" .FormError }}
+<form method="POST" action="/admin/contests/{{.Contest.ID}}" class="form-block">
+    {{ template "contest-inputs" .Form }}
+</form>
+{{ end }}

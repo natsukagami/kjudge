@@ -9,8 +9,8 @@ INSERT INTO version VALUES ("v1");
 CREATE TABLE contests (
 	id INTEGER PRIMARY KEY NOT NULL,
 	name VARCHAR NOT NULL,
-	start_time VARCHAR NOT NULL,
-	end_time VARCHAR NOT NULL, 
+	start_time DATETIME NOT NULL,
+	end_time DATETIME NOT NULL, 
 	contest_type VARCHAR NOT NULL
 );
 
@@ -127,6 +127,13 @@ CREATE TABLE files (
     problem_id INTEGER NOT NULL,
     filename VARCHAR NOT NULL,
     content BLOB NOT NULL,
+    public INTEGER NOT NULL,
 
-    FOREIGN KEY (problem_id) REFERENCES problems(id)
+    UNIQUE(problem_id, filename),
+    FOREIGN KEY (problem_id) REFERENCES problems(id) ON DELETE CASCADE
+);
+
+-- Configurations
+CREATE TABLE config (
+    session_key BLOB NOT NULL
 );

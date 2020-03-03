@@ -1,0 +1,126 @@
+{{ define "problem-inputs" }}
+<label for="name" class="text-sm block">#</label>
+<input required class="form-input" name="name" type="text" placeholder="A or 1" value="{{ .Name }}" />
+<label for="display_name" class="text-sm block">Name</label>
+<input required class="form-input" name="display_name" type="text" placeholder="An Interesting Problem"
+    value="{{ .DisplayName }}">
+<label for="time_limit" class="text-sm block">Time Limit (ms)</label>
+<input required class="form-input" name="time_limit" type="number" min="100" step="100" placeholder="1000"
+    value="{{ .TimeLimit }}">
+<label for="memory_limit" class="text-sm block">Memory Limit (KBs)</label>
+<input required class="form-input" name="memory_limit" type="number" min="1024" step="1024" placeholder="262144"
+    value="{{ .MemoryLimit }}">
+<label for="scoring_mode" class="text-sm block">Scoring Mode</label>
+<select required class="form-input" name="scoring_mode">
+    {{ if (eq .ScoringMode "best") }}
+    <option selected value="best">
+        {{ else }}
+    <option value="best">
+        {{ end }}
+        Best <span>[Highest score, highest penalty]</span></option>
+    {{ if (eq .ScoringMode "once") }}
+    <option selected value="once">
+        {{ else }}
+    <option value="once">
+        {{ end }}
+        Once <span>[First compiling submission]</span></option>
+    {{ if (eq .ScoringMode "last") }}
+    <option selected value="last">
+        {{ else }}
+    <option value="last">
+        {{ end }}
+        Last submission</option>
+    {{ if (eq .ScoringMode "decay") }}
+    <option selected value="decay">
+        {{ else }}
+    <option value="decay">
+        {{ end }}
+        Decay Mode</option>
+</select>
+<div class="p-1 text-sm text-gray-600">
+    There are:
+    <ul class="list-inside list-disc">
+        <li>Best: The submission with the highest score is chosen. If on a tie, choose the one with largest penalty.
+        </li>
+        <li>Once: The first (successfully compiled) submission is the best one.</li>
+        <li>Last: The last submission is the best one.</li>
+        <li>Decay: The last submission is the best one. The score is modified by the number of submissions before it
+            (0.1 * count), and the time passed (0.7 * time passed in %), to a minimum of 0.3 times the original.</li>
+    </ul>
+</div>
+<label for="penalty_policy" class="text-sm block">Penalty Policy</label>
+<select required class="form-input" name="penalty_policy">
+    {{ if (eq .PenaltyPolicy "none") }}
+    <option selected value="none">
+        {{ else }}
+    <option value="none">
+        {{ end }}
+        None</option>
+    {{ if (eq .PenaltyPolicy "submit_time") }}
+    <option selected value="submit_time">
+        {{ else }}
+    <option value="submit_time">
+        {{ end }}
+        Submission Time</option>
+    {{ if (eq .PenaltyPolicy "icpc") }}
+    <option selected value="icpc">
+        {{ else }}
+    <option value="icpc">
+        {{ end }}
+        ICPC-style</option>
+</select>
+<div class="p-1 text-sm text-gray-600">
+    There are:
+    <ul class="list-inside list-disc">
+        <li>None: No penalties at all.
+        </li>
+        <li>Submission time: The number of minutes (rounded up) from the start of the contest, of the submission.
+        </li>
+        <li>ICPC-style: Submission time + 20 * number of failed submissions</li>
+    </ul>
+</div>
+<div class="mt-2">
+    <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
+    <input required type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
+</div>
+{{ end }}
+
+{{ define "problem-table" }}
+<table class="table table-auto w-full">
+    <thead>
+        <tr>
+            <th class="py-2 border-b">#</th>
+            <th class="py-2 border-b">Name</th>
+            <th class="py-2 border-b">TimeLimit (ms)</th>
+            <th class="py-2 border-b">Memory Limit (KBs)</th>
+            <th class="py-2 border-b">Scoring Mode</th>
+            <th class="py-2 border-b">Penalty Policy</th>
+            <th class="py-2 border-b">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range . }}
+        {{ $link := printf "/admin/problems/%d" .ID }}
+        <tr>
+            <td class="text-center border-b py-1">{{.Name}}</td>
+            <td class="border-b py-1">{{.DisplayName}}</td>
+            <td class="text-center border-b py-1">{{.TimeLimit}}</td>
+            <td class="text-center border-b py-1">{{.MemoryLimit}}</td>
+            <td class="text-center border-b py-1">{{.ScoringMode}}</td>
+            <td class="text-center border-b py-1">{{.PenaltyPolicy}}</td>
+            <td class="text-center border-b py-1">
+                <a class="hover:text-blue-600 cursor-pointer" href="{{$link}}" title="Edit problem">[e]</a>
+                <form class="inline require-confirm" action="{{$link}}/delete" method="POST">
+                    <input required type="submit" class="hover:text-red-600 cursor-pointer" title="Delete problem"
+                        value="[d]">
+                </form>
+            </td>
+        </tr>
+        {{ else }}
+        <tr>
+            <td colspan="7" class="py-1 border-b text-center">No problems</td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+{{ end }}

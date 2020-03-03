@@ -1,0 +1,17 @@
+{{ define "admin-title" }}Contests{{ end }}
+
+{{ define "admin-content" }}
+<div class="py-4 mx-auto text-4xl">Contests</div>
+<div class="p-2">
+    {{ template "contests-table" .Contests }}
+</div>
+
+{{/* New Contest */}}
+<div class="p-2" id="new">
+    <div class="text-2xl mx-2 my-4 font-bold">New Contest</div>
+    {{ template "form-error" .FormError }}
+    <form method="POST" action="/admin/contests#new" class="form-block">
+        {{ template "contest-inputs" .Form }}
+    </form>
+</div>
+{{ end }}

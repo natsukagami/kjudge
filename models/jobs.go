@@ -111,3 +111,39 @@ func BatchInsertJobs(db db.DBContext, jobs ...*Job) error {
 	}
 	return nil
 }
+
+// QueueOverview gives overview information about the queue of jobs.
+type QueueOverview struct {
+	Compile int
+	Run     int
+	Score   int
+}
+
+// Total returns the sum of all queue counts.
+func (q *QueueOverview) Total() int {
+	return q.Compile + q.Run + q.Score
+}
+
+// GetQueueOverview gets the current queue overview.
+func GetQueueOverview(db db.DBContext) (*QueueOverview, error) {
+	type Count struct {
+		Count int     `db:"count"`
+		Type  JobType `db:"type"`
+	}
+	var rows []*Count
+	if err := db.Select(&rows, "SELECT COUNT(id) AS \"count\", type FROM jobs GROUP BY type"); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	var q QueueOverview
+	for _, row := range rows {
+		switch row.Type {
+		case JobTypeCompile:
+			q.Compile = row.Count
+		case JobTypeRun:
+			q.Run = row.Count
+		case JobTypeScore:
+			q.Score = row.Count
+		}
+	}
+	return &q, nil
+}

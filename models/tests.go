@@ -15,6 +15,16 @@ type TestGroupWithTests struct {
 
 // GetProblemTests collects test groups and tests from a problem.
 func GetProblemTests(db db.DBContext, problemID int) ([]*TestGroupWithTests, error) {
+	return getProblemTests(db, problemID, "*")
+}
+
+// GetProblemTestsMeta is like GetProblemTests, but inputs and outputs are not included.
+func GetProblemTestsMeta(db db.DBContext, problemID int) ([]*TestGroupWithTests, error) {
+	return getProblemTests(db, problemID, "id, name, test_group_id")
+}
+
+// GetProblemTests but allow us to omit rows (input, output)
+func getProblemTests(db db.DBContext, problemID int, rows string) ([]*TestGroupWithTests, error) {
 	testGroups, err := GetProblemTestGroups(db, problemID)
 	if err != nil {
 		return nil, err
@@ -28,8 +38,12 @@ func GetProblemTests(db db.DBContext, problemID int) ([]*TestGroupWithTests, err
 		IDs = append(IDs, tg.ID)
 		tgMap[tg.ID] = &TestGroupWithTests{TestGroup: tg}
 	}
+	if len(IDs) == 0 {
+		// Empty
+		return nil, nil
+	}
 	// Query the tests
-	query, params, err := sqlx.In("SELECT * FROM tests WHERE test_group_id IN ?", IDs)
+	query, params, err := sqlx.In("SELECT "+rows+" FROM tests WHERE test_group_id IN (?) ORDER BY name", IDs)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -43,8 +57,8 @@ func GetProblemTests(db db.DBContext, problemID int) ([]*TestGroupWithTests, err
 	}
 	// Collect the map into a slice.
 	var res []*TestGroupWithTests
-	for _, tg := range tgMap {
-		res = append(res, tg)
+	for _, tg := range testGroups {
+		res = append(res, tgMap[tg.ID])
 	}
 	return res, nil
 }
