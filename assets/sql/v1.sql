@@ -127,7 +127,9 @@ CREATE TABLE files (
     problem_id INTEGER NOT NULL,
     filename VARCHAR NOT NULL,
     content BLOB NOT NULL,
+    public INTEGER NOT NULL,
 
+    UNIQUE(problem_id, filename),
     FOREIGN KEY (problem_id) REFERENCES problems(id)
 );
 

@@ -1,5 +1,25 @@
 {{ define "admin-title" }}{{.Problem.Name}}. {{.Problem.DisplayName}} [e]{{ end }}
 
+{{ define "admin-nav" }}
+<nav>
+    <a href="#test-groups">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Test Groups</div>
+    </a>
+    <a href="#new-test-group">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-8 pl-4">New Test Group</div>
+    </a>
+    <a href="#files">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Files</div>
+    </a>
+    <a href="#new-file">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-8 pl-4">New File</div>
+    </a>
+    <a href="#edit">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Edit Contest</div>
+    </a>
+</nav>
+{{ end }}
+
 {{ define "admin-content" }}
 <div class="py-4 mx-auto">
     {{ $contest_link := printf "/admin/contests/%d" .Contest.ID }}
@@ -11,18 +31,28 @@
 </div>
 
 {{/* Test Management */}}
-<div class="subheader">Test Groups</div>
+<div class="subheader" id="test-groups">Test Groups</div>
 <div class="p-2">
     {{ template "test-group-table" .TestGroups }}
 </div>
-<div class="text-lg mx-2 my-4 font-bold">New Test Group</div>
+<div class="text-lg mx-2 my-4 font-bold" id="new-test-group">New Test Group</div>
 {{ template "form-error" .TestGroupFormError }}
 <form method="POST" action="/admin/problems/{{.Problem.ID}}/add_test_group" class="form-block">
     {{ template "test-group-inputs" .TestGroupForm }}
 </form>
 
+{{/* Files */}}
+<div class="subheader" id="files">Files</div>
+<div class="p-2">
+    {{ template "file-table" .Files }}
+</div>
+<div class="text-lg mx-2 my-4 font-bold" id="new-file">New File</div>
+<form method="POST" action="/admin/problems/{{.Problem.ID}}/add_file" class="form-block" enctype="multipart/form-data">
+    {{ template "file-inputs" }}
+</form>
+
 {{/* Edit */}}
-<div class="subheader">
+<div class="subheader" id="edit">
     Edit
     <span class="ml-4 text-gray-600 text-sm">
         <b>Note: </b>

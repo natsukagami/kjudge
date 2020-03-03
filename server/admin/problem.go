@@ -3,6 +3,7 @@ package admin
 import (
 	"database/sql"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -95,7 +96,11 @@ func (g *Group) getProblem(c echo.Context) (*ProblemCtx, error) {
 	for _, t := range tests {
 		testGroups = append(testGroups, TestGroup{t})
 	}
-	return &ProblemCtx{Problem: problem, Contest: contest, TestGroups: testGroups}, err
+	files, err := models.GetProblemFilesMeta(g.db, problem.ID)
+	if err != nil {
+		return nil, err
+	}
+	return &ProblemCtx{Problem: problem, Contest: contest, TestGroups: testGroups, Files: files}, err
 }
 
 // ProblemCtx is the context for rendering admin/problem.
@@ -103,6 +108,7 @@ type ProblemCtx struct {
 	*models.Problem
 	Contest    *models.Contest
 	TestGroups []TestGroup
+	Files      []*models.File
 
 	// Edit Problem Form
 	EditForm      ProblemForm
@@ -180,4 +186,42 @@ func (g *Group) ProblemDelete(c echo.Context) error {
 		return err
 	}
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/contests/%d", ctx.Contest.ID))
+}
+
+// ProblemAddFile implements POST /admin/problems/:id/add_file
+func (g *Group) ProblemAddFile(c echo.Context) error {
+	ctx, err := g.getProblem(c)
+	if err != nil {
+		return err
+	}
+	makePublic := c.FormValue("public") == "true"
+	form, err := c.MultipartForm()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	var files []*models.File
+	for _, file := range form.File["file"] {
+		r, err := file.Open()
+		if err != nil {
+			return errors.Wrapf(err, "file %s", file.Filename)
+		}
+		defer r.Close()
+		content, err := ioutil.ReadAll(r)
+		if err != nil {
+			return errors.Wrapf(err, "file %s", file.Filename)
+		}
+		files = append(files, &models.File{
+			Filename: file.Filename,
+			Content:  content,
+			Public:   makePublic,
+		})
+	}
+	rename := c.FormValue("filename")
+	if rename != "" && len(files) == 1 {
+		files[0].Filename = rename
+	}
+	if err := ctx.Problem.WriteFiles(g.db, files); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d#files", ctx.Problem.ID))
 }
