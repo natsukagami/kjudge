@@ -12,14 +12,16 @@ import (
 // Timestamp is a wrapped time.Time for form-parsing.
 type Timestamp time.Time
 
+const timeFormat = "2006-01-02T15:04"
+
 // String formats the timestamp as RFC3339.
 func (t Timestamp) String() string {
-	return time.Time(t).Format(time.RFC3339)
+	return time.Time(t).Format(timeFormat)
 }
 
 // UnmarshalParam implement echo's Bind.
 func (t *Timestamp) UnmarshalParam(src string) error {
-	ts, err := time.Parse(time.RFC3339, src)
+	ts, err := time.Parse(timeFormat, src)
 	*t = Timestamp(ts)
 	return err
 }

@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"strings"
+	"time"
 
 	"git.nkagami.me/natsukagami/kjudge/static"
 	"github.com/labstack/echo/v4"
@@ -76,6 +77,8 @@ func parseRootTemplate() (*template.Template, error) {
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+	// Include a time-parsing func
+	tRoot.Funcs(map[string]interface{}{"time": func(t time.Time) string { return t.Format(time.RFC1123) }})
 	return tRoot, nil
 }
 

@@ -18,12 +18,15 @@
         {{ end }}
         Weighted</option>
 </select>
-<label for="start_time" class="text-sm block">Start Time</label>
-<input required class="form-input" name="start_time" type="datetime-local" placeholder="2020-01-01 00:00:00 +0000 UTC"
+<label for="start_time" class="text-sm block">Start Time (UTC)</label>
+<input required class="form-input" name="start_time" type="datetime-local" placeholder="2020-01-01T00:00:00"
     value="{{ .StartTime }}" />
-<label for="name" class="text-sm block">End Time</label>
-<input required class="form-input" name="end_time" type="text" placeholder="2020-01-01 00:00:00 +0000 UTC"
+<label for="name" class="text-sm block">End Time (UTC)</label>
+<input required class="form-input" name="end_time" type="datetime-local" placeholder="2020-01-01T00:00:00"
     value="{{ .EndTime }}" />
+<div class="text-sm text-gray-600">
+    The current time in UTC is <span class="font-bold utc-current-time"></span>.
+</div>
 <div class="mt-2">
     <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
     <input required type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
@@ -47,8 +50,8 @@
         <tr class="border-b">
             <td class="text-center">{{.ID}}</td>
             <td>{{.Name}}</td>
-            <td class="text-center">{{.StartTime}}</td>
-            <td class="text-center">{{.EndTime}}</td>
+            <td class="text-center display-time" data-time="{{.StartTime | time}}">{{.StartTime}}</td>
+            <td class="text-center display-time" data-time="{{.EndTime | time}}">{{.EndTime}}</td>
             <td class="text-center">
                 <a href="{{$link}}" title="Edit Contest" class="hover:text-blue-600">[e]</a>
                 <form method="POST" action="/admin/contests/{{ .ID }}/delete" class="inline require-confirm">
