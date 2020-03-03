@@ -169,3 +169,15 @@ func (g *Group) ProblemAddTestGroup(c echo.Context) error {
 	}
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d", ctx.Problem.ID))
 }
+
+// ProblemDelete implements POST /admin/problems/:id/delete
+func (g *Group) ProblemDelete(c echo.Context) error {
+	ctx, err := g.getProblem(c)
+	if err != nil {
+		return err
+	}
+	if err := ctx.Problem.Delete(g.db); err != nil {
+		return err
+	}
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/contests/%d", ctx.Contest.ID))
+}
