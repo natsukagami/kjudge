@@ -18,6 +18,6 @@
   },
   "scripts": {
     "dev": "parcel watch -d ../templates \"html/**/*.html\"",
-    "build": "rm -rf ../templates && parcel build -d ../templates \"html/**/*.html\""
+    "build": "rm -rf ../templates && parcel build --no-source-maps -d ../templates \"html/**/*.html\""
   }
 }

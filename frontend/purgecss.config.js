@@ -1,4 +1,5 @@
 module.exports = {
   content: ["html/**/*.html", "html/*.html"],
-  whitelist: []
+  whitelist: [],
+  defaultExtractor: content => content.match(/[\w-/:]+(?<!:)/g) || [],
 }

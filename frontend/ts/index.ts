@@ -38,6 +38,12 @@ import "typeface-muli";
     const SHOW_ALL = "[show all]";
     const HIDE_ALL = "[hide all]";
 
+    const allToggle: Element = document.getElementById("toggle-all-tests");
+    if (!allToggle) {
+        // Not where we need. Return.
+        return;
+    }
+
     const testTables = Array.from(document.getElementsByClassName("tests-list"))
     const toggles = Array.from(document.getElementsByClassName("toggle-tests"))
     const groups = testTables
@@ -75,7 +81,6 @@ import "typeface-muli";
         toggle.addEventListener("click", () => doToggle(table, toggle))
     }
 
-    const allToggle: Element = document.getElementById("toggle-all-tests");
     allToggle.addEventListener("click", ev => {
         const switchOn = allToggle.innerHTML === SHOW_ALL;
         for (const [table, toggle] of items) {
