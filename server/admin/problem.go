@@ -16,7 +16,7 @@ type OptionalInt64 struct {
 	sql.NullInt64
 }
 
-func (o *OptionalInt64) String() string {
+func (o OptionalInt64) String() string {
 	if o.Valid {
 		return fmt.Sprintf("%d", o.Int64)
 	}
@@ -55,6 +55,21 @@ func (f *TestGroupForm) Bind(t *models.TestGroup) {
 	t.MemoryLimit = f.MemoryLimit.NullInt64
 }
 
+// TestGroup is the wrapper for a TestGroupWithTests, with to-form conversion.
+type TestGroup struct {
+	*models.TestGroupWithTests
+}
+
+func (t TestGroup) ToForm() TestGroupForm {
+	return TestGroupForm{
+		Name:        t.Name,
+		Score:       t.Score,
+		ScoringMode: t.ScoringMode,
+		MemoryLimit: OptionalInt64{t.MemoryLimit},
+		TimeLimit:   OptionalInt64{t.TimeLimit},
+	}
+}
+
 // Collect the ID and get the corresponding problem.
 func (g *Group) getProblem(c echo.Context) (*ProblemCtx, error) {
 	idStr := c.Param("id")
@@ -76,14 +91,18 @@ func (g *Group) getProblem(c echo.Context) (*ProblemCtx, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &ProblemCtx{Problem: problem, Contest: contest, TestGroups: tests}, err
+	var testGroups []TestGroup
+	for _, t := range tests {
+		testGroups = append(testGroups, TestGroup{t})
+	}
+	return &ProblemCtx{Problem: problem, Contest: contest, TestGroups: testGroups}, err
 }
 
 // ProblemCtx is the context for rendering admin/problem.
 type ProblemCtx struct {
 	*models.Problem
 	Contest    *models.Contest
-	TestGroups []*models.TestGroupWithTests
+	TestGroups []TestGroup
 
 	// Edit Problem Form
 	EditForm      ProblemForm
