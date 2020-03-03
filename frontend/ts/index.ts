@@ -13,6 +13,11 @@ import "typeface-muli";
 
 // load the list of tests
 (function () {
+    const SHOW = "[show]";
+    const HIDE = "[hide]";
+    const SHOW_ALL = "[show all]";
+    const HIDE_ALL = "[hide all]";
+
     const testTables = Array.from(document.getElementsByClassName("tests-list"))
     const toggles = Array.from(document.getElementsByClassName("toggle-tests"))
     const groups = testTables
@@ -31,18 +36,18 @@ import "typeface-muli";
         }
         if (force === current) return;
         if (force) {
-            toggle.innerHTML = "[-]"
+            toggle.innerHTML = HIDE;
             table.style.maxHeight = "";
             ++opening;
         } else {
-            toggle.innerHTML = "[+]"
+            toggle.innerHTML = SHOW;
             table.style.maxHeight = "0";
             --opening;
         }
         if (opening > 0) {
-            allToggle.innerHTML = "[-]";
+            allToggle.innerHTML = HIDE_ALL;
         } else {
-            allToggle.innerHTML = "[+]";
+            allToggle.innerHTML = SHOW_ALL;
         }
     }
     const items = Array.from(groups.values());
@@ -52,7 +57,7 @@ import "typeface-muli";
 
     const allToggle: Element = document.getElementById("toggle-all-tests");
     allToggle.addEventListener("click", ev => {
-        const switchOn = allToggle.innerHTML === "[+]";
+        const switchOn = allToggle.innerHTML === SHOW_ALL;
         for (const [table, toggle] of items) {
             doToggle(table, toggle, switchOn)
         }

@@ -106,6 +106,35 @@ func (g *Group) TestGroupUploadMultiple(c echo.Context) error {
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d", tg.ProblemID))
 }
 
+// TestGroupEdit implements POST /admin/test_groups/:id
+func (g *Group) TestGroupEdit(c echo.Context) error {
+	tg, err := getTestGroup(g.db, c)
+	if err != nil {
+		return err
+	}
+	var form TestGroupForm
+	if err := c.Bind(&form); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	form.Bind(tg)
+	if err := tg.Write(g.db); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d", tg.ProblemID))
+}
+
+// TestGroupDelete implements POST /admin/test_groups/:id/delete
+func (g *Group) TestGroupDelete(c echo.Context) error {
+	tg, err := getTestGroup(g.db, c)
+	if err != nil {
+		return err
+	}
+	if err := tg.Delete(g.db); err != nil {
+		return err
+	}
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d", tg.ProblemID))
+}
+
 func readFromForm(name string, form *multipart.Form) ([]byte, error) {
 	file, ok := form.File[name]
 	if !ok {
