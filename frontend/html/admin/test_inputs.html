@@ -1,0 +1,80 @@
+{{ define "test-upload-single" }}
+<div class="subheader">Upload a single test</div>
+<form method="POST" action="/admin/test_groups/{{.ID}}/upload_single" enctype="multipart/form-data" class="form-block">
+    <label class="text-sm block" for="name">Test name</label>
+    <input class="form-input" type="text" required name="name" placeholder="01">
+    <div class="p-1 text-sm text-gray-600">
+        The test name needs to be unique inside its test group.
+    </div>
+
+    <label class="text-sm block" for="input">Input file</label>
+    <input class="form-input" type="file" required name="input">
+
+    <label class="text-sm block" for="output">Output file</label>
+    <input class="form-input" type="file" required name="output">
+
+    <div class="mt-2">
+        <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
+        <input required type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
+    </div>
+</form>
+{{ end }}
+
+{{ define "test-upload-multiple" }}
+<div class="subheader">Upload multiple tests</div>
+<form method="POST" action="/admin/test_groups/{{.ID}}/upload_multiple" enctype="multipart/form-data"
+    class="form-block">
+    <label class="text-sm block" for="file">Test Archive (.zip)</label>
+    <input class="form-input" type="file" accept=".zip" required name="file">
+
+    <div class="grid grid-cols-2">
+        <div class="pr-2">
+            <label class="text-sm block" for="input">Input pattern</label>
+            <input class="form-input w-full font-mono" type="text" required name="input" placeholder="input/?.txt">
+        </div>
+        <div class="pl-2">
+            <label class="text-sm block" for="input">Output pattern</label>
+            <input class="form-input w-full font-mono" type="text" required name="output" placeholder="output/?.txt">
+        </div>
+    </div>
+
+    <div class="py-1 text-sm text-gray-600">
+        kjudge will unzip the given file, look for pairs of files with the matching input/output patterns,
+        and add them as a single test with name given as the filling
+        <span class="font-mono">?</span> part.
+        <p>For example,
+            <span class="font-mono">input/a1.txt</span> and
+            <span class="font-mono">output/a1.txt</span> would create a test
+            named
+            <span class="font-mono">a1</span>.</p>
+    </div>
+
+    <input id="override-{{.ID}}" type="checkbox" name="override" value="true">
+    <label for="override-{{.ID}}">Delete all tests inside the test group before adding.</label>
+
+    <div class="mt-2">
+        <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
+        <input required type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
+    </div>
+</form>
+{{ end }}
+
+{{ define "test-table" }}
+<div class="flex flex-row flex-wrap items-start justify-around">
+    {{ range . }}
+    {{ $link := printf "/admin/tests/%d" .ID }}
+    <div class="min-w-fit-5 m-1 text-sm font-mono rounded bg-gray-200 flex flex-row justify-between items-center p-2">
+        <div class="mx-1 px-1 bg-gray-400">{{.Name}}</div>
+        <div class="mx-1">
+            <a href="{{$link}}/input" class="cursor-pointer hover:text-green-600" title="Get the test's input">[i]</a>
+            <a href="{{$link}}/output" class="cursor-pointer hover:text-green-600" title="Get the test's output">[o]</a>
+            <form class="inline require-confirm" method="POST" action="{{$link}}/delete">
+                <input class="cursor-pointer hover:text-red-600" value="[d]" type="submit" title="Delete Test">
+            </form>
+        </div>
+    </div>
+    {{ else }}
+    <div class="text-center p-1 col-span-4">No tests</div>
+    {{ end }}
+</div>
+{{ end }}

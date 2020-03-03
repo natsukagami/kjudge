@@ -1,0 +1,88 @@
+{{ define "file-table" }}
+<table class="table table-auto w-full">
+    <thead>
+        <tr>
+            <th class="py-1 border-b">Filename</th>
+            <th class="py-1 border-b">Public?</th>
+            <th class="py-1 border-b">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range . }}
+        {{ $link := printf "/admin/files/%d" .ID }}
+        <tr>
+            <td class="py-1 border-b font-mono">{{.Filename}}</td>
+            <td class="py-1 border-b text-center">{{.Public}}</td>
+            <td class="py-1 border-b text-center">
+                <a title="Save file" class="cursor-pointer hover:text-blue-600" href="{{$link}}">
+                    [s]
+                </a>
+                <form class="inline require-confirm" method="POST" action="{{$link}}/delete">
+                    <input type="submit" class="hover:text-red-600 cursor-pointer" value="[d]" title="Delete file">
+                </form>
+            </td>
+        </tr>
+        {{ else }}
+        <tr>
+            <td colspan="3" class="py-1 border-b text-center">No Files</td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+{{ end }}
+
+{{ define "file-inputs" }}
+<label for="file" class="text-sm block">File(s)</label>
+<input name="file" class="form-input" type="file" multiple required>
+<label for="filename" class="text-sm block">Rename file (optional)</label>
+<input name="filename" class="form-input" type="text" list="sample-filenames" placeholder="Use the original name">
+<datalist id="sample-filenames">
+    <option value="statements.pdf" />
+    <option value="statements.md" />
+    <option value="compile_cc.sh" />
+    <option value="compile_go.sh" />
+    <option value="compile_rs.sh" />
+    <option value="compile_java.sh" />
+    <option value="compile_py2.sh" />
+    <option value="compile_py3.sh" />
+    <option value="compile_pas.sh" />
+</datalist>
+<div class="text-sm text-gray-600">
+    <div class="font-bold">This field is ignored if multiple files are uploaded.</div>
+    Leave blank to use the uploaded file's name.
+    Double click to choose one of the special filenames.
+</div>
+<div class="text-sm text-gray-600">
+    Recognized filenames:
+    <ul class="list-inside list-disc">
+        <li>
+            <span class="font-mono">statements.pdf</span>: A downloadable PDF statements file.</li>
+        <li>
+            <span class="font-mono">statements.md</span>: Statements that get rendered inline with Markdown + KaTeX.
+        </li>
+        <li>
+            <span class="font-mono">compile_[language].sh</span>: Customized build script for
+            <span class="font-mono">language</span>.
+            <span class="font-mono">language</span> can be one of
+            <span class="font-mono">cc</span>,
+            <span class="font-mono">go</span>,
+            <span class="font-mono">rs</span>,
+            <span class="font-mono">java</span>,
+            <span class="font-mono">py2</span>,
+            <span class="font-mono">py3</span>,
+            <span class="font-mono">pas</span>.
+        </li>
+    </ul>
+    Any other files (e.g headers, provided libraries, ...) will be available at the current working directory when
+    compiling contestant's solutions.
+</div>
+<div class="my-2">
+    <input id="make-public" name="public" value="true" type="checkbox">
+    <label for="make-public">Make the uploaded file(s) public: <span class="text-gray-600">Contestants can download this
+            file.</span></label>
+</div>
+<div class="mt-2">
+    <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
+    <input required type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
+</div>
+{{ end }}

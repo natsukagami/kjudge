@@ -29,7 +29,7 @@ func (db *DB) migrate() error {
 
 	if version != "" {
 		// Filter away the versions that are already migrated
-		sqlFileString := fmt.Sprintf("sql/%s.sql", version)
+		sqlFileString := fmt.Sprintf("assets/sql/%s.sql", version)
 		for len(versions) > 0 && versions[0] <= sqlFileString {
 			versions = versions[1:]
 		}
@@ -64,7 +64,7 @@ func (db *DB) getSchemaVersion() (string, error) {
 
 // Collect the schema files from the static.
 func getSchemaFiles() ([]string, error) {
-	files, err := static.WalkDirs("sql", false)
+	files, err := static.WalkDirs("assets/sql", false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models/verify"
 	"github.com/pkg/errors"
 )
@@ -29,4 +30,22 @@ func (c *Contest) Verify() error {
 		return errors.New("contest type: invalid value")
 	}
 	return nil
+}
+
+// GetContestsUnfinished gets a list of contests that are unfinished (upcoming or pending).
+func GetContestsUnfinished(db db.DBContext) ([]*Contest, error) {
+	var res []*Contest
+	if err := db.Select(&res, "SELECT * FROM contests WHERE datetime(end_time) > datetime('now') ORDER BY datetime(start_time) ASC"); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return res, nil
+}
+
+// GetContests returns a list of all contests.
+func GetContests(db db.DBContext) ([]*Contest, error) {
+	var res []*Contest
+	if err := db.Select(&res, "SELECT * FROM contests ORDER BY id DESC"); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return res, nil
 }
