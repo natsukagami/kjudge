@@ -37,5 +37,9 @@ func New(g *echo.Group, db *db.DB) *Group {
 	g.POST("/test_groups/:id/upload_multiple", grp.TestGroupUploadMultiple)
 	g.POST("/test_groups/:id", grp.TestGroupEdit)
 	g.POST("/test_groups/:id/delete", grp.TestGroupDelete)
+	// Test
+	g.GET("/tests/:id/input", grp.TestInput)
+	g.GET("/tests/:id/output", grp.TestOutput)
+	g.POST("/tests/:id/delete", grp.TestDelete)
 	return grp
 }
