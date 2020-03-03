@@ -22,9 +22,11 @@
                 <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 pl-4">Log Out</div>
             </a>
         </nav>
+        <hr>
+        {{ block "admin-nav" . }}{{ end }}
+        <hr>
         {{/* Footer */}}
         <div class="mt-5 mx-auto text-center">
-            <hr>
             <div class="my-2">
                 <b>kjudge</b> made with ❤️ by <a href="https://github.com/natsukagami">natsukagami</a>
             </div>
