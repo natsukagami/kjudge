@@ -130,7 +130,7 @@ CREATE TABLE files (
     public INTEGER NOT NULL,
 
     UNIQUE(problem_id, filename),
-    FOREIGN KEY (problem_id) REFERENCES problems(id)
+    FOREIGN KEY (problem_id) REFERENCES problems(id) ON DELETE CASCADE
 );
 
 -- Configurations
