@@ -1,6 +1,26 @@
 // Muli font
 import "typeface-muli";
 
+// Set timezone 
+(function () {
+    for (const elem of document.getElementsByClassName("utc-current-time")) {
+        // Parse and update the "the current time is" nodes.
+        setInterval(() => {
+            const now = new Date();
+            const iso = now.toISOString();
+            (elem as HTMLSpanElement).innerHTML = `${now.toUTCString()} (<span class="font-mono">${iso.substr(0, iso.length - 5)}</span>)`;
+        }, 1000);
+    }
+
+    for (const elem of document.getElementsByClassName("display-time")) {
+        // Special nodes that takes a time and formats it into local time.
+        const time = new Date(elem.getAttribute("data-time"));
+        elem.innerHTML = time.toLocaleString() + " (local)";
+        elem.setAttribute("title", "UTC: " + time.toUTCString())
+
+    }
+})();
+
 // require-confirm forms
 (function () {
     for (const elem of document.getElementsByClassName("require-confirm")) {
