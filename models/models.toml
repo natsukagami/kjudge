@@ -34,6 +34,7 @@ output = "[]byte"
 [users]
 id = "string"
 password = "string"
+hidden = "bool"
 
 [submissions]
 id = "int"
