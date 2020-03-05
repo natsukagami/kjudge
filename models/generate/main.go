@@ -189,6 +189,16 @@ type {{$name}} struct {
 {{- end}}
 }
 
+{{/* All getter */}}
+// GetAll{{$name}}s returns all available {{$name}}s.
+func GetAll{{$name}}s(db db.DBContext) ([]*{{$name}}, error) {
+    var result []*{{$name}}
+    if err := db.Select(&result, "SELECT * FROM {{.Name}}"); err != nil {
+        return nil, errors.WithStack(err)
+    }
+    return result, nil
+}
+
 {{/* Primary Key getter */}}
 {{$fn_name := print "Get" $name}}
 // {{$fn_name}} gets a {{$name}} from the Database.
