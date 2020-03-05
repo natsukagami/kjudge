@@ -1,0 +1,17 @@
+{{ define "admin-title" }}Users{{ end }}
+
+{{ define "admin-content" }}
+<div class="text-4xl mx-auto py-4">Users</div>
+
+{{/* Users list */}}
+<div class="p-2">
+    {{ template "user-table" .Users }}
+</div>
+
+{{/* New User */}}
+<div class="subheader">New User</div>
+{{ template "form-error" .FormError }}
+<form action="/admin/users" class="form-block" method="POST">
+    {{ template "user-inputs" .Form }}
+</form>
+{{ end }}
