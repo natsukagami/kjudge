@@ -154,7 +154,7 @@ func TableFromToml(tables TomlTables, name string, t TomlTable) *Table {
 	}
 	if v, ok := t["id"]; ok {
 		pks = map[string]string{"id": v}
-		upsert = false
+		upsert = !(v == "int")
 	}
 	return &Table{
 		Name:        name,
@@ -237,8 +237,8 @@ func (r *{{$name}}) Write(db db.DBContext) error {
     if err := r.Verify(); err != nil {
         return err
     }
-    _, err := db.Exec("INSERT INTO {{.Name}}({{args .Fields "-"}}) VALUES ({{marks .Fields}}) WHERE {{condition .PrimaryKeys " AND "}} ON CONFLICT ({{args .PrimaryKeys "-"}}) DO UPDATE SET {{condition .Fields ", "}}",
-                        {{args .Fields "r"}}, {{args .PrimaryKeys "r"}}, {{args .Fields "r"}})
+    _, err := db.Exec("INSERT INTO {{.Name}}({{args .Fields "-"}}) VALUES ({{marks .Fields}}) ON CONFLICT ({{args .PrimaryKeys "-"}}) DO UPDATE SET {{condition .Fields ", "}}",
+                        {{args .Fields "r"}}, {{args .Fields "r"}})
     return errors.WithStack(err)
 }
 `
