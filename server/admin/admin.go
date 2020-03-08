@@ -47,5 +47,6 @@ func New(g *echo.Group, db *db.DB) *Group {
 	g.POST("/files/:id/delete", grp.FileDelete)
 	// Users
 	g.GET("/users", grp.UsersGet)
+	g.POST("/users", grp.UsersAdd)
 	return grp
 }
