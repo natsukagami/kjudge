@@ -18,7 +18,7 @@ import "typeface-muli";
 
     for (const elem of document.getElementsByClassName("display-time")) {
         // Special nodes that takes a time and formats it into local time.
-        const time = new Date(elem.getAttribute("data-time"));
+        const time = new Date(elem.getAttribute("data-time") || 0);
         elem.innerHTML = time.toLocaleString() + " (local)";
         elem.setAttribute("title", "UTC: " + time.toUTCString())
 
@@ -42,7 +42,7 @@ import "typeface-muli";
     const SHOW_ALL = "[show all]";
     const HIDE_ALL = "[hide all]";
 
-    const allToggle: Element = document.getElementById("toggle-all-tests");
+    const allToggle = document.getElementById("toggle-all-tests");
     if (!allToggle) {
         // Not where we need. Return.
         return;
@@ -55,7 +55,7 @@ import "typeface-muli";
             const e = elem as HTMLDivElement;
             const group = e.getAttribute("data-test-group");
             const toggle = toggles.find(t => t.getAttribute("data-test-group") == group);
-            m.set(group, [e, toggle]);
+            if (group && toggle) m.set(group, [e, toggle]);
             return m;
         }, new Map<string, [HTMLDivElement, Element]>());
     let opening = 0;
@@ -85,7 +85,7 @@ import "typeface-muli";
         toggle.addEventListener("click", () => doToggle(table, toggle))
     }
 
-    allToggle.addEventListener("click", ev => {
+    allToggle.addEventListener("click", _ => {
         const switchOn = allToggle.innerHTML === SHOW_ALL;
         for (const [table, toggle] of items) {
             doToggle(table, toggle, switchOn)
