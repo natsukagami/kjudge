@@ -40,10 +40,16 @@ node.js: >= 9
 yarn:    >= 1
 ```
 
+Go dependencies: See `tools.go`.
+All Go dependencies can be installed with 
+```sh
+scripts/install_tools.sh
+```
+
 Build steps:
 
 ```sh
-./production_build.sh
+scripts/production_build.sh
 ```
 
 ## Directory Structure
