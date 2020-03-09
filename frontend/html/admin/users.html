@@ -8,6 +8,15 @@
     {{ template "user-table" .Users }}
 </div>
 
+<div class="mt-4 mx-4 flex flex-row justify-around">
+    <div class="text-2xl">Registration is <span>{{ if .Config.EnableRegistration }}enabled{{ else }}disabled{{ end }}</span>.</div>
+    <div>
+        <form class="inline" method="POST" action="/admin/config/toggle_enable_registration">
+            <input class="text-lg p-2 bg-blue-200 hover:bg-blue-400 rounded" type="submit" value="Toggle Registration">
+        </form>
+    </div>
+</div>
+
 {{/* New User */}}
 <div class="subheader">New User</div>
 {{ template "form-error" .FormError }}
