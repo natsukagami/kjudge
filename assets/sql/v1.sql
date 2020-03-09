@@ -56,7 +56,8 @@ CREATE TABLE tests (
 -- Users
 CREATE TABLE users (
 	id VARCHAR PRIMARY KEY NOT NULL,
-	password VARCHAR NOT NULL
+	password VARCHAR NOT NULL,
+    hidden INTEGER NOT NULL
 );
 
 -- Submissions
