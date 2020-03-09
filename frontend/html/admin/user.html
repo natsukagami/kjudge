@@ -1,0 +1,27 @@
+{{ define "admin-title" }}{{.ID}} [e]{{ end }}
+
+{{ define "admin-nav" }}
+<nav>
+    <a href="#submissions">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Submissions</div>
+    </a>
+    <a href="#edit">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Edit User</div>
+    </a>
+</nav>
+{{ end }}
+
+{{ define "admin-content" }}
+<div class="text-4xl p-2">User <span class="font-semibold">{{.ID}}</span></div>
+
+<div class="subheader" id="submissions">Submissions</div>
+<div class="p-2">
+    {{ template "submission-table" .Submissions }}
+</div>
+
+<div class="subheader" id="edit">Edit User</div>
+{{ template "form-error" .EditFormError }}
+<form method="POST" action="/admin/users/{{.ID}}" class="form-block">
+    {{ template "user-inputs" .EditForm }}
+</form>
+{{ end }}

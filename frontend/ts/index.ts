@@ -3,18 +3,22 @@ import "typeface-muli";
 
 // Set timezone 
 (function () {
-    for (const elem of document.getElementsByClassName("utc-current-time")) {
+    setInterval(() => {
         // Parse and update the "the current time is" nodes.
-        setInterval(() => {
-            const now = new Date();
-            const iso = now.toISOString();
-            (elem as HTMLSpanElement).innerHTML = `${now.toUTCString()} (<span class="font-mono">${iso.substr(0, iso.length - 5)}</span>)`;
-        }, 1000);
-    }
+        const now = new Date();
+        const nowStr = now.toUTCString();
+        const iso = now.toISOString();
+        const html = `${nowStr.substr(0, nowStr.length - 7)} (<span class="font-mono">${iso.substr(0, iso.length - 8)}</span>)`; // Strip timezone and seconds branch
+        for (const elem of document.getElementsByClassName("utc-current-time")) {
+            const e = elem as HTMLSpanElement;
+            if (e.innerHTML !== html)
+                e.innerHTML = html;
+        }
+    }, 1000);
 
     for (const elem of document.getElementsByClassName("display-time")) {
         // Special nodes that takes a time and formats it into local time.
-        const time = new Date(elem.getAttribute("data-time"));
+        const time = new Date(elem.getAttribute("data-time") || 0);
         elem.innerHTML = time.toLocaleString() + " (local)";
         elem.setAttribute("title", "UTC: " + time.toUTCString())
 
@@ -38,7 +42,7 @@ import "typeface-muli";
     const SHOW_ALL = "[show all]";
     const HIDE_ALL = "[hide all]";
 
-    const allToggle: Element = document.getElementById("toggle-all-tests");
+    const allToggle = document.getElementById("toggle-all-tests");
     if (!allToggle) {
         // Not where we need. Return.
         return;
@@ -51,7 +55,7 @@ import "typeface-muli";
             const e = elem as HTMLDivElement;
             const group = e.getAttribute("data-test-group");
             const toggle = toggles.find(t => t.getAttribute("data-test-group") == group);
-            m.set(group, [e, toggle]);
+            if (group && toggle) m.set(group, [e, toggle]);
             return m;
         }, new Map<string, [HTMLDivElement, Element]>());
     let opening = 0;
@@ -81,7 +85,7 @@ import "typeface-muli";
         toggle.addEventListener("click", () => doToggle(table, toggle))
     }
 
-    allToggle.addEventListener("click", ev => {
+    allToggle.addEventListener("click", _ => {
         const switchOn = allToggle.innerHTML === SHOW_ALL;
         for (const [table, toggle] of items) {
             doToggle(table, toggle, switchOn)

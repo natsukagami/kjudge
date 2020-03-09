@@ -6,6 +6,7 @@ import (
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models/verify"
+	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
 
@@ -58,10 +59,27 @@ func (r *Submission) Verify() error {
 	return verify.All(m)
 }
 
-// GetUserProblemSubmissions gets all submissions belonging to an user on a problem.
-func GetUserProblemSubmissions(db db.DBContext, userID string, problemID int) ([]*Submission, error) {
+// GetProblemsSubmissions returns the submissions that belong to a list of problems.
+func GetProblemsSubmissions(db db.DBContext, problemID ...int) ([]*Submission, error) {
+	query, args, err := sqlx.In("SELECT * FROM submissions WHERE problem_id IN (?) AND user_id = ?", problemID)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
 	var result []*Submission
-	if err := db.Select(&result, "SELECT * FROM submissions WHERE problem_id = ? AND user_id = ?", problemID, userID); err != nil {
+	if err := db.Select(&result, query, args...); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return result, nil
+}
+
+// GetUserProblemSubmissions gets all submissions belonging to an user on a (list of) problem(s).
+func GetUserProblemSubmissions(db db.DBContext, userID string, problemID ...int) ([]*Submission, error) {
+	query, args, err := sqlx.In("SELECT * FROM submissions WHERE problem_id IN (?) AND user_id = ?", problemID, userID)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	var result []*Submission
+	if err := db.Select(&result, query, args...); err != nil {
 		return nil, errors.WithStack(err)
 	}
 	return result, nil

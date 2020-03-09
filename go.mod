@@ -17,7 +17,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.10.0
 	github.com/nsf/termbox-go v0.0.0-20200204031403-4d2b513ad8be // indirect
 	github.com/pkg/errors v0.9.1
-	golang.org/x/crypto v0.0.0-20200221170553-0f24fbd83dfb // indirect
+	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073
 	golang.org/x/net v0.0.0-20200219183655-46282727080f
 	golang.org/x/sys v0.0.0-20200219091948-cb0a6d8edb6c // indirect
 	golang.org/x/tools v0.0.0-20200227200655-6862ededa516
