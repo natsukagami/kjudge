@@ -12,6 +12,8 @@ import (
 type UsersCtx struct {
 	Users []*models.User
 
+	Config *models.Config
+
 	FormError error
 	Form      UserForm
 }
@@ -47,7 +49,11 @@ func getUsers(db db.DBContext, c echo.Context) (*UsersCtx, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &UsersCtx{Users: users}, nil
+	config, err := models.GetConfig(db)
+	if err != nil {
+		return nil, err
+	}
+	return &UsersCtx{Users: users, Config: config}, nil
 }
 
 // UsersGet implements GET /admin/users.

@@ -50,5 +50,6 @@ func New(g *echo.Group, db *db.DB) *Group {
 	g.POST("/users", grp.UsersAdd)
 	g.GET("/users/:id", grp.UserGet)
 	g.POST("/users/:id", grp.UserEdit)
+	g.POST("/config/toggle_enable_registration", grp.ToggleEnableRegistration)
 	return grp
 }

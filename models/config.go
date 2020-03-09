@@ -9,13 +9,15 @@ import (
 
 // Config is the configuation of the server.
 type Config struct {
-	SessionKey []byte `db:"session_key"`
+	SessionKey         []byte `db:"session_key"`
+	EnableRegistration bool   `db:"enable_registration"`
 }
 
 // GenerateConfig generates a random configuration.
 func GenerateConfig() (*Config, error) {
 	c := Config{
-		SessionKey: make([]byte, 64),
+		SessionKey:         make([]byte, 64),
+		EnableRegistration: true,
 	}
 	if _, err := rand.Read(c.SessionKey); err != nil {
 		return nil, errors.WithStack(err)
@@ -45,7 +47,7 @@ func (c *Config) Write(db *db.DB) error {
 	}
 	defer tx.Rollback()
 
-	res, err := tx.Exec("UPDATE config SET session_key = ?", c.SessionKey)
+	res, err := tx.Exec("UPDATE config SET session_key = ?, enable_registration = ?", c.SessionKey, c.EnableRegistration)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -55,7 +57,7 @@ func (c *Config) Write(db *db.DB) error {
 	}
 	if rowsAffected == 0 {
 		// Gotta INSERT something I guess
-		_, err := tx.Exec("INSERT INTO config(session_key) VALUES (?)", c.SessionKey)
+		_, err := tx.Exec("INSERT INTO config(session_key, enable_registration) VALUES (?, ?)", c.SessionKey, c.EnableRegistration)
 		if err != nil {
 			return errors.WithStack(err)
 		}
