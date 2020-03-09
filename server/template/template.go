@@ -22,6 +22,7 @@ var templateList = map[string][]string{
 	"admin/contest":  []string{"admin/root", "admin/contest_inputs", "admin/problem_inputs"},
 	"admin/problem":  []string{"admin/root", "admin/problem_inputs", "admin/test_inputs", "admin/test_group_inputs", "admin/file_inputs"},
 	"admin/users":    []string{"admin/root", "admin/user_inputs"},
+	"admin/user":     []string{"admin/root", "admin/user_inputs", "admin/submission_inputs"},
 }
 
 // From a single template name, resolve the requirement tree into a list of template names.
@@ -79,7 +80,11 @@ func parseRootTemplate() (*template.Template, error) {
 		return nil, errors.WithStack(err)
 	}
 	// Include a time-parsing func
-	tRoot.Funcs(map[string]interface{}{"time": func(t time.Time) string { return t.Format(time.RFC1123) }})
+	tRoot.Funcs(map[string]interface{}{
+		"time": func(t time.Time) string { return t.Format(time.RFC1123) },
+		"join": strings.Join,
+		"add":  func(a, b int) int { return a + b },
+	})
 	return tRoot, nil
 }
 

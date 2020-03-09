@@ -21,13 +21,25 @@ type UserForm struct {
 	ID       string `form:"id"`
 	Password string `form:"password"`
 	Hidden   bool   `form:"hidden"`
+
+	IsUpdate bool
 }
 
 // Bind binds the form's values to the model.
 func (f *UserForm) Bind(u *models.User) {
 	u.ID = f.ID
-	u.Password = f.Password
+	if f.Password != "" {
+		u.Password = f.Password
+	}
 	u.Hidden = f.Hidden
+}
+
+func UserToForm(u *models.User) *UserForm {
+	return &UserForm{
+		ID:       u.ID,
+		Password: "",
+		Hidden:   u.Hidden,
+	}
 }
 
 func getUsers(db db.DBContext, c echo.Context) (*UsersCtx, error) {

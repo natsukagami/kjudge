@@ -48,5 +48,7 @@ func New(g *echo.Group, db *db.DB) *Group {
 	// Users
 	g.GET("/users", grp.UsersGet)
 	g.POST("/users", grp.UsersAdd)
+	g.GET("/users/:id", grp.UserGet)
+	g.POST("/users/:id", grp.UserEdit)
 	return grp
 }
