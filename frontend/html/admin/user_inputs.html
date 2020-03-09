@@ -14,10 +14,9 @@
             <td class="text-mono py-1 border-b">{{.ID}}</td>
             <td class="py-1 border-b text-center">{{.Hidden}}</td>
             <td class="py-1 border-b text-center">
-                {{ $subs_link := printf "/admin/submissions?user_id=%s" .ID }}
-                <a href="{{$subs_link}}" title="See user's submissions"
+                <a href="{{$link}}#submissions" title="See user's submissions"
                     class="cursor-pointer hover:text-green-600">[s]</a>
-                <a href="{{$link}}" title="Edit User" class="cursor-pointer hover:text-blue-600">[e]</a>
+                <a href="{{$link}}#edit" title="Edit User" class="cursor-pointer hover:text-blue-600">[e]</a>
                 <form class="inline require-confirm" method="POST" action="{{$link}}/delete">
                     <input type="submit" value="[d]" title="Delete User" class="cursor-pointer hover:text-red-600">
                 </form>
@@ -34,9 +33,17 @@
 
 {{ define "user-inputs" }}
 <label for="id" class="text-sm block">Username</label>
+{{ if .IsUpdate }}
+<input class="form-input bg-gray-200" type="text" name="id" placeholder="user_01" required value="{{.ID}}" readonly>
+{{ else }}
 <input class="form-input" type="text" name="id" placeholder="user_01" required value="{{.ID}}">
+{{ end }}
 <label for="password" class="text-sm block">Password</label>
+{{ if .IsUpdate }}
+<input class="form-input" type="password" name="password" placeholder="Leave blank to leave unchanged">
+{{ else }}
 <input class="form-input" type="password" name="password" placeholder="*********" required>
+{{ end }}
 <div class="my-2">
     {{ if .Hidden }}
     <input type="checkbox" checked id="user-form-hidden" name="hidden" value="true">
