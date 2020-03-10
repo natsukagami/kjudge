@@ -53,6 +53,8 @@
             <td class="text-center display-time" data-time="{{.StartTime | time}}">{{.StartTime}}</td>
             <td class="text-center display-time" data-time="{{.EndTime | time}}">{{.EndTime}}</td>
             <td class="text-center">
+                <a href="{{$link}}/submissions" title="See submissions for contest"
+                    class="cursor-pointer hover:text-green-600">[s]</a>
                 <a href="{{$link}}" title="Edit Contest" class="hover:text-blue-600">[e]</a>
                 <form method="POST" action="/admin/contests/{{ .ID }}/delete" class="inline require-confirm">
                     <input required type="submit" title="Delete Contest" class="cursor-pointer hover:text-red-600"

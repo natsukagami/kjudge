@@ -1,0 +1,11 @@
+{{ define "admin-title" }}Submissions{{ end }}
+
+{{ define "admin-content" }}
+<div class="py-4 mx-auto text-4xl">
+    Submissions
+</div>
+
+<div class="p-2">
+    {{ template "submission-table" . }}
+</div>
+{{ end }}

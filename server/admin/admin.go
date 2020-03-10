@@ -24,11 +24,13 @@ func New(g *echo.Group, db *db.DB) *Group {
 	g.POST("/contests", grp.ContestsPost)
 	// Contest Management
 	g.GET("/contests/:id", grp.ContestGet)
+	g.GET("/contests/:id/submissions", grp.ContestSubmissionsGet)
 	g.POST("/contests/:id", grp.ContestEdit)
 	g.POST("/contests/:id/delete", grp.ContestDelete)
 	g.POST("/contests/:id/add_problem", grp.ContestAddProblem)
 	// Problem Management
 	g.GET("/problems/:id", grp.ProblemGet)
+	g.GET("/problems/:id/submissions", grp.ProblemSubmissionsGet)
 	g.POST("/problems/:id", grp.ProblemEdit)
 	g.POST("/problems/:id/add_test_group", grp.ProblemAddTestGroup)
 	g.POST("/problems/:id/add_file", grp.ProblemAddFile)
@@ -51,5 +53,7 @@ func New(g *echo.Group, db *db.DB) *Group {
 	g.GET("/users/:id", grp.UserGet)
 	g.POST("/users/:id", grp.UserEdit)
 	g.POST("/config/toggle_enable_registration", grp.ToggleEnableRegistration)
+	// Submissions
+	g.GET("/submissions", grp.SubmissionsGet)
 	return grp
 }

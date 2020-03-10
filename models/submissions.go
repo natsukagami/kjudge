@@ -61,7 +61,10 @@ func (r *Submission) Verify() error {
 
 // GetProblemsSubmissions returns the submissions that belong to a list of problems.
 func GetProblemsSubmissions(db db.DBContext, problemID ...int) ([]*Submission, error) {
-	query, args, err := sqlx.In("SELECT * FROM submissions WHERE problem_id IN (?) AND user_id = ?", problemID)
+	if len(problemID) == 0 {
+		return nil, nil
+	}
+	query, args, err := sqlx.In("SELECT * FROM submissions WHERE problem_id IN (?)", problemID)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -74,6 +77,9 @@ func GetProblemsSubmissions(db db.DBContext, problemID ...int) ([]*Submission, e
 
 // GetUserProblemSubmissions gets all submissions belonging to an user on a (list of) problem(s).
 func GetUserProblemSubmissions(db db.DBContext, userID string, problemID ...int) ([]*Submission, error) {
+	if len(problemID) == 0 {
+		return nil, nil
+	}
 	query, args, err := sqlx.In("SELECT * FROM submissions WHERE problem_id IN (?) AND user_id = ?", problemID, userID)
 	if err != nil {
 		return nil, errors.WithStack(err)

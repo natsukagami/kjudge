@@ -225,3 +225,16 @@ func (g *Group) ProblemAddFile(c echo.Context) error {
 	}
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d#files", ctx.Problem.ID))
 }
+
+// ProblemSubmissionsGet implements GET /admin/problems/:id/submissions.
+func (g *Group) ProblemSubmissionsGet(c echo.Context) error {
+	p, err := g.getProblem(c)
+	if err != nil {
+		return err
+	}
+	subs, err := SubmissionsBy(g.db, nil, nil, p.Problem)
+	if err != nil {
+		return err
+	}
+	return c.Render(http.StatusOK, "admin/problem_submissions", subs)
+}

@@ -1,8 +1,11 @@
 package admin
 
 import (
+	"net/http"
+
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"github.com/labstack/echo/v4"
 )
 
 // ContestWithProblems is a contest with embedded problems.
@@ -145,4 +148,13 @@ func (s *SubmissionsCtx) fillContests(db db.DBContext) error {
 	s.ProblemsMap = problemsMap
 
 	return nil
+}
+
+// SubmissionsGet implements GET /admin/submissions
+func (g *Group) SubmissionsGet(c echo.Context) error {
+	subs, err := SubmissionsAll(g.db)
+	if err != nil {
+		return err
+	}
+	return c.Render(http.StatusOK, "admin/submissions", subs)
 }

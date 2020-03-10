@@ -1,0 +1,13 @@
+{{ define "admin-title" }}Submissions for {{printf "%s. %s" .Problem.Name .Problem.DisplayName}}{{ end }}
+
+{{ define "admin-content" }}
+<div class="py-4 text-4xl p-2">Submissions for
+    {{ $link := printf "/admin/problems/%d" .Problem.ID }}
+    <a href="{{$link}}"
+        class="cursor-pointer hover:text-blue-600">{{printf "%s. %s" .Problem.Name .Problem.DisplayName}}</a>
+</div>
+
+<div class="p-2">
+    {{ template "submission-table" . }}
+</div>
+{{ end }}
