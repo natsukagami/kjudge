@@ -34,7 +34,7 @@
             <th class="py-1 border-b">
                 <select data-field="problem">
                     <option value="" selected>All Problems</option>
-                    {{ range .Problems }}
+                    {{ range .Contest.Problems }}
                     <option value="{{.ID}}">{{.Name}}. {{.DisplayName}}</option>
                     {{ end }}
                 </select>

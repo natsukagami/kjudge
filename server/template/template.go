@@ -17,12 +17,15 @@ import (
 //
 // The root template "root" is always prepended at the beginning.
 var templateList = map[string][]string{
-	"admin/home":     []string{"admin/root", "admin/contest_inputs"},
-	"admin/contests": []string{"admin/root", "admin/contest_inputs"},
-	"admin/contest":  []string{"admin/root", "admin/contest_inputs", "admin/problem_inputs"},
-	"admin/problem":  []string{"admin/root", "admin/problem_inputs", "admin/test_inputs", "admin/test_group_inputs", "admin/file_inputs"},
-	"admin/users":    []string{"admin/root", "admin/user_inputs"},
-	"admin/user":     []string{"admin/root", "admin/user_inputs", "admin/submission_inputs"},
+	"admin/home":                []string{"admin/root", "admin/contest_inputs"},
+	"admin/contests":            []string{"admin/root", "admin/contest_inputs"},
+	"admin/contest":             []string{"admin/root", "admin/contest_inputs", "admin/problem_inputs"},
+	"admin/contest_submissions": []string{"admin/root", "admin/submission_inputs"},
+	"admin/problem":             []string{"admin/root", "admin/problem_inputs", "admin/test_inputs", "admin/test_group_inputs", "admin/file_inputs"},
+	"admin/problem_submissions": []string{"admin/root", "admin/submission_inputs"},
+	"admin/users":               []string{"admin/root", "admin/user_inputs"},
+	"admin/user":                []string{"admin/root", "admin/user_inputs", "admin/submission_inputs"},
+	"admin/submissions":         []string{"admin/root", "admin/submission_inputs"},
 }
 
 // From a single template name, resolve the requirement tree into a list of template names.

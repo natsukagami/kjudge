@@ -142,3 +142,16 @@ func (g *Group) ContestAddProblem(c echo.Context) error {
 	}
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d", problem.ID))
 }
+
+// ContestSubmissionsGet implements GET /admin/contests/:id/submissions.
+func (g *Group) ContestSubmissionsGet(c echo.Context) error {
+	contest, err := g.getContest(c)
+	if err != nil {
+		return err
+	}
+	subs, err := SubmissionsBy(g.db, nil, contest, nil)
+	if err != nil {
+		return err
+	}
+	return c.Render(http.StatusOK, "admin/contest_submissions", subs)
+}

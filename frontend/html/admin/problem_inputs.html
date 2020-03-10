@@ -109,6 +109,8 @@
             <td class="text-center border-b py-1">{{.ScoringMode}}</td>
             <td class="text-center border-b py-1">{{.PenaltyPolicy}}</td>
             <td class="text-center border-b py-1">
+                <a href="{{$link}}/submissions" title="See submissions for problem"
+                    class="cursor-pointer hover:text-green-600">[s]</a>
                 <a class="hover:text-blue-600 cursor-pointer" href="{{$link}}" title="Edit problem">[e]</a>
                 <form class="inline require-confirm" action="{{$link}}/delete" method="POST">
                     <input required type="submit" class="hover:text-red-600 cursor-pointer" title="Delete problem"
