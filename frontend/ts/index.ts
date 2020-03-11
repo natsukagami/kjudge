@@ -1,18 +1,22 @@
 // Muli font
 import "typeface-muli";
 
-// Set timezone 
-(function () {
+// Set timezone
+(function() {
     setInterval(() => {
         // Parse and update the "the current time is" nodes.
         const now = new Date();
         const nowStr = now.toUTCString();
         const iso = now.toISOString();
-        const html = `${nowStr.substr(0, nowStr.length - 7)} (<span class="font-mono">${iso.substr(0, iso.length - 8)}</span>)`; // Strip timezone and seconds branch
-        for (const elem of document.getElementsByClassName("utc-current-time")) {
+        const html = `${nowStr.substr(
+            0,
+            nowStr.length - 7,
+        )} (<span class="font-mono">${iso.substr(0, iso.length - 8)}</span>)`; // Strip timezone and seconds branch
+        for (const elem of document.getElementsByClassName(
+            "utc-current-time",
+        )) {
             const e = elem as HTMLSpanElement;
-            if (e.innerHTML !== html)
-                e.innerHTML = html;
+            if (e.innerHTML !== html) e.innerHTML = html;
         }
     }, 1000);
 
@@ -20,23 +24,22 @@ import "typeface-muli";
         // Special nodes that takes a time and formats it into local time.
         const time = new Date(elem.getAttribute("data-time") || 0);
         elem.innerHTML = time.toLocaleString() + " (local)";
-        elem.setAttribute("title", "UTC: " + time.toUTCString())
-
+        elem.setAttribute("title", "UTC: " + time.toUTCString());
     }
 })();
 
 // require-confirm forms
-(function () {
+(function() {
     for (const elem of document.getElementsByClassName("require-confirm")) {
         (elem as HTMLFormElement).addEventListener("submit", ev => {
             if (!confirm("Are you sure you want to delete this item?"))
                 ev.preventDefault();
-        })
+        });
     }
 })();
 
 // load the list of tests
-(function () {
+(function() {
     const SHOW = "[show]";
     const HIDE = "[hide]";
     const SHOW_ALL = "[show all]";
@@ -48,18 +51,25 @@ import "typeface-muli";
         return;
     }
 
-    const testTables = Array.from(document.getElementsByClassName("tests-list"))
-    const toggles = Array.from(document.getElementsByClassName("toggle-tests"))
-    const groups = testTables
-        .reduce((m, elem) => {
-            const e = elem as HTMLDivElement;
-            const group = e.getAttribute("data-test-group");
-            const toggle = toggles.find(t => t.getAttribute("data-test-group") == group);
-            if (group && toggle) m.set(group, [e, toggle]);
-            return m;
-        }, new Map<string, [HTMLDivElement, Element]>());
+    const testTables = Array.from(
+        document.getElementsByClassName("tests-list"),
+    );
+    const toggles = Array.from(document.getElementsByClassName("toggle-tests"));
+    const groups = testTables.reduce((m, elem) => {
+        const e = elem as HTMLDivElement;
+        const group = e.getAttribute("data-test-group");
+        const toggle = toggles.find(
+            t => t.getAttribute("data-test-group") == group,
+        );
+        if (group && toggle) m.set(group, [e, toggle]);
+        return m;
+    }, new Map<string, [HTMLDivElement, Element]>());
     let opening = 0;
-    const doToggle = (table: HTMLDivElement, toggle: Element, force?: boolean) => {
+    const doToggle = (
+        table: HTMLDivElement,
+        toggle: Element,
+        force?: boolean,
+    ) => {
         const current = table.style.maxHeight === ""; // table showing?
         if (force === undefined) {
             force = !current;
@@ -79,16 +89,16 @@ import "typeface-muli";
         } else {
             allToggle.innerHTML = SHOW_ALL;
         }
-    }
+    };
     const items = Array.from(groups.values());
     for (const [table, toggle] of items) {
-        toggle.addEventListener("click", () => doToggle(table, toggle))
+        toggle.addEventListener("click", () => doToggle(table, toggle));
     }
 
     allToggle.addEventListener("click", _ => {
         const switchOn = allToggle.innerHTML === SHOW_ALL;
         for (const [table, toggle] of items) {
-            doToggle(table, toggle, switchOn)
+            doToggle(table, toggle, switchOn);
         }
     });
 })();
