@@ -47,7 +47,7 @@ func (m *Meta) Int(key string) int {
 		m.error = errors.Wrapf(err, "key %s", key)
 		return r
 	} else {
-		m.error = errors.Errorf("key %s: does not exist")
+		m.error = errors.Errorf("key %s: does not exist", key)
 		return 0
 	}
 }
@@ -62,7 +62,7 @@ func (m *Meta) Float64(key string) float64 {
 		m.error = errors.Wrapf(err, "key %s", key)
 		return r
 	} else {
-		m.error = errors.Errorf("key %s: does not exist")
+		m.error = errors.Errorf("key %s: does not exist", key)
 		return 0
 	}
 }
@@ -75,7 +75,7 @@ func (m *Meta) String(key string) string {
 	if val, ok := m.Fields[key]; ok {
 		return val
 	}
-	m.error = errors.Errorf("key %s: does not exist")
+	m.error = errors.Errorf("key %s: does not exist", key)
 	return ""
 }
 

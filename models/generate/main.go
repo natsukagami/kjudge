@@ -298,6 +298,7 @@ func main() {
 	if err := exec.Command("rm", "-v", "models/*_generated.go").Run(); err != nil {
 		// log.Fatal(err)
 	}
+	files := []string{"-w"} // This is actually goimports's parameters.
 	for name, fields := range tables {
 		table := TableFromToml(tables, name, fields)
 		filename := fmt.Sprintf("models/%s_generated.go", name)
@@ -315,9 +316,14 @@ func main() {
 		if err := exec.Command("go", "fmt", filename).Run(); err != nil {
 			log.Fatal(err)
 		}
-		if err := exec.Command("goimports", "-w", filename).Run(); err != nil {
-			log.Fatal(err)
-		}
+		files = append(files, filename)
 		log.Printf("Generated code for table %s to %s\n", name, filename)
 	}
+
+	log.Printf("Running goimports")
+	if err := exec.Command("goimports", files...).Run(); err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("Done")
 }

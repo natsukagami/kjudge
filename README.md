@@ -1,5 +1,7 @@
 # kjudge
 
+[![Build Status](https://ci.nkagami.me/api/badges/natsukagami/kjudge/status.svg)](https://ci.nkagami.me/natsukagami/kjudge)
+
 ## Project Goals
 
 - As lightweightedly deployable as possible (single binary, minimal dependencies)

@@ -8,7 +8,7 @@ set -e
 sed -i 's/^debug/# debug/' fileb0x.yaml
 
 # Re-generate
-go generate
+scripts/generate.sh
 
 # Build
 go build -tags "production" -o kjudge cmd/kjudge/main.go

@@ -1,23 +1,26 @@
 {
-  "name": "templates",
-  "version": "1.0.0",
-  "description": "Templates and others for kjudge.",
-  "main": "index.js",
-  "repository": "https://git.nkagami.me/natsukagami/kjudge",
-  "author": "Natsu Kagami",
-  "license": "MIT ",
-  "private": true,
-  "devDependencies": {
-    "autoprefixer": "^9.7.4",
-    "parcel-bundler": "^1.12.4",
-    "parcel-plugin-purgecss": "^2.1.3",
-    "postcss-modules": "^1.5.0",
-    "tailwindcss": "^1.2.0",
-    "typeface-muli": "^1.1.3",
-    "typescript": "^3.8.2"
-  },
-  "scripts": {
-    "dev": "parcel watch -d ../templates \"html/**/*.html\"",
-    "build": "rm -rf ../templates && parcel build --no-source-maps -d ../templates \"html/**/*.html\""
-  }
+    "name": "templates",
+    "version": "1.0.0",
+    "description": "Templates and others for kjudge.",
+    "main": "index.js",
+    "repository": "https://git.nkagami.me/natsukagami/kjudge",
+    "author": "Natsu Kagami",
+    "license": "MIT ",
+    "private": true,
+    "devDependencies": {
+        "autoprefixer": "^9.7.4",
+        "parcel-bundler": "^1.12.4",
+        "parcel-plugin-purgecss": "^2.1.3",
+        "postcss-modules": "^1.5.0",
+        "prettier": "1.19.1",
+        "tailwindcss": "^1.2.0",
+        "typeface-muli": "^1.1.3",
+        "typescript": "^3.8.2"
+    },
+    "scripts": {
+        "test": "echo No tests... yet",
+        "fmt": "prettier \"css/**/*\" \"ts/**/*\" \"package.json\"",
+        "dev": "parcel watch -d ../templates \"html/**/*.html\"",
+        "build": "mkdir -p ../templates && rm -rf ../templates/* && parcel build --no-source-maps -d ../templates \"html/**/*.html\""
+    }
 }
