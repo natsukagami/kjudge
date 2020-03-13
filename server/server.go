@@ -3,6 +3,8 @@ package server
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"net/http"
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
@@ -19,6 +21,15 @@ import (
 type Server struct {
 	db   *db.DB
 	echo *echo.Echo
+}
+
+func (s *Server) HTTPErrorHandler(err error, c echo.Context) {
+	if errors.As(err, &echo.HTTPError{}) {
+		s.echo.DefaultHTTPErrorHandler(err, c)
+	} else {
+		log.Printf("%+v", err)
+		c.JSON(http.StatusInternalServerError, "Internal Server Error")
+	}
 }
 
 // New creates a new server.
@@ -44,10 +55,10 @@ func New(db *db.DB) (*Server, error) {
 	// ...
 	s.echo.HideBanner = true
 	s.echo.Renderer = template.Renderer{}
+	s.echo.HTTPErrorHandler = s.HTTPErrorHandler
 	s.echo.Use(session.Middleware(sessions.NewCookieStore(config.SessionKey)))
 	s.echo.Use(middleware.Recover())
 	s.echo.Use(middleware.Gzip())
-	s.echo.Use(middleware.Logger())
 
 	admin.New(s.echo.Group("/admin"), s.db)
 	s.echo.GET("*", StaticFiles)
