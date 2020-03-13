@@ -24,7 +24,8 @@ type Server struct {
 }
 
 func (s *Server) HTTPErrorHandler(err error, c echo.Context) {
-	if errors.As(err, &echo.HTTPError{}) {
+	var e *echo.HTTPError
+	if errors.As(err, &e) {
 		s.echo.DefaultHTTPErrorHandler(err, c)
 	} else {
 		log.Printf("%+v", err)
