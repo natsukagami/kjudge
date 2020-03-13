@@ -53,6 +53,18 @@ func (u *UserCtx) Render(db db.DBContext, c echo.Context) error {
 	return c.Render(status, "admin/user", u)
 }
 
+// UserDelete implement POST /admin/users/:id/delete
+func (g *Group) UserDelete(c echo.Context) error {
+	ctx, err := getUser(g.db, c)
+	if err != nil {
+		return err
+	}
+	if err := ctx.User.Delete(g.db); err != nil {
+		return err
+	}
+	return c.Redirect(http.StatusSeeOther, "/admin/users")
+}
+
 // UserGet implements GET /admin/user/:id
 func (g *Group) UserGet(c echo.Context) error {
 	ctx, err := getUser(g.db, c)
