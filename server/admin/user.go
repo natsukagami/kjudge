@@ -82,7 +82,11 @@ func (g *Group) UserEdit(c echo.Context) error {
 	if form.ID != nw.ID {
 		return echo.NewHTTPError(http.StatusBadRequest, "cannot change user id")
 	}
-	form.Bind(&nw)
+	if err := form.Bind(&nw); err != nil {
+		ctx.EditForm = &form
+		ctx.EditFormError = err
+		return ctx.Render(tx, c)
+	}
 
 	if err := nw.Write(tx); err != nil {
 		ctx.EditForm = &form
