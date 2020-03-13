@@ -1,0 +1,20 @@
+{{ define "title" }}Login{{ end }}
+
+{{ define "main" }}
+<div class="w-1/2 mx-auto rounded mt-4 p-4 bg-gray-200">
+    <h2 class="text-2xl ml-4">Login</h2>
+    {{ template "form-error" .Error }}
+    <form class="py-4 px-2" method="POST">
+        <label class="text-sm block" for="id">ID</label>
+        <input class="form-input w-full" id="id" type="text" placeholder="Username" autofocus required name="id"
+            value="{{.ID}}">
+        <label class="text-sm block" for="password">Password</label>
+        <input class="form-input w-full" id="password" type="password" placeholder="Password" required name="password">
+
+        <div class="mt-2">
+            <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
+            <input required type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
+        </div>
+    </form>
+</div>
+{{ end }}

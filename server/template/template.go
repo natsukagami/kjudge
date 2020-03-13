@@ -26,6 +26,9 @@ var templateList = map[string][]string{
 	"admin/users":               []string{"admin/root", "admin/user_inputs"},
 	"admin/user":                []string{"admin/root", "admin/user_inputs", "admin/submission_inputs"},
 	"admin/submissions":         []string{"admin/root", "admin/submission_inputs"},
+
+	"user/login": []string{},
+	"user/home":  []string{},
 }
 
 // From a single template name, resolve the requirement tree into a list of template names.

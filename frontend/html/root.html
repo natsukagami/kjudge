@@ -11,3 +11,11 @@
     </div>
     <script src="../ts/index.ts"></script>
 </body>
+
+{{/* Common components */}}
+
+{{ define "form-error" }}
+{{ if . }}
+<div class="bg-red-400 rounded border p-4 text-center text-white">{{ .Error }}</div>
+{{ end }}
+{{ end }}

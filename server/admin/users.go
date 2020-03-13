@@ -5,6 +5,7 @@ import (
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/server/auth"
 	"github.com/labstack/echo/v4"
 )
 
@@ -28,12 +29,17 @@ type UserForm struct {
 }
 
 // Bind binds the form's values to the model.
-func (f *UserForm) Bind(u *models.User) {
+func (f *UserForm) Bind(u *models.User) error {
 	u.ID = f.ID
 	if f.Password != "" {
-		u.Password = f.Password
+		p, err := auth.PasswordHash(f.Password)
+		if err != nil {
+			return err
+		}
+		u.Password = string(p)
 	}
 	u.Hidden = f.Hidden
+	return nil
 }
 
 func UserToForm(u *models.User) *UserForm {
@@ -71,7 +77,14 @@ func (g *Group) UsersAdd(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	var u models.User
-	form.Bind(&u)
+	if err := form.Bind(&u); err != nil {
+		ctx, ctxErr := getUsers(g.db, c)
+		if ctxErr != nil {
+			return ctxErr
+		}
+		ctx.FormError = err
+		return c.Render(http.StatusBadRequest, "admin/users", ctx)
+	}
 	if err := u.Write(g.db); err != nil {
 		ctx, ctxErr := getUsers(g.db, c)
 		if ctxErr != nil {

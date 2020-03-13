@@ -10,6 +10,7 @@ import (
 	"git.nkagami.me/natsukagami/kjudge/models"
 	"git.nkagami.me/natsukagami/kjudge/server/admin"
 	"git.nkagami.me/natsukagami/kjudge/server/template"
+	"git.nkagami.me/natsukagami/kjudge/server/user"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
@@ -62,6 +63,7 @@ func New(db *db.DB) (*Server, error) {
 	s.echo.Use(middleware.Gzip())
 
 	admin.New(s.echo.Group("/admin"), s.db)
+	user.New(s.db, s.echo.Group("/user"))
 	s.echo.GET("*", StaticFiles)
 
 	return &s, nil
