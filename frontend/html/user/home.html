@@ -1,6 +1,24 @@
 {{ define "title" }}Home{{ end }}
 
-{{ define "main" }}
-<div>Hello {{ .Me.ID }} uwu</div>
-<div><a href="/user/logout">Logout</a></div>
+{{ define "content" }}
+<div class="py-4 mx-auto text-4xl">User Control Panel [<b>{{.Me.ID}}</b>]</div>
+
+<div class="subheader">Change Password</div>
+{{ template "form-error" .ChangePasswordError }}
+<form id="change-password-form" class="form-block" method="POST" action="/user/change_password">
+    <label for="current-password" class="text-sm block">Current Password</label>
+    <input id="current-password" class="form-input" type="password" placeholder="Current Password"
+        name="current_password" required>
+    <label for="new-password" class="text-sm block">New Password</label>
+    <input id="new-password" class="form-input" type="password" placeholder="New Password" name="new_password" required>
+    <label for="confirm-password" class="text-sm block">Confirm Password <span style="display: none;" id="match_warning"
+            class="font-bold text-red-600">[Please match passwords]</span></label>
+    <input id="confirm-password" class="form-input" type="password" placeholder="Confirm Password" required>
+
+    <div class="mt-2">
+        <input required type="submit" class="form-btn bg-green-200 hover:bg-green-300" value="Submit">
+        <input required type="reset" class="form-btn bg-red-200 hover:bg-red-300" value="Reset">
+    </div>
+</form>
+<script type="application/javascript" src="../../ts/user.ts"></script>
 {{ end }}

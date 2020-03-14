@@ -2,8 +2,6 @@
 package user
 
 import (
-	"net/http"
-
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/server/auth"
 	"github.com/labstack/echo/v4"
@@ -27,17 +25,9 @@ func New(db *db.DB, g *echo.Group) (*Group, error) {
 
 	authed := g.Group("", auth.MustAuth(db))
 	authed.GET("", grp.HomeGet)
+	authed.POST("/change_password", grp.ChangePassword)
 	authed.GET("/logout", grp.LogoutPost)
 	authed.POST("/logout", grp.LogoutPost)
 
 	return grp, nil
-}
-
-// HomeGet implements "/user".
-func (g *Group) HomeGet(c echo.Context) error {
-	u, err := Me(g.db, c)
-	if err != nil {
-		return err
-	}
-	return c.Render(http.StatusOK, "user/home", u)
 }
