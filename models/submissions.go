@@ -28,10 +28,16 @@ var availableLanguages []string
 
 func init() {
 	for _, l := range []Language{LanguageCpp, LanguagePas, LanguageJava, LanguagePy2, LanguagePy3, LanguageGo, LanguageRust} {
-		if exec.Command(string(l), "--version").Run() != nil && exec.Command(string(l), "version").Run() != nil {
-			log.Printf("`%s --version` errored out, kjudge will reject such submissions.", l)
-		} else {
-			availableLanguages = append(availableLanguages, string(l))
+		ok := false
+		for _, versionArg := range []string{"--version", "-version", "version"} {
+			if exec.Command(string(l), versionArg).Run() == nil {
+				availableLanguages = append(availableLanguages, string(l))
+				ok = true
+				break
+			}
+		}
+		if !ok {
+			log.Printf("\"%s\" seems to be unavailable on the system. Declining all submissions with the language...", l)
 		}
 	}
 }
