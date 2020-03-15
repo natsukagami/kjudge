@@ -102,3 +102,15 @@ import "typeface-muli";
         }
     });
 })();
+
+// Handle login button: set href = login address + back-ref
+(() => {
+    for (const link of document.getElementsByClassName("login-button")) {
+        (link as HTMLAnchorElement).href =
+            "/user/login?last=" + encodeURIComponent(document.URL);
+    }
+    for (const link of document.getElementsByClassName("logout-button")) {
+        (link as HTMLAnchorElement).href =
+            "/user/logout?last=" + encodeURIComponent(document.URL);
+    }
+})();

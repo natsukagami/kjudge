@@ -9,6 +9,7 @@ import (
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
 	"git.nkagami.me/natsukagami/kjudge/server/admin"
+	"git.nkagami.me/natsukagami/kjudge/server/contests"
 	"git.nkagami.me/natsukagami/kjudge/server/template"
 	"git.nkagami.me/natsukagami/kjudge/server/user"
 	"github.com/gorilla/sessions"
@@ -62,9 +63,18 @@ func New(db *db.DB) (*Server, error) {
 	s.echo.Use(middleware.Recover())
 	s.echo.Use(middleware.Gzip())
 
-	admin.New(s.echo.Group("/admin"), s.db)
-	user.New(s.db, s.echo.Group("/user"))
+	if _, err := admin.New(s.db, s.echo.Group("/admin")); err != nil {
+		return nil, err
+	}
+	if _, err := user.New(s.db, s.echo.Group("/user")); err != nil {
+		return nil, err
+	}
+	contests, err := contests.New(s.db, s.echo.Group("/contests"))
+	if err != nil {
+		return nil, err
+	}
 	s.echo.GET("*", StaticFiles)
+	s.echo.GET("", contests.ConestsGetNearestOngoingContest)
 
 	return &s, nil
 }

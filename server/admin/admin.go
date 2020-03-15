@@ -13,7 +13,7 @@ type Group struct {
 }
 
 // New creates a new group.
-func New(g *echo.Group, db *db.DB) *Group {
+func New(db *db.DB, g *echo.Group) (*Group, error) {
 	grp := &Group{
 		Group: g,
 		db:    db,
@@ -56,5 +56,5 @@ func New(g *echo.Group, db *db.DB) *Group {
 	g.POST("/config/toggle_enable_registration", grp.ToggleEnableRegistration)
 	// Submissions
 	g.GET("/submissions", grp.SubmissionsGet)
-	return grp
+	return grp, nil
 }
