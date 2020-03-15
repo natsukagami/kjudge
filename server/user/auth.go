@@ -17,6 +17,11 @@ type AuthCtx struct {
 	Me *models.User
 }
 
+// GetMe implements template.Me
+func (a *AuthCtx) GetMe() *models.User {
+	return a.Me
+}
+
 // Me returns the "me" user context.
 func Me(db db.DBContext, c echo.Context) (*AuthCtx, error) {
 	u, err := auth.Authenticate(db, c)
@@ -94,7 +99,7 @@ func (g *Group) LoginPost(c echo.Context) error {
 	// Perform redirect
 	last := c.QueryParam("last")
 	if last == "" {
-		last = "/user"
+		last = "/"
 	}
 	return c.Redirect(http.StatusSeeOther, last)
 }
@@ -104,7 +109,11 @@ func (g *Group) LogoutPost(c echo.Context) error {
 	if err := auth.Remove(c); err != nil {
 		return err
 	}
-	return c.Redirect(http.StatusSeeOther, "/user")
+	last := c.QueryParam("last")
+	if last == "" {
+		last = "/"
+	}
+	return c.Redirect(http.StatusSeeOther, last)
 }
 
 // Redirect if already logged in.
@@ -117,7 +126,7 @@ func alreadyLoggedIn(db db.DBContext, c echo.Context) (bool, error) {
 	if u != nil {
 		last := c.QueryParam("last")
 		if last == "" {
-			last = "/user"
+			last = "/"
 		}
 		return true, c.Redirect(http.StatusSeeOther, last)
 	}

@@ -1,10 +1,18 @@
 {{ define "main" }}
 <div class="flex flex-rowi h-screen">
     <div class="w-1/4 mx-4 flex-shrink-0">
-        <div class="text-lg py-4 pl-4">Welcome <b>{{.Me.ID}}</b>!</div>
+        <div class="text-lg py-4 pl-4">
+            Welcome
+            {{ if (loggedIn .) }}
+            <b>{{.Me.ID}}</b>!
+            {{ else }}
+            to <b>kjudge</b>
+            {{ end }}
+        </div>
         <hr>
         {{ block "nav" . }}{{ end }}
         <hr>
+        {{ block "nav-button" . }}
         <nav class="py-1">
             <a href="/">
                 <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-1 pl-4">Home</div>
@@ -12,13 +20,20 @@
             <a href="/contests">
                 <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-1 pl-4">Contests</div>
             </a>
+            {{ if (loggedIn .) }}
             <a href="/user">
                 <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-1 pl-4">Me</div>
             </a>
-            <a href="/user/logout">
-                <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-1 pl-4">Log Out</div>
+            <a class="logout-button">
+                <div class="bg-gray-400 rounded-sm hover:bg-red-200 m-2 py-1 pl-4">Log Out</div>
             </a>
+            {{ else }}
+            <a class="login-button">
+                <div class="bg-gray-400 rounded-sm hover:bg-blue-200 m-2 py-1 pl-4">Log in</div>
+            </a>
+            {{ end }}
         </nav>
+        {{ end }}
         <hr>
         {{/* Footer */}}
         <div class="mt-5 mx-auto text-center">

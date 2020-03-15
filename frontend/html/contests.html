@@ -1,0 +1,45 @@
+{{ define "title" }}Contests{{ end }}
+
+{{ define "contests-table" }}
+<table class="table table-auto w-full">
+    <thead>
+        <tr>
+            <th class="border-b py-1">ID</th>
+            <th class="border-b py-1">Name</th>
+            <th class="border-b py-1">Start Time</th>
+            <th class="border-b py-1">End Time</th>
+            <th class="border-b py-1">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range . }}
+        {{ $link := printf "/contests/%d" (.ID) }}
+        <tr class="border-b">
+            <td class="text-center">{{.ID}}</td>
+            <td>{{.Name}}</td>
+            <td class="text-center display-time" data-time="{{.StartTime | time}}">{{.StartTime}}</td>
+            <td class="text-center display-time" data-time="{{.EndTime | time}}">{{.EndTime}}</td>
+            <td class="text-center">
+                <a href="{{$link}}" title="Enter Contest"
+                    class="cursor-pointer hover:text-green-600">Enter Contest</a>
+            </td>
+        </tr>
+        {{ else }}
+        <tr class="border-b">
+            <td colspan="5" class="py-1 text-center">No contests.</td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+{{ end }}
+
+{{ define "content" }}
+<div class="p-2">
+    <div class="py-4 mx-auto text-4xl">Active Contests</div>
+    {{ template "contests-table" .ActiveContests }}
+</div>
+<div class="p-2">
+    <div class="py-4 mx-auto text-4xl">Past Contests</div>
+    {{ template "contests-table" .PastContests }}
+</div>
+{{ end }}
