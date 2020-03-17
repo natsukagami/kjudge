@@ -65,7 +65,7 @@ CREATE TABLE submissions (
     id INTEGER PRIMARY KEY NOT NULL,
     problem_id INTEGER NOT NULL,
     user_id VARCHAR NOT NULL,
-    submitted_at VARCHAR NOT NULL,
+    submitted_at DATETIME NOT NULL,
     -- Source file information
     language VARCHAR NOT NULL,
     source BLOB NOT NULL,
@@ -88,7 +88,9 @@ CREATE TABLE test_results (
   verdict VARCHAR NOT NULL,
   score   REAL NOT NULL,
   running_time INTEGER NOT NULL,
-  memory_used INTEGER NOT NULL
+  memory_used INTEGER NOT NULL,
+
+  UNIQUE(submission_id, test_id)
 );
     
 -- Problem results

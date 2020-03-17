@@ -2,6 +2,7 @@ package worker
 
 import (
 	"log"
+	"time"
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
@@ -95,5 +96,10 @@ func (q *Queue) startHook() <-chan struct{} {
 			toUpdate <- struct{}{}
 		}
 	})
+	go func() {
+		for range time.Tick(3 * time.Second) {
+			toUpdate <- struct{}{}
+		}
+	}()
 	return toUpdate
 }

@@ -1,6 +1,9 @@
 // Muli font
 import "typeface-muli";
 
+// Moment.js
+import hd from "humanize-duration";
+
 // Set timezone
 (function() {
     setInterval(() => {
@@ -112,5 +115,55 @@ import "typeface-muli";
     for (const link of document.getElementsByClassName("logout-button")) {
         (link as HTMLAnchorElement).href =
             "/user/logout?last=" + encodeURIComponent(document.URL);
+    }
+})();
+
+// Handle timers
+(() => {
+    for (const t of document.getElementsByClassName("timer")) {
+        const timer = t as HTMLDivElement;
+
+        const start = timer.getAttribute("data-start");
+        const end = timer.getAttribute("data-end");
+        if (!start || !end) {
+            continue;
+        }
+
+        const startTime = new Date(start);
+        const endTime = new Date(end);
+
+        const interval = setInterval(() => {
+            const now = new Date();
+            if (now.getTime() < startTime.getTime()) {
+                timer.innerHTML = `Contest starting in <span class="font-semibold">${hd(
+                    startTime.getTime() - now.getTime(),
+                    {
+                        largest: 2,
+                        units: ["h", "m", "s"],
+                        round: true,
+                    },
+                )}</span>`;
+            } else if (now.getTime() < endTime.getTime()) {
+                timer.innerHTML = `Time remaining: <span class="font-semibold">${hd(
+                    endTime.getTime() - now.getTime(),
+                    {
+                        largest: 2,
+                        units: ["h", "m", "s"],
+                        round: true,
+                    },
+                )}</span>`;
+            } else {
+                timer.innerHTML = "Contest has ended.";
+                clearInterval(interval);
+            }
+        }, 1000);
+    }
+})();
+
+(() => {
+    for (const p of document.getElementsByClassName("make-embed")) {
+        p.innerHTML = `<embed src="${p.getAttribute(
+            "data-src",
+        )}" type="application/pdf" class="w-full" style="height: 75vh;"/>`;
     }
 })();

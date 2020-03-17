@@ -59,24 +59,28 @@
         </tr>
     </thead>
     <tbody>
+        {{ $user := .User }}
+        {{ $users := .Users }}
+        {{ $problem := .Problem }}
+        {{ $problemsMap := .ProblemsMap }}
         {{ range $sub := .Submissions }}
         <tr class="table-row" data-id="{{$sub.ID}}" data-user="{{$sub.UserID}}" data-problem="{{$sub.ProblemID}}">
             <td class="py-1 border-b text-center">
                 <input class="select-to-rejudge" value="{{$sub.ID}}" type="checkbox">
             </td>
             <td class="py-1 border-b text-center">{{$sub.ID}}</td>
-            {{ if .User }}
+            {{ if $user }}
             {{  else  }}
-            {{ with (index .Users $sub.UserID) }}
+            {{ with (index $users $sub.UserID) }}
             {{ $link := printf "/admin/users/%s" .ID }}
             <td class="py-1 border-b">
                 <a href="{{$link}}" class="cursor-pointer hover:text-blue-600">{{.ID}}</a>
             </td>
             {{ end }}
             {{ end }}
-            {{ if .Problem }}
+            {{ if $problem }}
             {{ else }}
-            {{ with (index .ProblemsMap $sub.ProblemID) }}
+            {{ with (index $problemsMap $sub.ProblemID) }}
             {{ $link := printf "/admin/problems/%d" .ID }}
             <td class="py-1 border-b"><a href="{{$link}}" class="cursor-pointer hover:text-blue-600">{{.Name}}.
                     {{.DisplayName}}</a></td>

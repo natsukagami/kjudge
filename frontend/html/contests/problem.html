@@ -1,0 +1,136 @@
+{{ define "inner-title" }}{{.Problem.Name}}. {{.Problem.DisplayName}}{{ end }}
+
+{{ define "content" }}
+<div class="text-4xl my-4 ml-2">{{.Problem.Name}}. {{.Problem.DisplayName}}</div>
+
+<div class="text-lg my-4 ml-4">
+    <div>
+        Time Limit: <span class="font-semibold">{{.Problem.TimeLimit}}</span>ms
+    </div>
+    <div>
+        Memory Limit: <span class="font-semibold">{{.Problem.MemoryLimit}}</span>KBs
+    </div>
+</div>
+
+<nav class="flex flex-row justify-start mt-6 mb-2">
+    <a href="#statements" class="mx-4">
+        <div class="rounded bg-gray-200 hover:bg-gray-400 problem-tab py-2 px-4" data-tab="statements">Statements
+        </div>
+    </a>
+    <a href="#files" class="mx-4">
+        <div class="rounded bg-gray-200 hover:bg-gray-400 problem-tab py-2 px-4" data-tab="files">Files</div>
+    </a>
+    {{ if (isFuture .Contest.EndTime) }}
+    <a href="#submit" class="mx-4">
+        <div class="rounded bg-gray-200 hover:bg-gray-400 problem-tab py-2 px-4" data-tab="submit">Submit
+        </div>
+    </a>
+    {{ end }}
+    <a href="#submissions" class="mx-4">
+        <div class="rounded bg-gray-200 hover:bg-gray-400 problem-tab py-2 px-4" data-tab="submissions">Submissions
+        </div>
+    </a>
+</nav>
+<hr class="mt-2 mb-4">
+
+<div class="my-2 px-2">
+    <div style="display: none;" class="tab" data-tab="statements">{{ template "problem-statements" . }}</div>
+    <div style="display: none;" class="tab" data-tab="files">{{ template "problem-files" . }}</div>
+    {{ if (isFuture .Contest.EndTime) }}
+    <div style="display: none;" class="tab" data-tab="submit">{{ template "problem-submit" . }}</div>
+    {{ end }}
+    <div style="display: none;" class="tab" data-tab="submissions">{{ template "problem-submissions" . }}</div>
+</div>
+
+<script src="../../ts/problem.ts"></script>
+{{ end }}
+
+{{ define "problem-statements" }}
+{{ $problem_link := printf "/contests/%d/problems/%s" .Problem.ContestID .Problem.Name }}
+{{ with (index .Files "statements.pdf") }}
+{{ $link :=  printf "%s/files/%d" $problem_link .ID }}
+<div class="make-embed" data-src="{{$link}}"></div>
+{{ else }}
+<div class="text-center">
+    No <span class="font-mono">statements.pdf</span> file.
+</div>
+{{ end }}
+{{ end }}
+
+{{ define "problem-files" }}
+{{ $problem_link := printf "/contests/%d/problems/%s" .Problem.ContestID .Problem.Name }}
+<table class="table table-auto w-full">
+    <thead>
+        <tr>
+            <th class="my-2 border-b text-center">Filename</th>
+            <th class="my-2 border-b text-center">Download</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range .Files }}
+        {{ $link :=  printf "%s/files/%d" $problem_link .ID }}
+        <tr>
+            <td class="my-2 border-b font-mono">{{.Filename}}</td>
+            <td class="my-2 border-b text-center"><a href="{{$link}}" class="hover:text-blue-600">Download</a></td>
+        </tr>
+        {{ else }}
+        <tr>
+            <td colspan="2" class="my-2 border-b text-center">No Files</td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+{{ end }}
+
+{{ define "problem-submit" }}
+{{ $submit_link := printf "/contests/%d/problems/%s/submit" .Problem.ContestID .Problem.Name }}
+<form class="form-block" method="POST" action="{{ $submit_link }}" enctype="multipart/form-data">
+    <label for="file" class="block text-sm">File</label>
+    <input class="form-input" type="file" id="file" name="file" required>
+
+    <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
+</form>
+{{ end }}
+
+{{ define "problem-submissions" }}
+<table class="table table-auto w-full">
+    <thead>
+        <tr>
+            <th class="my-1 border-b text-center">ID</th>
+            <th class="my-1 border-b text-center">Submitted At</th>
+            <th class="my-1 border-b text-center">Verdict</th>
+            <th class="my-1 border-b text-center">Score</th>
+            <th class="my-1 border-b text-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ $contest_link := printf "/contests/%d" .Contest.ID }}
+        {{ range .Submissions }}
+        <tr>
+            <td class="my-1 border-b text-center">{{.ID}}</td>
+            <td class="my-1 border-b text-center display-time" data-time="{{.SubmittedAt | time}}"></td>
+            <td class="my-1 border-b text-center">{{.Verdict}}</td>
+            <td class="my-1 border-b text-center">
+                {{ if .Score.Valid }}
+                {{printf "%.2f" .Score.Float64}}
+                {{ if lt .Penalty.Int64 0 }}
+                ({{printf "%d" .Penalty.Int64}})
+                {{ end }}
+                {{ else }}
+                -
+                {{ end }}
+            </td>
+            <td class="my-1 border-b text-center">
+                {{ $link := printf "%s/submissions/%d" $contest_link .ID }}
+                <a href="{{$link}}" class="hover:bg-blue-600" title="View the submission's details">[v]</a>
+                <a href="{{$link}}/download" class="hover:bg-green-600" title="Download">[d]</a>
+            </td>
+        </tr>
+        {{ else }}
+        <tr>
+            <td colspan="5" class="my-1 border-b text-center">No Submissions</td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+{{ end }}

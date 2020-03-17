@@ -1,6 +1,14 @@
 package models
 
-import "git.nkagami.me/natsukagami/kjudge/models/verify"
+import (
+	"fmt"
+	"strings"
+
+	"git.nkagami.me/natsukagami/kjudge/db"
+	"git.nkagami.me/natsukagami/kjudge/models/verify"
+	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
+)
 
 // ScoringMode dictates how the best submission is chosen.
 // There are:
@@ -51,4 +59,82 @@ func (r *Problem) Verify() error {
 		"TimeLimit":     verify.IntPositive(r.TimeLimit),
 		"MemoryLimit":   verify.IntPositive(r.MemoryLimit),
 	})
+}
+
+// ProblemWithTestGroups is a problem with attached test groups,
+// that will provide score-related statistics.
+type ProblemWithTestGroups struct {
+	*Problem
+	TestGroups []*TestGroup
+}
+
+// TotalScore returns the problem's maximal total score.
+func (p *ProblemWithTestGroups) TotalScore() float64 {
+	total := 0.0
+	for _, tg := range p.TestGroups {
+		if tg.Score >= 0 {
+			total += tg.Score
+		}
+	}
+	return total
+}
+
+// SubtaskScores returns the problem's test group scores as a list seperated by forward slash.
+func (p *ProblemWithTestGroups) SubtaskScores() string {
+	first := true
+	var res strings.Builder
+	for _, tg := range p.TestGroups {
+		if tg.Score < 0 {
+			continue
+		}
+		if !first {
+			res.WriteString("/")
+		}
+		first = false
+		res.WriteString(fmt.Sprintf("%.2f", tg.Score))
+	}
+	return res.String()
+}
+
+// CollectTestGroups collects the test groups for a list of problems.
+func CollectTestGroups(db db.DBContext, problems []*Problem, private bool) ([]*ProblemWithTestGroups, error) {
+	if len(problems) == 0 {
+		return nil, nil
+	}
+	pMap := make(map[int]*ProblemWithTestGroups)
+	var IDs []int
+	for _, p := range problems {
+		pMap[p.ID] = &ProblemWithTestGroups{Problem: p}
+		IDs = append(IDs, p.ID)
+	}
+	privateQuery := ""
+	if !private {
+		privateQuery = " AND score >= 0"
+	}
+	var tgs []*TestGroup
+	query, args, err := sqlx.In("SELECT * FROM test_groups WHERE problem_id IN (?)"+privateQuery+" ORDER BY name", IDs)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	if err := db.Select(&tgs, query, args...); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	for _, tg := range tgs {
+		p := pMap[tg.ProblemID]
+		p.TestGroups = append(p.TestGroups, tg)
+	}
+	var ps []*ProblemWithTestGroups
+	for _, p := range problems {
+		ps = append(ps, pMap[p.ID])
+	}
+	return ps, nil
+}
+
+// GetProblemByName gets a Problem from the Database by its name and contest.
+func GetProblemByName(db db.DBContext, contestID int, name string) (*Problem, error) {
+	var result Problem
+	if err := db.Get(&result, "SELECT * FROM problems WHERE contest_id = ? AND name = ?", contestID, name); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return &result, nil
 }

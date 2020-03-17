@@ -36,6 +36,14 @@ func Score(s *ScoreContext) error {
 	if err != nil {
 		return err
 	}
+	if compiled, source := s.CompiledSource(); !compiled {
+		// Add a compilation job and re-add ourselves.
+		log.Printf("[WORKER] Submission %v not compiled, creating Compile job.\n", s.Sub.ID)
+		return models.BatchInsertJobs(s.DB, models.NewJobCompile(s.Sub.ID), models.NewJobScore(s.Sub.ID))
+	} else if source == nil {
+		log.Printf("[WORKER] Not running a submission that failed to compile.\n")
+		return nil
+	}
 	if missing := MissingTests(tests, testResults); len(missing) > 0 {
 		log.Printf("[WORKER] Submission %v needs to run %d tests before being scored.\n", s.Sub.ID, len(missing))
 		var jobs []*models.Job
@@ -253,4 +261,13 @@ func MissingTests(tests []*models.TestGroupWithTests, results map[int]*models.Te
 		}
 	}
 	return res
+}
+
+// CompiledSource returns the CompiledSource. Returns false when the submission hasn't been compiled.
+// Returns nil if the submission failed to compile.
+func (s *ScoreContext) CompiledSource() (bool, []byte) {
+	if s.Sub.CompilerOutput == nil {
+		return false, nil
+	}
+	return true, s.Sub.CompiledSource
 }

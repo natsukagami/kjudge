@@ -26,6 +26,28 @@ const (
 
 var availableLanguages []string
 
+// LanguageByExt returns a language based on the file extension.
+func LanguageByExt(ext string) (Language, error) {
+	switch ext {
+	case ".cpp", ".cc":
+		return LanguageCpp, nil
+	case ".pas":
+		return LanguagePas, nil
+	case ".java":
+		return LanguageJava, nil
+	case ".py2":
+		return LanguagePy2, nil
+	case ".py3", ".py":
+		return LanguagePy3, nil
+	case ".go":
+		return LanguageGo, nil
+	case ".rs":
+		return LanguageRust, nil
+	default:
+		return "", errors.New("unknown language")
+	}
+}
+
 func init() {
 	for _, l := range []Language{LanguageCpp, LanguagePas, LanguageJava, LanguagePy2, LanguagePy3, LanguageGo, LanguageRust} {
 		ok := false
