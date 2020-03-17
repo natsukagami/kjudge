@@ -43,16 +43,14 @@ func Authenticate(db db.DBContext, c echo.Context) (*models.User, error) {
 
 	sess, err := session.Get(sessionName, c)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, Remove(c)
 	}
 	if sess.IsNew {
 		return nil, nil
 	}
 	username, ok := sess.Values["username"].(string)
 	if !ok {
-		sess.Options.MaxAge = -1
-		sess.Save(c.Request(), c.Response())
-		return nil, nil
+		return nil, Remove(c)
 	}
 
 	user, err := models.GetUser(db, username)
@@ -83,10 +81,7 @@ func Store(u *models.User, timeout time.Duration, c echo.Context) error {
 
 // Remove removes the authentication cookie.
 func Remove(c echo.Context) error {
-	sess, err := session.Get(sessionName, c)
-	if err != nil {
-		return errors.WithStack(err)
-	}
+	sess, _ := session.Get(sessionName, c)
 	sess.Options.MaxAge = -1
 	return errors.WithStack(sess.Save(c.Request(), c.Response()))
 }
