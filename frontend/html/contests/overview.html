@@ -1,0 +1,78 @@
+{{ define "inner-title" }}Overview{{ end }}
+
+{{ define "content" }}
+<div class="text-4xl py-4"><b>{{.Contest.Name}}</b>: Overview</div>
+
+<div class="text-xl my-2 text-gray-800 timer" data-start="{{.Contest.StartTime | time}}"
+    data-end="{{.Contest.EndTime | time}}"><span class="font-semibold"></span></div>
+
+<div class="text-xl my-2">
+    The contest starts at <span class="font-semibold display-time" data-time="{{.Contest.StartTime | time}}"></span> and
+    ends at <span class="font-semibold display-time" data-time="{{.Contest.EndTime | time}}"></span>.
+</div>
+
+{{ if (isFuture .Contest.StartTime) }}
+{{ else }}
+<div class="subheader">Problems</div>
+<table class="table table-auto w-full">
+    <thead>
+        <tr>
+            <th class="text-lg py-3 border-b text-center">Name</th>
+            <th class="text-lg py-3 border-b text-center" title="Time Limit">Time Limit</th>
+            <th class="text-lg py-3 border-b text-center" title="Memory Limit">Memory Limit</th>
+            <th class="text-lg py-3 border-b text-center">Your Score</th>
+            <th class="text-lg py-3 border-b text-center">Max Score</th>
+            <th class="text-lg py-3 border-b text-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ $scores := .Scores }}
+        {{ $ended := isFuture .Contest.EndTime }}
+        {{ range .Problems }}
+        {{ $link := printf "/contests/%d/problems/%s" .ContestID .Name }}
+        <tr>
+            <td class="text-lg py-3 border-b">
+                <a href="{{$link}}" class="hover:text-blue-600">{{.Name}}. {{.DisplayName}}</a>
+            </td>
+            <td class="text-lg py-3 border-b text-center">
+                <span class="font-semibold">{{.TimeLimit}}</span>ms
+            </td>
+            <td class="text-lg py-3 border-b text-center">
+                <span class="font-semibold">{{.MemoryLimit}}</span>KBs
+            </td>
+            <td class="text-lg py-3 border-b text-center">
+                {{ with (index $scores .ID) }}
+                <span class="font-semibold">{{ .Score }}</span>
+                {{ if .Penalty }}
+                <span>(+{{ .Penalty}})</span>
+                {{ end }}
+                {{ else }}
+                -
+                {{ end }}
+            </td>
+            <td class="text-lg py-3 border-b text-center">
+                <span class="font-semibold">{{.TotalScore}}</span>
+                {{ if gt (len .TestGroups) 2 }}
+                ({{.SubtaskScores}})
+                {{ end }}
+            </td>
+            <td class="text-lg py-3 border-b text-center">
+                <a href="{{$link}}#statements" title="View statements"
+                    class="cursor-pointer hover:text-blue-600">[v]</a>
+                <a href="{{$link}}#files" title="Download files" class="cursor-pointer hover:text-yellow-600">[f]</a>
+                {{ if $ended }}
+                <a href="{{$link}}#submit" title="Submit a solution" class="cursor-pointer hover:text-green-600">[s]</a>
+                {{ end }}
+                <a href="{{$link}}#submissions" title="View your submissions"
+                    class="cursor-pointer hover:text-red-600">[l]</a>
+            </td>
+        </tr>
+        {{ else }}
+        <tr>
+            <td colspan="6" class="text-lg py-3 border-b text-center">No Problems</td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+{{ end }}
+{{ end }}

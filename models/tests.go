@@ -23,8 +23,8 @@ func GetProblemTestsMeta(db db.DBContext, problemID int) ([]*TestGroupWithTests,
 	return getProblemTests(db, problemID, "id, name, test_group_id")
 }
 
-// GetProblemTests but allow us to omit rows (input, output)
-func getProblemTests(db db.DBContext, problemID int, rows string) ([]*TestGroupWithTests, error) {
+// GetProblemTests but allow us to omit cols (input, output)
+func getProblemTests(db db.DBContext, problemID int, cols string) ([]*TestGroupWithTests, error) {
 	testGroups, err := GetProblemTestGroups(db, problemID)
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func getProblemTests(db db.DBContext, problemID int, rows string) ([]*TestGroupW
 		return nil, nil
 	}
 	// Query the tests
-	query, params, err := sqlx.In("SELECT "+rows+" FROM tests WHERE test_group_id IN (?) ORDER BY name", IDs)
+	query, params, err := sqlx.In("SELECT "+cols+" FROM tests WHERE test_group_id IN (?) ORDER BY name", IDs)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

@@ -1,0 +1,46 @@
+{{ define "title" }} {{ block "inner-title" . }}{{ end }} - {{ .Contest.Name }}{{ end }}
+
+{{ define "nav" }}
+{{ $contest_link := printf "/contests/%d" .Contest.ID }}
+<div class="py-1">
+    <div class="text-lg pl-4 mb-2 py-2 font-semibold">
+        {{ .Contest.Name }}
+    </div>
+    <div class="pl-4 my-2 text-gray-800 timer" data-start="{{.Contest.StartTime | time}}"
+        data-end="{{.Contest.EndTime | time}}"><span class="font-semibold"></span></div>
+    <nav class="mt-1">
+        <a href="{{$contest_link}}">
+            <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 pl-4">Overview</div>
+        </a>
+        <a href="{{$contest_link}}/scoreboard">
+            <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 pl-4">Scoreboard</div>
+        </a>
+        {{ if (isFuture .Contest.StartTime)}}
+        {{ else }}
+        {{ $ended := (isFuture .Contest.EndTime) }}
+        {{ range .Problems }}
+        {{ $link := printf "%s/problems/%s" $contest_link .Name }}
+        <a href="{{$link}}">
+            <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 px-4 flex flex-row justify-between">
+                <div>
+                    {{.Name}}. {{.DisplayName}}
+                </div>
+                <div>
+                    <a href="{{$link}}#statements" title="View statements"
+                        class="cursor-pointer hover:text-blue-600">[v]</a>
+                    <a href="{{$link}}#files" title="Download files"
+                        class="cursor-pointer hover:text-yellow-600">[f]</a>
+                    {{ if $ended }}
+                    <a href="{{$link}}#submit" title="Submit a solution"
+                        class="cursor-pointer hover:text-green-600">[s]</a>
+                    {{ end }}
+                    <a href="{{$link}}#submissions" title="View your submissions"
+                        class="cursor-pointer hover:text-red-600">[l]</a>
+                </div>
+            </div>
+        </a>
+        {{ end }}
+        {{ end }}
+    </nav>
+</div>
+{{ end }}

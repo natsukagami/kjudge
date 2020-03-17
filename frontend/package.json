@@ -8,6 +8,7 @@
     "license": "MIT ",
     "private": true,
     "devDependencies": {
+        "@types/humanize-duration": "^3.18.0",
         "autoprefixer": "^9.7.4",
         "parcel-bundler": "^1.12.4",
         "parcel-plugin-purgecss": "^2.1.3",
@@ -22,5 +23,8 @@
         "fmt": "prettier \"css/**/*\" \"ts/**/*\" \"package.json\"",
         "dev": "parcel watch -d ../templates \"html/**/*.html\"",
         "build": "mkdir -p ../templates && rm -rf ../templates/* && parcel build --no-source-maps -d ../templates \"html/**/*.html\""
+    },
+    "dependencies": {
+        "humanize-duration": "^3.22.0"
     }
 }

@@ -8,6 +8,7 @@ import (
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/server/auth"
 	"git.nkagami.me/natsukagami/kjudge/server/user"
 	"github.com/labstack/echo/v4"
 )
@@ -50,6 +51,11 @@ func New(db *db.DB, g *echo.Group) (*Group, error) {
 	}
 
 	g.GET("", grp.ContestsGet)
+	authed := g.Group("/", auth.MustAuth(db))
+	authed.GET(":id", grp.OverviewGet)
+	authed.GET(":id/problems/:problem", grp.ProblemGet)
+	authed.GET(":id/problems/:problem/files/:file", grp.FileGet)
+	authed.POST(":id/problems/:problem/submit", grp.SubmitPost)
 
 	return grp, nil
 }
@@ -60,7 +66,7 @@ func (g *Group) ContestsGet(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.Render(http.StatusOK, "contests", ctx)
+	return c.Render(http.StatusOK, "contests/home", ctx)
 
 }
 

@@ -11,14 +11,13 @@ package raw
 
 import (
 	"bytes"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"git.nkagami.me/natsukagami/kjudge/worker"
-	"github.com/pkg/errors"
 )
 
 // Sandbox implements worker.Sandbox.
@@ -48,41 +47,23 @@ func (s *Sandbox) RunFrom(cwd string, input *worker.SandboxInput) (*worker.Sandb
 	}
 
 	// Prepare the command
+	if !strings.HasPrefix(input.Command, "/") {
+		input.Command = "./" + input.Command
+	}
 	cmd := exec.Command(input.Command, input.Args...)
 	cmd.Dir = cwd
 	cmd.Env = []string{"ONLINE_JUDGE=true", "KJUDGE=true"} // No env access
 	cmd.Stdin = bytes.NewBuffer(input.Input)
-
-	stdoutPipe, err := cmd.StdoutPipe()
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	stderrPipe, err := cmd.StderrPipe()
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	startTime := time.Now()
-	if err := cmd.Start(); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	var stdout, stderr []byte
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
 
 	// Collect output BUT don't do it for too long
 	done := make(chan error)
+	var startTime time.Time
 	go func() {
-		stdout, err = ioutil.ReadAll(stdoutPipe)
-		if err != nil {
-			done <- errors.WithStack(err)
-			return
-		}
-		stderr, err = ioutil.ReadAll(stderrPipe)
-		if err != nil {
-			done <- errors.WithStack(err)
-			return
-		}
-		done <- cmd.Wait()
+		startTime = time.Now()
+		done <- cmd.Run()
 	}()
 
 	select {
@@ -98,15 +79,12 @@ func (s *Sandbox) RunFrom(cwd string, input *worker.SandboxInput) (*worker.Sandb
 		}, nil
 	case commandErr := <-done:
 		runningTime := time.Now().Sub(startTime)
-		if err != nil {
-			return nil, err // ReadAll errors
-		}
 		return &worker.SandboxOutput{
 			Success:      commandErr == nil,
 			MemoryUsed:   0,
 			RunningTime:  runningTime,
-			Stdout:       stdout,
-			Stderr:       stderr,
+			Stdout:       stdout.Bytes(),
+			Stderr:       stderr.Bytes(),
 			ErrorMessage: "",
 		}, nil
 

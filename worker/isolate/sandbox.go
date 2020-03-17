@@ -57,12 +57,12 @@ func New() *Sandbox {
 // Run implements Sandbox.Run.
 func (s *Sandbox) Run(input *worker.SandboxInput) (*worker.SandboxOutput, error) {
 	// Init the sandbox
+	defer exec.Command(isolateCommand, "--cleanup", "--cg").Run()
 	dirBytes, err := exec.Command(isolateCommand, "--init", "--cg").Output()
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 	dir := filepath.Join(strings.TrimSpace(string(dirBytes)), "box")
-	defer exec.Command(isolateCommand, "--cleanup", "--cg").Run()
 
 	// Copy items to dir
 	if err := input.CopyTo(dir); err != nil {
@@ -124,17 +124,16 @@ func buildCmd(dir, metaFile string, input *worker.SandboxInput) *exec.Cmd {
 		"-t", fmt.Sprintf("%.1f", timeLimit), // Time limit
 		"-w", fmt.Sprintf("%.1f", 2*timeLimit+1.0), // Wall time
 		"-x", "1.0", // Extra time
-		"-m", fmt.Sprintf("%d", input.MemoryLimit), // Individual memory
 		"-f", "262144", // 256MBs of files
 		"-p", // Allow multiple processes
 		"-s", // Be silent
 		"--env=ONLINE_JUDGE=true",
 		"--env=KJUDGE=true",
 		fmt.Sprintf("--cg-mem=%d", input.MemoryLimit), // total memory
+		"--",
 		input.Command,
 	)
 	if len(input.Args) > 0 {
-		cmd.Args = append(cmd.Args, "-")
 		cmd.Args = append(cmd.Args, input.Args...)
 	}
 	cmd.Dir = dir

@@ -72,6 +72,14 @@ func SubmissionsBy(db db.DBContext, u *models.User, c *models.Contest, p *models
 			s.Submissions, err = models.GetUserSubmissions(db, u.ID)
 		}
 	} else {
+		users, err := models.GetAllUsers(db)
+		if err != nil {
+			return nil, err
+		}
+		s.Users = make(map[string]*models.User)
+		for _, u := range users {
+			s.Users[u.ID] = u
+		}
 		if p != nil {
 			s.Problem = p
 			s.Submissions, err = models.GetProblemSubmissions(db, p.ID)

@@ -121,6 +121,10 @@ func Run(sandbox Sandbox, r *RunContext) error {
 		log.Printf("[WORKER] Submission %v not compiled, creating Compile job.\n", r.Sub.ID)
 		return models.BatchInsertJobs(r.DB, models.NewJobCompile(r.Sub.ID), models.NewJobRun(r.Sub.ID, r.Test.ID))
 	}
+	if source == nil {
+		log.Printf("[WORKER] Not running a submission that failed to compile.\n")
+		return nil
+	}
 
 	log.Printf("[WORKER] Running submission %v on [test `%v`, group `%v`]\n", r.Sub.ID, r.Test.Name, r.TestGroup.Name)
 
@@ -136,6 +140,7 @@ func Run(sandbox Sandbox, r *RunContext) error {
 	result := parseSandboxOutput(output, r)
 
 	if !output.Success {
+		result.Verdict = "Runtime Error"
 		// If running the source did not succeed, we stop here and be happy with the test result.
 		return result.Write(r.DB)
 	}
