@@ -42,7 +42,19 @@ func Score(s *ScoreContext) error {
 		return models.BatchInsertJobs(s.DB, models.NewJobCompile(s.Sub.ID), models.NewJobScore(s.Sub.ID))
 	} else if source == nil {
 		log.Printf("[WORKER] Not running a submission that failed to compile.\n")
-		return nil
+		s.Sub.Verdict = VerdictCompileError
+		if err := s.Sub.Write(s.DB); err != nil {
+			return err
+		}
+		// Update the ProblemResult
+		subs, err := models.GetUserProblemSubmissions(s.DB, s.Sub.UserID, s.Problem.ID)
+		if err != nil {
+			return err
+		}
+		pr := s.CompareScores(subs)
+		log.Printf("[WORKER] Problem results updated for user %s, problem %d (score = %.1f, penalty = %d)\n", s.Sub.UserID, s.Problem.ID, pr.Score, pr.Penalty)
+
+		return pr.Write(s.DB)
 	}
 	if missing := MissingTests(tests, testResults); len(missing) > 0 {
 		log.Printf("[WORKER] Submission %v needs to run %d tests before being scored.\n", s.Sub.ID, len(missing))
