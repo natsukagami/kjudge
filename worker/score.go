@@ -158,6 +158,12 @@ func (s *ScoreContext) ComputePenalties(sub *models.Submission) error {
 	default:
 		panic(s)
 	}
+	contestType := s.Contest.ContestType
+	if contestType == "weighted" && sub.Score.Float64 == 0.0 {
+		value = 0
+	} else if contestType == "unweighted" && sub.Verdict != VerdictAccepted {
+		value = 0
+	}
 	sub.Penalty = sql.NullInt64{Int64: int64(value), Valid: true}
 	return nil
 }
@@ -178,6 +184,7 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 	var which *models.Submission
 	contestTime := float64(s.Contest.EndTime.Sub(s.Contest.StartTime))
 	counted := 0
+	failedAttempts := 0
 	for _, sub := range subs {
 		score, _, counts := scoreOf(sub)
 		if !counts {
@@ -209,10 +216,23 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 		counted++
 	}
 
+	for _, sub := range subs {
+		_, _, counts := scoreOf(sub)
+		if !counts {
+			continue
+		}
+		if sub == which {
+			break
+		} else {
+			failedAttempts++
+		}
+	}
+
 	_, penalty, counts := scoreOf(which)
 	if !counts {
 		return &models.ProblemResult{
 			BestSubmissionID: sql.NullInt64{},
+			FailedAttempts:   failedAttempts,
 			Penalty:          0,
 			Score:            0.0,
 			Solved:           false,
@@ -223,6 +243,7 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 
 	return &models.ProblemResult{
 		BestSubmissionID: sql.NullInt64{Int64: int64(which.ID), Valid: true},
+		FailedAttempts:   failedAttempts,
 		Penalty:          penalty,
 		Score:            maxScore,
 		Solved:           which.Verdict == VerdictAccepted,
