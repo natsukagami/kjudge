@@ -70,9 +70,8 @@ func Score(s *ScoreContext) error {
 	// Calculate the score by summing scores on each test group.
 	s.Sub.Score = sql.NullFloat64{Float64: 0.0, Valid: true}
 	for _, tg := range tests {
-		score, counts := ScoreGroup(tg, testResults)
-		if counts {
-			s.Sub.Score.Float64 += score
+		if !tg.Hidden() {
+			s.Sub.Score.Float64 += tg.ComputeScore(testResults)
 		}
 	}
 	// Calculate penalty too
@@ -151,7 +150,11 @@ func (s *ScoreContext) ComputePenalties(sub *models.Submission) error {
 		}
 		fallthrough // We also need the submit time
 	case models.PenaltyPolicySubmitTime:
-		value += int((sub.SubmittedAt.Sub(s.Contest.StartTime) + time.Minute - 1) / time.Minute)
+		// Sometimes the penalty can be messed up
+		submitTimePenalty := int((sub.SubmittedAt.Sub(s.Contest.StartTime) + time.Minute - 1) / time.Minute)
+		if submitTimePenalty >= 0 {
+			value += submitTimePenalty
+		}
 	default:
 		panic(s)
 	}
@@ -226,40 +229,6 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 		ProblemID:        s.Problem.ID,
 		UserID:           s.Sub.UserID,
 	}
-}
-
-// ScoreGroup returns the score for a group.
-// If it returns false, the group's result should be hidden.
-func ScoreGroup(tg *models.TestGroupWithTests, results map[int]*models.TestResult) (float64, bool) {
-	if tg.Score < 0 {
-		return 0, false
-	}
-	switch tg.ScoringMode {
-	case models.TestScoringModeSum:
-		score := 0.0
-		for _, test := range tg.Tests {
-			result := results[test.ID]
-			score += result.Score
-		}
-		return tg.Score * (score / float64(len(tg.Tests))), true
-	case models.TestScoringModeMin:
-		ratio := 1.0
-		for _, test := range tg.Tests {
-			result := results[test.ID]
-			if ratio < result.Score {
-				ratio = result.Score
-			}
-		}
-		return tg.Score * ratio, true
-	case models.TestScoringModeProduct:
-		ratio := 1.0
-		for _, test := range tg.Tests {
-			result := results[test.ID]
-			ratio *= result.Score
-		}
-		return tg.Score * ratio, true
-	}
-	panic("Unknown Scoring Mode: " + tg.ScoringMode)
 }
 
 // MissingTests finds all the tests that are missing a TestResult.
