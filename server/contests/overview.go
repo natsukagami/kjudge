@@ -31,7 +31,7 @@ func getOverviewCtx(db db.DBContext, c echo.Context) (*OverviewCtx, error) {
 	if err != nil {
 		return nil, err
 	}
-	scores, err := models.CollectProblemResults(db, contest.Me.ID, contest.Problems)
+	scores, err := models.CollectUserProblemResults(db, contest.Me.ID, contest.Problems)
 	if err != nil {
 		return nil, err
 	}

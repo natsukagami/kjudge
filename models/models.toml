@@ -64,6 +64,7 @@ solved = "bool"
 score = "float64"
 penalty = "int"
 best_submission_id = "sql.NullInt64"
+failed_attempts = "int"
 
 [jobs]
 id = "int"

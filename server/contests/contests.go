@@ -51,6 +51,7 @@ func New(db *db.DB, g *echo.Group) (*Group, error) {
 	}
 
 	g.GET("", grp.ContestsGet)
+	g.GET("/:id/scoreboard", grp.ScoreboardGet)
 	authed := g.Group("/", auth.MustAuth(db))
 	authed.GET(":id", grp.OverviewGet)
 	authed.GET(":id/problems/:problem", grp.ProblemGet)
@@ -78,6 +79,14 @@ func (g *Group) ConestsGetNearestOngoingContest(c echo.Context) error {
 		return c.Redirect(http.StatusSeeOther, "/contests")
 	} else if err != nil {
 		return err
+	}
+
+	user, err := user.Me(g.db, c)
+	if err != nil {
+		return err
+	}
+	if user.Me == nil {
+		return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/contests/%d/scoreboard", contest.ID))
 	}
 
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/contests/%d", contest.ID))
