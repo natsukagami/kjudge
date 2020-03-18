@@ -1,0 +1,89 @@
+{{ define "inner-title" }}Submission #{{.Submission.ID}}{{ end }}
+
+{{ define "content" }}
+<div class="text-4xl my-4 ml-2">
+    Submission #{{.Submission.ID}}
+</div>
+
+<div class="text-xl my-2 ml-2">
+    <div>
+        Verdict: <span class="font-semibold">{{.Submission.Verdict}}</span>
+    </div>
+    {{ if .Submission.Score.Valid }}
+    <div>
+        Score: <span class="font-semibold">
+            {{ printf "%.2f" .Submission.Score.Float64 }}
+            {{ if lt .Submission.Penalty.Int64 0 }}
+            (+{{.Submission.Penalty.Int64}})
+            {{ end }}
+        </span>
+    </div>
+    {{ end }}
+    <div>
+        {{ $problem_link := printf "/contests/%d/problems/%s" .Problem.ContestID .Problem.Name }}
+        Problem: <a href="{{$problem_link}}" class="hover:text-blue-600">{{.Problem.Name}}. {{.Problem.DisplayName}}</a>
+    </div>
+</div>
+
+{{ template "submission-compile-error" . }}
+{{ if .TestResults }}
+{{ template "submission-subtasks" . }}
+{{ end }}
+{{ end }}
+
+{{ define "submission-compile-error" }}
+{{ if .Submission.CompilerOutput }}
+<div class="subheader">Compiler Output</div>
+<pre class="font-mono w-full bg-black m-2 px-1 text-green-600 overflow-auto" style="max-height: 75vh;">
+    {{- printf "%s" .Submission.CompilerOutput -}}
+</pre>
+{{ end }}
+{{ end }}
+
+{{ define "submission-subtasks" }}
+<div class="text-2xl my-2 ml-2">
+    Subtasks
+</div>
+{{ $testResults := .TestResults }}
+{{ range .TestGroups }}
+{{ $score := .ComputeScore $testResults }}
+{{ if (not .Hidden) }}
+<div class="my-2 p-2 rounded-sm border">
+    <div class="text-xl m-2 font-semibold">{{.Name}}</div>
+    <div class="text-sm text-gray-800 mx-2 flex flex-row justify-between">
+        <div>Scoring Scheme: <span class="font-semibold">{{.ScoringMode}}</span></div>
+        <div>Weight: <span class="font-semibold">{{.Score}}</span></div>
+    </div>
+    <table class="table table-auto w-full">
+        <thead>
+            <tr class="text-lg">
+                <th class="my-1 border-b text-center">Test Name</th>
+                <th class="my-1 border-b text-center">Running Time</th>
+                <th class="my-1 border-b text-center">Memory Used</th>
+                <th class="my-1 border-b text-center">Verdict</th>
+                <th class="my-1 border-b text-center">Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Tests }}
+            {{ $tr := index $testResults .ID }}
+            <tr>
+                <td class="my-1 border-b text-center">{{.Name}}</td>
+                <td class="my-1 border-b text-center">{{$tr.RunningTime}}</td>
+                <td class="my-1 border-b text-center">{{$tr.MemoryUsed}}</td>
+                <td class="my-1 border-b text-center">{{$tr.Verdict}}</td>
+                <td class="my-1 border-b text-center">{{printf "%.1f" $tr.Score}}</td>
+            </tr>
+            {{ end }}
+        </tbody>
+        <tfoot>
+            <tr class="bg-gray-200 text-lg">
+                <td class="my-1 border-b text-center font-semibold" colspan="4">Total</td>
+                <td class="my-1 border-b text-center font-semibold">{{printf "%.1f" $score}}</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+{{ end }}
+{{ end }}
+{{ end }}

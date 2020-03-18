@@ -30,10 +30,11 @@ var templateList = map[string][]string{
 	"user/login": []string{},
 	"user/home":  []string{"user_root"},
 
-	"contests/home":     []string{"user_root"},
-	"contests/root":     []string{"user_root"},
-	"contests/overview": []string{"contests/root"},
-	"contests/problem":  []string{"contests/root"},
+	"contests/home":       []string{"user_root"},
+	"contests/root":       []string{"user_root"},
+	"contests/overview":   []string{"contests/root"},
+	"contests/problem":    []string{"contests/root"},
+	"contests/submission": []string{"contests/root"},
 }
 
 // From a single template name, resolve the requirement tree into a list of template names.

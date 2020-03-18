@@ -71,3 +71,8 @@ func (r *TestGroup) WriteTests(db db.DBContext, tests []*Test, override bool) er
 	}
 	return nil
 }
+
+// Hidden returns whether the test group is hidden.
+func (r *TestGroup) Hidden() bool {
+	return r.Score < 0
+}

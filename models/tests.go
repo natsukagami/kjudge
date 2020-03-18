@@ -73,3 +73,36 @@ func (r *Test) Verify() error {
 	}
 	return errors.Wrapf(verify.Names(r.Name), "field name")
 }
+
+// ComputeScore returns the score of a test group (with tests), given the test results.
+func (tg *TestGroupWithTests) ComputeScore(results map[int]*TestResult) float64 {
+	if tg.Score < 0 {
+		return 0
+	}
+	switch tg.ScoringMode {
+	case TestScoringModeSum:
+		score := 0.0
+		for _, test := range tg.Tests {
+			result := results[test.ID]
+			score += result.Score
+		}
+		return tg.Score * (score / float64(len(tg.Tests)))
+	case TestScoringModeMin:
+		ratio := 1.0
+		for _, test := range tg.Tests {
+			result := results[test.ID]
+			if ratio < result.Score {
+				ratio = result.Score
+			}
+		}
+		return tg.Score * ratio
+	case TestScoringModeProduct:
+		ratio := 1.0
+		for _, test := range tg.Tests {
+			result := results[test.ID]
+			ratio *= result.Score
+		}
+		return tg.Score * ratio
+	}
+	panic("Unknown Scoring Mode: " + tg.ScoringMode)
+}
