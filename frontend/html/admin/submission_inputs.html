@@ -13,13 +13,13 @@
 <table class="submissions-table table table-auto w-full">
     <thead>
         <tr>
-            <th class="py-1 border-b select-all hover:text-blue-600">[all]</th>
+            <th class="py-1 border-b select-all cursor-pointer hover:text-blue-600">[all]</th>
             <th class="py-1 border-b">ID</th>
             {{ if .User }}
             {{ else }}
             {{ $cols = add 1 $cols }}
             <th class="py-1 border-b">
-                <select data-field="user">
+                <select class="user-filter" data-field="user">
                     <option value="" selected>All Users</option>
                     {{ range .Users }}
                     <option value="{{.ID}}">{{.ID}}</option>
@@ -32,7 +32,7 @@
             {{ $cols = add 1 $cols }}
             {{ if .Contest }}
             <th class="py-1 border-b">
-                <select data-field="problem">
+                <select class="problem-filter" data-field="problem">
                     <option value="" selected>All Problems</option>
                     {{ range .Contest.Problems }}
                     <option value="{{.ID}}">{{.Name}}. {{.DisplayName}}</option>
@@ -41,12 +41,12 @@
             </th>
             {{ else }}
             <th class="py-1 border-b">
-                <select data-field="problem">
+                <select class="problem-filter" data-field="problem">
                     <option value="" selected>All Contests</option>
                     {{ range .Contests }}
                     <option value="{{range .Problems}}{{.ID}},{{end}}">{{.Name}}</option>
                     {{ range .Problems }}
-                    <option value="{{.ID}}"> > {{.Name}}. {{.DisplayName}}</option>
+                    <option value="{{.ID}},"> > {{.Name}}. {{.DisplayName}}</option>
                     {{ end }}
                     {{ end }}
                 </select>
@@ -116,23 +116,24 @@
         </tr>
         {{ end }}
     </tbody>
-    <tfoot>
+    <tfoot class="sticky bottom-0 bg-gray-200 text-lg">
         <tr>
-            <td class="py-1 border-b font-bold" colspan="{{add -1 $cols}}">With selected...</td>
+            <td class="py-1 border-b font-bold" colspan="{{add -1 $cols}}">With selected... <span
+                    class="selected-count"></span></td>
             <td class="py-1 border-b font-bold text-center">
                 <form class="inline" method="POST" action="/admin/rejudge">
-                    <input class="selected_submissions" type="hidden" name="id" value="" required>
+                    <input class="selected-submissions" type="hidden" name="id" value="" required>
                     <input type="hidden" name="stage" value="compile">
                     <input type="submit" value="[c]" title="Recompile" class="cursor-pointer hover:text-blue-900">
                 </form>
                 <form class="inline" method="POST" action="/admin/rejudge">
-                    <input class="selected_submissions" type="hidden" name="id" value="" required>
+                    <input class="selected-submissions" type="hidden" name="id" value="" required>
                     <input type="hidden" name="stage" value="run">
                     <input type="submit" value="[r]" title="Re-run all tests"
                         class="cursor-pointer hover:text-blue-600">
                 </form>
                 <form class="inline" method="POST" action="/admin/rejudge">
-                    <input class="selected_submissions" type="hidden" name="id" value="" required>
+                    <input class="selected-submissions" type="hidden" name="id" value="" required>
                     <input type="hidden" name="stage" value="score">
                     <input type="submit" value="[s]" title="Recalculate score"
                         class="cursor-pointer hover:text-blue-300">
@@ -141,12 +142,13 @@
         </tr>
     </tfoot>
 </table>
+<script src="../../ts/admin_submissions.ts"></script>
 {{ end }}
 
 {{ define "submission-verdict" }}
 {{ if eq .Verdict "..." }}
 <span class="live-update" data-id="{{.ID}}">[...]</span>
 {{ else }}
-<span>{{.Verdict}}{{ if .Score.Valid }} [{{.Score.Float64 | printf "%.2f"}}]{{ end }}</span>
+<span>{{.Verdict}}{{ if .Score.Valid }} [{{.Score.Float64 | printf "%.2f"}} | {{.Penalty.Int64}}]{{ end }}</span>
 {{ end }}
 {{ end }}

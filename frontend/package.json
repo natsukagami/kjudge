@@ -20,11 +20,13 @@
     },
     "scripts": {
         "test": "echo No tests... yet",
-        "fmt": "prettier \"css/**/*\" \"ts/**/*\" \"package.json\"",
+        "fmt": "prettier \"css/**/*\" \"ts/**/*\" \"*.json\" \"*.js\"",
         "dev": "parcel watch -d ../templates \"html/**/*.html\"",
         "build": "mkdir -p ../templates && rm -rf ../templates/* && parcel build --no-source-maps -d ../templates \"html/**/*.html\""
     },
     "dependencies": {
-        "humanize-duration": "^3.22.0"
+        "core-js": "^3.6.4",
+        "humanize-duration": "^3.22.0",
+        "regenerator-runtime": "^0.13.5"
     }
 }
