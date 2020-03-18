@@ -4,11 +4,14 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"regexp"
 	"sort"
 
 	"git.nkagami.me/natsukagami/kjudge/static"
 	"github.com/pkg/errors"
 )
+
+var versionRegexp = regexp.MustCompile(`assets\/sql\/(.+)\.sql`)
 
 // Attempt to migrate to a newer version of the schema, if any.
 func (db *DB) migrate() error {
@@ -29,14 +32,14 @@ func (db *DB) migrate() error {
 
 	if version != "" {
 		// Filter away the versions that are already migrated
-		sqlFileString := fmt.Sprintf("assets/sql/%s.sql", version)
-		for len(versions) > 0 && versions[0] <= sqlFileString {
+		for len(versions) > 0 && versions[0] <= version {
 			versions = versions[1:]
 		}
 	}
 
 	// Do migrations one by one
-	for _, path := range versions {
+	for _, name := range versions {
+		path := fmt.Sprintf("assets/sql/%s.sql", name)
 		file, err := static.ReadFile(path)
 		if err != nil {
 			return errors.Wrapf(err, "File %s", path)
@@ -45,6 +48,12 @@ func (db *DB) migrate() error {
 			return errors.Wrapf(err, "File %s", path)
 		}
 		log.Printf("DB migrated to schema: %s", path)
+		version = name
+	}
+
+	// Update the schema version
+	if _, err := db.Exec("UPDATE version SET version = ?", version); err != nil {
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -68,6 +77,13 @@ func getSchemaFiles() ([]string, error) {
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	sort.Slice(files, func(i, j int) bool { return files[i] < files[j] })
-	return files, nil
+	var names []string
+	for _, file := range files {
+		matches := versionRegexp.FindAllStringSubmatch(file, 1)
+		if len(matches) == 1 {
+			names = append(names, matches[0][1])
+		}
+	}
+	sort.Slice(names, func(i, j int) bool { return names[i] < names[j] })
+	return names, nil
 }
