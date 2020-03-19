@@ -58,7 +58,7 @@
             <th class="py-1 border-b">Actions</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="table-reverse">
         {{ $user := .User }}
         {{ $users := .Users }}
         {{ $problem := .Problem }}
@@ -93,17 +93,20 @@
                 <form class="inline" method="POST" action="/admin/rejudge">
                     <input type="hidden" name="id" value="{{.ID}}">
                     <input type="hidden" name="stage" value="compile">
+                    <input type="hidden" name="last" class="current-url">
                     <input type="submit" value="[c]" title="Recompile" class="cursor-pointer hover:text-blue-900">
                 </form>
                 <form class="inline" method="POST" action="/admin/rejudge">
                     <input type="hidden" name="id" value="{{.ID}}">
                     <input type="hidden" name="stage" value="run">
+                    <input type="hidden" name="last" class="current-url">
                     <input type="submit" value="[r]" title="Re-run all tests"
                         class="cursor-pointer hover:text-blue-600">
                 </form>
                 <form class="inline" method="POST" action="/admin/rejudge">
                     <input type="hidden" name="id" value="{{.ID}}">
                     <input type="hidden" name="stage" value="score">
+                    <input type="hidden" name="last" class="current-url">
                     <input type="submit" value="[s]" title="Recalculate score"
                         class="cursor-pointer hover:text-blue-300">
                 </form>
@@ -124,17 +127,20 @@
                 <form class="inline" method="POST" action="/admin/rejudge">
                     <input class="selected-submissions" type="hidden" name="id" value="" required>
                     <input type="hidden" name="stage" value="compile">
+                    <input type="hidden" name="last" class="current-url">
                     <input type="submit" value="[c]" title="Recompile" class="cursor-pointer hover:text-blue-900">
                 </form>
                 <form class="inline" method="POST" action="/admin/rejudge">
                     <input class="selected-submissions" type="hidden" name="id" value="" required>
                     <input type="hidden" name="stage" value="run">
+                    <input type="hidden" name="last" class="current-url">
                     <input type="submit" value="[r]" title="Re-run all tests"
                         class="cursor-pointer hover:text-blue-600">
                 </form>
                 <form class="inline" method="POST" action="/admin/rejudge">
                     <input class="selected-submissions" type="hidden" name="id" value="" required>
                     <input type="hidden" name="stage" value="score">
+                    <input type="hidden" name="last" class="current-url">
                     <input type="submit" value="[s]" title="Recalculate score"
                         class="cursor-pointer hover:text-blue-300">
                 </form>
@@ -143,12 +149,22 @@
     </tfoot>
 </table>
 <script src="../../ts/admin_submissions.ts"></script>
+<script src="../../ts/submission.ts"></script>
 {{ end }}
 
 {{ define "submission-verdict" }}
+{{ $link := printf "/admin/submissions/%d" .ID }}
 {{ if eq .Verdict "..." }}
-<span class="live-update" data-id="{{.ID}}">[...]</span>
+<a href="{{$link}}" class="hover:text-blue-600 text-blue-800 live-update" title="View details"
+    data-id="{{.ID}}">[...]</a>
 {{ else }}
-<span>{{.Verdict}}{{ if .Score.Valid }} [{{.Score.Float64 | printf "%.2f"}} | {{.Penalty.Int64}}]{{ end }}</span>
+<a href="{{$link}}" class="hover:text-blue-600 text-blue-800" title="View details">{{.Verdict}}
+    {{- if .Score.Valid }}
+    [{{.Score.Float64 | printf "%.2f"}}
+    {{- if gt .Penalty.Int64 0 -}}
+    <span class="text-gray-600"> (+{{.Penalty.Int64}})</span>
+    {{- end -}}
+    ]
+    {{- end }}</a>
 {{ end }}
 {{ end }}

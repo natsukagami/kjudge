@@ -26,10 +26,10 @@
         for (const t of tabButtons) {
             if (t.getAttribute("data-tab") === tab) {
                 t.classList.remove("bg-gray-200", "hover:bg-gray-400");
-                t.classList.add("bg-blue-400");
+                t.classList.add("bg-blue-400", "text-white");
             } else {
                 t.classList.add("bg-gray-200", "hover:bg-gray-400");
-                t.classList.remove("bg-blue-400");
+                t.classList.remove("bg-blue-400", "text-white");
             }
         }
     };

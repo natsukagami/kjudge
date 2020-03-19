@@ -37,7 +37,7 @@ func (s *ScoreboardCtx) Render(c echo.Context) error {
 
 // compareUserRanking checks if ranking of user[i] is strictly less than the ranking of user[j]
 func compareUserRanking(userResult []*UserResult, contestType models.ContestType, i, j int) bool {
-	if contestType == "weighted" {
+	if contestType == models.ContestTypeWeighted {
 		// sort based on totalScore if two users have same totalScore sort based on totalPenalty in an ascending order
 		return (userResult[i].TotalScore > userResult[j].TotalScore ||
 			(userResult[i].TotalScore == userResult[j].TotalScore && userResult[i].TotalPenalty < userResult[j].TotalPenalty))

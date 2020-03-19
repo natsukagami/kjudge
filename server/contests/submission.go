@@ -7,6 +7,7 @@ import (
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/worker"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
@@ -85,10 +86,29 @@ func (ctx *SubmissionCtx) Render(c echo.Context) error {
 	return c.Render(http.StatusOK, "contests/submission", ctx)
 }
 
+// SubmissionGet implements GET /contests/:id/submissions/:submission
 func (g *Group) SubmissionGet(c echo.Context) error {
 	ctx, err := getSubmissionCtx(g.db, c)
 	if err != nil {
 		return err
 	}
 	return ctx.Render(c)
+}
+
+// SubmissionVerdictGet implements GET /contests/:id/submissions/:submission/verdict
+func (g *Group) SubmissionVerdictGet(c echo.Context) error {
+	ctx, err := getSubmissionCtx(g.db, c)
+	if err != nil {
+		return err
+	}
+	if ctx.Submission.Verdict == "..." || ctx.Submission.Verdict == worker.VerdictCompileError {
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"verdict": ctx.Submission.Verdict,
+		})
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"verdict": ctx.Submission.Verdict,
+		"score":   ctx.Submission.Score.Float64,
+		"penalty": ctx.Submission.Penalty.Int64,
+	})
 }
