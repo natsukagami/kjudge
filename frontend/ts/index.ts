@@ -167,3 +167,10 @@ import hd from "humanize-duration";
         )}" type="application/pdf" class="w-full" style="height: 75vh;"/>`;
     }
 })();
+
+// Handle "current-url" input fields
+(() => {
+    for (const input of document.getElementsByClassName("current-url")) {
+        (input as HTMLInputElement).value = document.URL;
+    }
+})();
