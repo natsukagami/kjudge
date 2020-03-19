@@ -3,6 +3,7 @@ package admin
 
 import (
 	"git.nkagami.me/natsukagami/kjudge/db"
+	"git.nkagami.me/natsukagami/kjudge/server/auth"
 	"github.com/labstack/echo/v4"
 )
 
@@ -13,11 +14,17 @@ type Group struct {
 }
 
 // New creates a new group.
-func New(db *db.DB, g *echo.Group) (*Group, error) {
+func New(db *db.DB, unauthed *echo.Group) (*Group, error) {
 	grp := &Group{
-		Group: g,
+		Group: unauthed,
 		db:    db,
 	}
+	// Authentication
+	unauthed.GET("/login", grp.LoginGet)
+	unauthed.POST("/login", grp.LoginPost)
+
+	g := unauthed.Group("", auth.MustAdmin)
+	g.GET("/logout", grp.LogoutPost)
 	g.GET("", grp.Home)
 	// Contest List
 	g.GET("/contests", grp.ContestsGet)
@@ -60,5 +67,6 @@ func New(db *db.DB, g *echo.Group) (*Group, error) {
 	g.GET("/submissions/:id/verdict", grp.SubmissionVerdictGet)
 	g.GET("/submissions/:id/binary", grp.SubmissionBinaryGet)
 	g.POST("/rejudge", grp.RejudgePost)
+
 	return grp, nil
 }

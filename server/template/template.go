@@ -27,6 +27,7 @@ var templateList = map[string][]string{
 	"admin/user":                []string{"admin/root", "admin/user_inputs", "admin/submission_inputs"},
 	"admin/submissions":         []string{"admin/root", "admin/submission_inputs"},
 	"admin/submission":          []string{"admin/root"},
+	"admin/login":               []string{},
 
 	"user/login": []string{"user_root"},
 	"user/home":  []string{"user_root"},
