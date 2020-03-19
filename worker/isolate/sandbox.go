@@ -71,7 +71,6 @@ func (s *Sandbox) Run(input *worker.SandboxInput) (*worker.SandboxOutput, error)
 
 	// Prepare a meta file.
 	tmp := os.TempDir()
-	defer os.RemoveAll(tmp)
 
 	metaFile := filepath.Join(tmp, "meta.txt")
 	cmd := buildCmd(dir, metaFile, input)
