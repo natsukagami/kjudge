@@ -156,7 +156,6 @@
     }
 })();
 
-import "core-js/stable";
 import "regenerator-runtime/runtime";
 
 // Live updating verdicts
