@@ -151,6 +151,9 @@ func Run(sandbox Sandbox, r *RunContext) error {
 		return err
 	}
 	output, err = sandbox.Run(input)
+	if err != nil {
+		return err
+	}
 	if err := parseComparatorOutput(output, result, useComparator); err != nil {
 		return err
 	}

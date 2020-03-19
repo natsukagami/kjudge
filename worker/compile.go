@@ -62,7 +62,6 @@ func Compile(c *CompileContext) (bool, error) {
 
 	// Now, create a temporary directory.
 	dir := os.TempDir()
-	defer os.RemoveAll(dir)
 	// Copy over all files and the source code.
 	if err := ioutil.WriteFile(filepath.Join(dir, action.Source), c.Sub.Source, 0666); err != nil {
 		return false, errors.WithStack(err)

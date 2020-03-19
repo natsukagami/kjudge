@@ -28,7 +28,6 @@ var _ worker.Sandbox = (*Sandbox)(nil)
 // Run implements Sandbox.Run
 func (s *Sandbox) Run(input *worker.SandboxInput) (*worker.SandboxOutput, error) {
 	dir := os.TempDir()
-	defer os.RemoveAll(dir)
 
 	log.Printf("[SANDBOX] Running %s %v\n", input.Command, input.Args)
 
