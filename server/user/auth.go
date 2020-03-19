@@ -33,11 +33,25 @@ func Me(db db.DBContext, c echo.Context) (*AuthCtx, error) {
 
 // LoginCtx represents the context to render logins.
 type LoginCtx struct {
-	Error error
+	AllowRegistration bool
 
+	Error error
+	LoginForm
+}
+
+type LoginForm struct {
 	ID       string `form:"id"`
 	Password string `form:"password"`
 	Remember bool   `form:"remember"`
+}
+
+// Returns a login ctx, but with empty errors and fields.
+func getLoginCtx(db db.DBContext, c echo.Context) (*LoginCtx, error) {
+	cfg, err := models.GetConfig(db)
+	if err != nil {
+		return nil, err
+	}
+	return &LoginCtx{AllowRegistration: cfg.EnableRegistration}, nil
 }
 
 // LoginGet implements GET /user/login.
@@ -47,7 +61,11 @@ func (g *Group) LoginGet(c echo.Context) error {
 	} else if ok {
 		return nil
 	}
-	return (&LoginCtx{}).Render(c)
+	ctx, err := getLoginCtx(g.db, c)
+	if err != nil {
+		return err
+	}
+	return ctx.Render(c)
 }
 
 // Render performs rendering for the context.
@@ -66,8 +84,11 @@ func (g *Group) LoginPost(c echo.Context) error {
 	} else if ok {
 		return nil
 	}
-	var ctx LoginCtx
-	if err := c.Bind(&ctx); err != nil {
+	ctx, err := getLoginCtx(g.db, c)
+	if err != nil {
+		return err
+	}
+	if err := c.Bind(&ctx.LoginForm); err != nil {
 		return err
 	}
 	// get an user with corresponding username
@@ -94,6 +115,71 @@ func (g *Group) LoginPost(c echo.Context) error {
 		if err := auth.Store(u, 0, c); err != nil {
 			return err
 		}
+	}
+
+	// Perform redirect
+	last := c.QueryParam("last")
+	if last == "" {
+		last = "/"
+	}
+	return c.Redirect(http.StatusSeeOther, last)
+}
+
+// RegisterPost implements POST /user/register
+func (g *Group) RegisterPost(c echo.Context) error {
+	tx, err := g.db.Beginx()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	defer tx.Rollback()
+
+	ctx, err := getLoginCtx(tx, c)
+	if err != nil {
+		return err
+	}
+
+	handle := func() error {
+		if !ctx.AllowRegistration {
+			return errors.New("Registration is disabled")
+		}
+
+		if err := c.Bind(&ctx.LoginForm); err != nil {
+			return errors.WithStack(err)
+		}
+
+		// Check if same username exists
+		if _, err := models.GetUser(tx, ctx.ID); err == nil {
+			return errors.Errorf("Username `%s` already exists", ctx.ID)
+		} else if !errors.Is(err, sql.ErrNoRows) {
+			return err
+		}
+
+		// Hash the password
+		password, err := auth.PasswordHash(ctx.Password)
+		if err != nil {
+			return err
+		}
+
+		u := &models.User{ID: ctx.ID, Password: string(password)}
+		if err := u.Write(tx); err != nil {
+			return err
+		}
+
+		// Set the cookie
+		if ctx.Remember {
+			if err := auth.Store(u, time.Hour*24*30, c); err != nil {
+				return err
+			}
+		} else {
+			if err := auth.Store(u, 0, c); err != nil {
+				return err
+			}
+		}
+		return errors.WithStack(tx.Commit())
+	}
+	if err := handle(); err != nil {
+		ctx.Error = err
+		return ctx.Render(c)
 	}
 
 	// Perform redirect

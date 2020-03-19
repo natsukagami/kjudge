@@ -22,6 +22,7 @@ func New(db *db.DB, g *echo.Group) (*Group, error) {
 
 	g.GET("/login", grp.LoginGet)
 	g.POST("/login", grp.LoginPost)
+	g.POST("/register", grp.RegisterPost)
 
 	authed := g.Group("", auth.MustAuth(db))
 	authed.GET("", grp.HomeGet)
