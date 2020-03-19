@@ -1,0 +1,24 @@
+{{ define "title" }}Login{{ end }}
+
+{{ define "main" }}
+<div class="rounded bg-gray-200 mt-8 p-4 mx-auto w-2/3">
+    <h2 class="text-4xl ml-4 mx-4">Admin Panel is Locked</h2>
+    {{ template "form-error" .Error }}
+    <form class="py-4 px-2" method="POST">
+        <label class="text-sm block" for="key">Admin Key</label>
+        <input class="form-input w-full" id="key" type="password" placeholder="Password" required name="key">
+        <div class="text-sm text-gray-800 m-2">
+            The Admin Key can be found either in <span class="font-mono">kjudge</span>'s log output (check the first 5
+            lines!),
+            or the <span class="font-mono font-semibold">ADMIN_KEY</span> environment variable.
+        </div>
+
+        <div class="mt-4 flex flex-row justify-between">
+            <div>
+                <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
+                <input required type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
+            </div>
+        </div>
+    </form>
+</div>
+{{ end }}
