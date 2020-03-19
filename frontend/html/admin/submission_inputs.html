@@ -161,8 +161,8 @@
 <a href="{{$link}}" class="hover:text-blue-600 text-blue-800" title="View details">{{.Verdict}}
     {{- if .Score.Valid }}
     [{{.Score.Float64 | printf "%.2f"}}
-    {{- if ge .Penalty.Int64 0 -}}
-    <span class="text-gray-800"> (+{{.Penalty.Int64}})</span>
+    {{- if gt .Penalty.Int64 0 -}}
+    <span class="text-gray-600"> (+{{.Penalty.Int64}})</span>
     {{- end -}}
     ]
     {{- end }}</a>

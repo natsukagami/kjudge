@@ -155,5 +155,3 @@
         handleTable(table as HTMLTableElement);
     }
 })();
-
-import "regenerator-runtime/runtime";
