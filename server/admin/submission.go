@@ -15,6 +15,16 @@ import (
 // SubmissionCtx is the context for rendering the submission interface.
 type SubmissionCtx struct {
 	Submission *models.Submission
+
+	Problem     *models.Problem
+	Contest     *models.Contest
+	TestGroups  []*models.TestGroupWithTests
+	TestResults map[int]*models.TestResult
+}
+
+// Render renders the context.
+func (s *SubmissionCtx) Render(c echo.Context) error {
+    return c.Render(http.StatusOK, "admin/submission", s)
 }
 
 // Collect a SubmissionCtx.
@@ -30,7 +40,45 @@ func getSubmissionCtx(db db.DBContext, c echo.Context) (*SubmissionCtx, error) {
 	} else if err != nil {
 		return nil, err
 	}
-	return &SubmissionCtx{Submission: sub}, nil
+
+	problem, err := models.GetProblem(db, sub.ProblemID)
+	if err != nil {
+		return nil, err
+	}
+	contest, err := models.GetContest(db, problem.ContestID)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := &SubmissionCtx{Submission: sub, Problem: problem, Contest: contest}
+
+	if sub.Score.Valid {
+		testGroups, err := models.GetProblemTestsMeta(db, problem.ID)
+		if err != nil {
+			return nil, err
+		}
+		testResults, err := models.GetSubmissionTestResults(db, sub.ID)
+		if err != nil {
+			return nil, err
+		}
+		trMap := make(map[int]*models.TestResult)
+		for _, tr := range testResults {
+			trMap[tr.TestID] = tr
+		}
+		ctx.TestGroups = testGroups
+		ctx.TestResults = trMap
+	}
+
+	return ctx, nil
+}
+
+// SubmissionGet implement GET /admin/submissions/:id
+func (g *Group) SubmissionGet(c echo.Context) error {
+    ctx, err := getSubmissionCtx(g.db, c)
+    if err != nil {
+        return err
+    }
+    return ctx.Render(c)
 }
 
 // SubmissionVerdictGet implements GET /admin/submissions/:id/verdict
