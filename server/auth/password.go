@@ -21,6 +21,9 @@ func CheckPassword(raw, hashed string) (bool, error) {
 
 // PasswordHash hashes a raw string into a hashed password.
 func PasswordHash(raw string) ([]byte, error) {
+	if len(raw) < 6 {
+		return nil, errors.New("Password too short")
+	}
 	hashed, err := bcrypt.GenerateFromPassword([]byte(raw), hashCost)
 	if err != nil {
 		return nil, errors.WithStack(err)
