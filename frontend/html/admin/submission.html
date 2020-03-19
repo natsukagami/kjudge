@@ -24,16 +24,19 @@
             <form class="inline" method="POST" action="/admin/rejudge">
                 <input type="hidden" name="id" value="{{.Submission.ID}}">
                 <input type="hidden" name="stage" value="compile">
+                <input type="hidden" name="last" class="current-url">
                 <input type="submit" value="[recompile]" class="cursor-pointer hover:text-blue-900">
             </form>
             <form class="inline" method="POST" action="/admin/rejudge">
                 <input type="hidden" name="id" value="{{.Submission.ID}}">
                 <input type="hidden" name="stage" value="run">
+                <input type="hidden" name="last" class="current-url">
                 <input type="submit" value="[re-run all tests]" class="cursor-pointer hover:text-blue-600">
             </form>
             <form class="inline" method="POST" action="/admin/rejudge">
                 <input type="hidden" name="id" value="{{.Submission.ID}}">
                 <input type="hidden" name="stage" value="score">
+                <input type="hidden" name="last" class="current-url">
                 <input type="submit" value="[recalculate score]" class="cursor-pointer hover:text-blue-300">
             </form>
             {{ if .Submission.CompiledSource }}
