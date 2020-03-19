@@ -1,0 +1,131 @@
+{{ define "admin-title" }}Submission #{{.Submission.ID}}{{ end }}
+{{ define "admin-content" }}
+<div class="text-4xl my-4 ml-2">
+    Submission #{{.Submission.ID}}
+</div>
+
+<div class="text-xl m-2 flex flex-row justify-between">
+    <div>
+        <div>
+            Verdict: <span class="font-semibold">{{.Submission.Verdict}}</span>
+        </div>
+        {{ if .Submission.Score.Valid }}
+        <div>
+            Score: <span class="font-semibold">
+                {{ printf "%.2f" .Submission.Score.Float64 }}
+                {{ if lt .Submission.Penalty.Int64 0 }}
+                (+{{.Submission.Penalty.Int64}})
+                {{ end }}
+            </span>
+        </div>
+        {{ end }}
+        <div>
+            Actions:
+            <form class="inline" method="POST" action="/admin/rejudge">
+                <input type="hidden" name="id" value="{{.Submission.ID}}">
+                <input type="hidden" name="stage" value="compile">
+                <input type="submit" value="[recompile]" class="cursor-pointer hover:text-blue-900">
+            </form>
+            <form class="inline" method="POST" action="/admin/rejudge">
+                <input type="hidden" name="id" value="{{.Submission.ID}}">
+                <input type="hidden" name="stage" value="run">
+                <input type="submit" value="[re-run all tests]" class="cursor-pointer hover:text-blue-600">
+            </form>
+            <form class="inline" method="POST" action="/admin/rejudge">
+                <input type="hidden" name="id" value="{{.Submission.ID}}">
+                <input type="hidden" name="stage" value="score">
+                <input type="submit" value="[recalculate score]" class="cursor-pointer hover:text-blue-300">
+            </form>
+            {{ if .Submission.CompiledSource }}
+            {{ $link := printf "/admin/submissions/%d" .Submission.ID }}
+            <a href="{{$link}}/binary" class="hover:text-green-600">[download binary]</a>
+            {{ end }}
+        </div>
+    </div>
+    <div class="text-right">
+        <div>
+            {{ $user_link := printf "/admin/users/%s" .Submission.UserID }}
+            Author: <a href="{{$user_link}}" class="font-semibold hover:text-blue-600">{{.Submission.UserID}}</a>
+        </div>
+        <div>
+            {{ $contest_link := printf "/admin/contest/%d" .Contest.ID }}
+            Contest: <a href="{{$contest_link}}" class="font-semibold hover:text-blue-600">{{.Contest.Name}}</a>
+        </div>
+        <div>
+            {{ $problem_link := printf "/admin/problems/%d" .Problem.ID }}
+            Problem: <a href="{{$problem_link}}" class="font-semibold hover:text-blue-600">{{.Problem.Name}}.
+                {{.Problem.DisplayName}}</a>
+        </div>
+    </div>
+
+</div>
+
+{{ template "submission-compile-error" . }}
+{{ if .TestResults }}
+{{ template "submission-subtasks" . }}
+{{ end }}
+
+{{/* Source code */}}
+<div class="subheader">Source Code</div>
+<pre class="rounded-sm font-mono m-2 overflow-auto" style="max-height: 75vh;">
+<code class="rounded-sm">{{- printf "%s" .Submission.Source -}}</code>
+</pre>
+<script src="../../ts/submission.ts"></script>
+
+
+{{ end }}
+
+{{ define "submission-compile-error" }}
+{{ if .Submission.CompilerOutput }}
+<div class="subheader">Compiler Output</div>
+<pre class="rounded-sm font-mono bg-black m-2 p-2 text-green-600 overflow-auto" style="max-height: 75vh;">
+    {{- printf "%s" .Submission.CompilerOutput -}}
+</pre>
+{{ end }}
+{{ end }}
+
+{{ define "submission-subtasks" }}
+<div class="text-2xl my-2 ml-2">
+    Subtasks
+</div>
+{{ $testResults := .TestResults }}
+{{ range .TestGroups }}
+{{ $score := .ComputeScore $testResults }}
+<div class="m-2 p-2 rounded-sm border {{ if .Hidden }}bg-gray-200{{ end }}">
+    <div class="text-xl m-2 font-semibold">{{.Name}}</div>
+    <div class="text-sm text-gray-800 mx-2 flex flex-row justify-between">
+        <div>Scoring Scheme: <span class="font-semibold">{{.ScoringMode}}</span></div>
+        <div>Weight: <span class="font-semibold">{{if (not .Hidden)}}{{.Score}}{{else}}Hidden{{end}}</span></div>
+    </div>
+    <table class="table table-auto w-full">
+        <thead>
+            <tr class="text-lg">
+                <th class="my-1 border-b text-center">Test Name</th>
+                <th class="my-1 border-b text-center">Running Time</th>
+                <th class="my-1 border-b text-center">Memory Used</th>
+                <th class="my-1 border-b text-center">Verdict</th>
+                <th class="my-1 border-b text-center">Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Tests }}
+            {{ $tr := index $testResults .ID }}
+            <tr>
+                <td class="my-1 border-b text-center">{{.Name}}</td>
+                <td class="my-1 border-b text-center">{{$tr.RunningTime}}</td>
+                <td class="my-1 border-b text-center">{{$tr.MemoryUsed}}</td>
+                <td class="my-1 border-b text-center">{{$tr.Verdict}}</td>
+                <td class="my-1 border-b text-center">{{printf "%.1f" $tr.Score}}</td>
+            </tr>
+            {{ end }}
+        </tbody>
+        <tfoot>
+            <tr class="bg-gray-400 text-lg">
+                <td class="my-1 border-b text-center font-semibold" colspan="4">Total</td>
+                <td class="my-1 border-b text-center font-semibold">{{printf "%.1f" $score}}</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+{{ end }}
+{{ end }}
