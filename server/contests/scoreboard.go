@@ -26,8 +26,7 @@ type UserResult struct {
 type ScoreboardCtx struct {
 	*ContestCtx
 
-	UsersCtx    []*UserResult
-	ProblemsCtx []*models.Problem
+	UserResults []*UserResult
 }
 
 // Render renders the scoreboard context
@@ -59,13 +58,12 @@ func getScoreboardCtx(db db.DBContext, c echo.Context) (*ScoreboardCtx, error) {
 	if contest.Contest.StartTime.After(time.Now()) {
 		return nil, echo.NewHTTPError(http.StatusBadRequest, "Contest has not started")
 	}
+
 	// get contestType (weighted and unweighted)
 	contestType := contest.Contest.ContestType
 
-	problems, err := models.GetContestProblems(db, contest.Contest.ID)
-	if err != nil {
-		return nil, err
-	}
+	// get contest's problems
+	problems := contest.Problems
 
 	users, err := models.GetAllUsers(db)
 	if err != nil {
@@ -83,9 +81,6 @@ func getScoreboardCtx(db db.DBContext, c echo.Context) (*ScoreboardCtx, error) {
 		userProblemResults[user.ID] = &UserResult{
 			User:           user,
 			ProblemResults: make(map[int]*models.ProblemResult),
-		}
-		for _, problem := range problems {
-			userProblemResults[user.ID].ProblemResults[problem.ID] = &models.ProblemResult{}
 		}
 	}
 	for _, problemResult := range contestProblemResults {
@@ -123,8 +118,7 @@ func getScoreboardCtx(db db.DBContext, c echo.Context) (*ScoreboardCtx, error) {
 
 	return &ScoreboardCtx{
 		ContestCtx:  contest,
-		UsersCtx:    userResults,
-		ProblemsCtx: problems,
+		UserResults: userResults,
 	}, nil
 }
 
