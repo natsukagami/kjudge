@@ -29,12 +29,20 @@
 {{ if .TestResults }}
 {{ template "submission-subtasks" . }}
 {{ end }}
+
+{{/* Source code */}}
+<div class="subheader">Source Code</div>
+<pre class="rounded-sm font-mono m-2 overflow-auto" style="max-height: 75vh;">
+<code class="rounded-sm">{{- printf "%s" .Submission.Source -}}</code>
+</pre>
+<script src="../../ts/submission.ts"></script>
+
 {{ end }}
 
 {{ define "submission-compile-error" }}
 {{ if .Submission.CompilerOutput }}
 <div class="subheader">Compiler Output</div>
-<pre class="font-mono w-full bg-black m-2 px-1 text-green-600 overflow-auto" style="max-height: 75vh;">
+<pre class="rounded-sm font-mono bg-black m-2 p-2 text-green-600 overflow-auto" style="max-height: 75vh;">
     {{- printf "%s" .Submission.CompilerOutput -}}
 </pre>
 {{ end }}
@@ -48,7 +56,7 @@
 {{ range .TestGroups }}
 {{ $score := .ComputeScore $testResults }}
 {{ if (not .Hidden) }}
-<div class="my-2 p-2 rounded-sm border">
+<div class="m-2 p-2 rounded-sm border">
     <div class="text-xl m-2 font-semibold">{{.Name}}</div>
     <div class="text-sm text-gray-800 mx-2 flex flex-row justify-between">
         <div>Scoring Scheme: <span class="font-semibold">{{.ScoringMode}}</span></div>
