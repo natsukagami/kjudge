@@ -116,6 +116,10 @@ func (g *Group) SubmitPost(c echo.Context) error {
 		return err
 	}
 
+	if ctx.Contest.EndTime.Before(time.Now()) {
+		return echo.NewHTTPError(http.StatusBadRequest, "Contest has already ended")
+	}
+
 	form, err := c.MultipartForm()
 	if err != nil {
 		return err
