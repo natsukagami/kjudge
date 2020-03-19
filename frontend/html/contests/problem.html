@@ -99,38 +99,43 @@
             <th class="my-1 border-b text-center">ID</th>
             <th class="my-1 border-b text-center">Submitted At</th>
             <th class="my-1 border-b text-center">Verdict</th>
-            <th class="my-1 border-b text-center">Score</th>
             <th class="my-1 border-b text-center">Actions</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="table-reverse">
         {{ $contest_link := printf "/contests/%d" .Contest.ID }}
         {{ range .Submissions }}
         <tr>
             <td class="my-1 border-b text-center">{{.ID}}</td>
             <td class="my-1 border-b text-center display-time" data-time="{{.SubmittedAt | time}}"></td>
-            <td class="my-1 border-b text-center">{{.Verdict}}</td>
-            <td class="my-1 border-b text-center">
-                {{ if .Score.Valid }}
-                {{printf "%.2f" .Score.Float64}}
-                {{ if lt .Penalty.Int64 0 }}
-                ({{printf "%d" .Penalty.Int64}})
-                {{ end }}
-                {{ else }}
-                -
-                {{ end }}
-            </td>
+            <td class="my-1 border-b text-center">{{ template "submission-verdict" . }}</td>
             <td class="my-1 border-b text-center">
                 {{ $link := printf "%s/submissions/%d" $contest_link .ID }}
-                <a href="{{$link}}" class="hover:bg-blue-600" title="View the submission's details">[v]</a>
-                <a href="{{$link}}/download" class="hover:bg-green-600" title="Download">[d]</a>
+                <a href="{{$link}}" class="hover:text-blue-600" title="View the submission's details">[v]</a>
+                <a href="{{$link}}/download" class="hover:text-green-600" title="Download">[d]</a>
             </td>
         </tr>
         {{ else }}
         <tr>
-            <td colspan="5" class="my-1 border-b text-center">No Submissions</td>
+            <td colspan="4" class="my-1 border-b text-center">No Submissions</td>
         </tr>
         {{ end }}
     </tbody>
 </table>
+<script src="../../ts/submission.ts"></script>
+{{ end }}
+
+{{ define "submission-verdict" }}
+{{ if eq .Verdict "..." }}
+<span class="live-update as-user" data-id="{{.ID}}">[...]</span>
+{{ else }}
+<span>{{.Verdict}}
+    {{- if .Score.Valid }}
+    [{{.Score.Float64 | printf "%.2f"}}
+    {{- if gt .Penalty.Int64 0 -}}
+    <span class="text-gray-600"> (+{{.Penalty.Int64}})</span>
+    {{- end -}}
+    ]
+    {{- end }}</span>
+{{ end }}
 {{ end }}

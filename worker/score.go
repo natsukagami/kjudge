@@ -158,12 +158,6 @@ func (s *ScoreContext) ComputePenalties(sub *models.Submission) error {
 	default:
 		panic(s)
 	}
-	contestType := s.Contest.ContestType
-	if contestType == "weighted" && sub.Score.Float64 == 0.0 {
-		value = 0
-	} else if contestType == "unweighted" && sub.Verdict != VerdictAccepted {
-		value = 0
-	}
 	sub.Penalty = sql.NullInt64{Int64: int64(value), Valid: true}
 	return nil
 }
@@ -241,6 +235,13 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 		}
 	}
 
+	// Don't consider penalty in certain scenarios...
+	contestType := s.Contest.ContestType
+	if contestType == models.ContestTypeWeighted && maxScore == 0.0 {
+		penalty = 0
+	} else if contestType == models.ContestTypeUnweighted && which.Verdict != VerdictAccepted {
+		penalty = 0
+	}
 	return &models.ProblemResult{
 		BestSubmissionID: sql.NullInt64{Int64: int64(which.ID), Valid: true},
 		FailedAttempts:   failedAttempts,

@@ -25,7 +25,8 @@
         "build": "mkdir -p ../templates && rm -rf ../templates/* && parcel build --no-source-maps -d ../templates \"html/**/*.html\""
     },
     "dependencies": {
-        "core-js": "^3.6.4",
+        "@types/highlight.js": "^9.12.3",
+        "highlight.js": "^9.18.1",
         "humanize-duration": "^3.22.0",
         "regenerator-runtime": "^0.13.5"
     }

@@ -56,7 +56,9 @@ func New(db *db.DB, g *echo.Group) (*Group, error) {
 	g.POST("/config/toggle_enable_registration", grp.ToggleEnableRegistration)
 	// Submissions
 	g.GET("/submissions", grp.SubmissionsGet)
+	g.GET("/submissions/:id", grp.SubmissionGet)
 	g.GET("/submissions/:id/verdict", grp.SubmissionVerdictGet)
+	g.GET("/submissions/:id/binary", grp.SubmissionBinaryGet)
 	g.POST("/rejudge", grp.RejudgePost)
 	return grp, nil
 }
