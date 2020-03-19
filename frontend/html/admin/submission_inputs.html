@@ -146,9 +146,12 @@
 {{ end }}
 
 {{ define "submission-verdict" }}
+{{ $link := printf "/admin/submissions/%d" .ID }}
 {{ if eq .Verdict "..." }}
-<span class="live-update" data-id="{{.ID}}">[...]</span>
+<a href="{{$link}}" class="hover:text-blue-600 text-blue-800 live-update" title="View details"
+    data-id="{{.ID}}">[...]</a>
 {{ else }}
-<span>{{.Verdict}}{{ if .Score.Valid }} [{{.Score.Float64 | printf "%.2f"}} | {{.Penalty.Int64}}]{{ end }}</span>
+<a href="{{$link}}" class="hover:text-blue-600 text-blue-800" title="View details">{{.Verdict}}{{ if .Score.Valid }}
+    [{{.Score.Float64 | printf "%.2f"}} | {{.Penalty.Int64}}]{{ end }}</a>
 {{ end }}
 {{ end }}
