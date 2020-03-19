@@ -1,4 +1,5 @@
 import hs from "highlight.js";
+import "regenerator-runtime/runtime";
 
 hs.initHighlightingOnLoad();
 
@@ -20,17 +21,29 @@ hs.initHighlightingOnLoad();
         ).json() as Promise<Result>;
     }
 
+    async function fetchResultAsUser(id: string): Promise<Result> {
+        return (
+            await fetch(
+                `/contests/${
+                    (window as any).contestId
+                }/submissions/${id}/verdict`,
+            )
+        ).json() as Promise<Result>;
+    }
+
     for (const field of document.getElementsByClassName("live-update")) {
         const id = field.getAttribute("data-id");
         if (id) {
             const interval = setInterval(async () => {
-                const result = await fetchResult(id);
+                const result = await (field.classList.contains("as-user")
+                    ? fetchResultAsUser
+                    : fetchResult)(id);
                 if (result.verdict !== "...") {
                     let output = result.verdict;
                     if ("score" in result) {
                         output += ` [${result.score.toFixed(2)}`;
                         if (result.penalty > 0) {
-                            output += `<span class="text-gray-800"> (+${result.penalty})</span>]`;
+                            output += `<span class="text-gray-600"> (+${result.penalty})</span>]`;
                         } else {
                             output += "]";
                         }

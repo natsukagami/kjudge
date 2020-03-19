@@ -7,7 +7,22 @@
 <div class="text-xl m-2 flex flex-row justify-between">
     <div>
         <div>
-            Verdict: <span class="font-semibold">{{.Submission.Verdict}}</span>
+            Verdict: <span class="font-semibold">
+                {{ with .Submission }}
+                {{ if eq .Verdict "..." }}
+                <span class="live-update refresh-on-found" data-id="{{.ID}}">[...]</span>
+                {{ else }}
+                <span>{{.Verdict}}
+                    {{- if .Score.Valid }}
+                    [{{.Score.Float64 | printf "%.2f"}}
+                    {{- if gt .Penalty.Int64 0 -}}
+                    <span class="text-gray-600"> (+{{.Penalty.Int64}})</span>
+                    {{- end -}}
+                    ]
+                    {{- end }}</span>
+                {{ end }}
+                {{ end }}
+            </span>
         </div>
         {{ if .Submission.Score.Valid }}
         <div>
@@ -74,7 +89,6 @@
 <code class="rounded-sm">{{- printf "%s" .Submission.Source -}}</code>
 </pre>
 <script src="../../ts/submission.ts"></script>
-
 
 {{ end }}
 
