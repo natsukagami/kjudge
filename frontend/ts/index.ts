@@ -122,7 +122,6 @@ import hd from "humanize-duration";
 (() => {
     for (const t of document.getElementsByClassName("timer")) {
         const timer = t as HTMLDivElement;
-
         const start = timer.getAttribute("data-start");
         const end = timer.getAttribute("data-end");
         if (!start || !end) {
@@ -132,7 +131,7 @@ import hd from "humanize-duration";
         const startTime = new Date(start);
         const endTime = new Date(end);
 
-        const interval = setInterval(() => {
+        const update = () => {
             const now = new Date();
             if (now.getTime() < startTime.getTime()) {
                 timer.innerHTML = `Contest starting in <span class="font-semibold">${hd(
@@ -156,7 +155,10 @@ import hd from "humanize-duration";
                 timer.innerHTML = "Contest has ended.";
                 clearInterval(interval);
             }
-        }, 1000);
+        };
+
+        const interval = setInterval(update, 1000);
+        update();
     }
 })();
 
