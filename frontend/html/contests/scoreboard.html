@@ -29,8 +29,9 @@
         </tr>
     </thead>
     <tbody>
-        {{ $contestType := .ContestCtx.Contest.ContestType }}
-        {{ range .UsersCtx }}
+        {{ $contestType := .Contest.ContestType }}
+        {{ range .UserResults }}
+        {{ $user := . }}
         <tr>
             <td class="text-lg py-3 border-b text-center" style="width: 3rem;">{{ .Rank }}</td>
             <td class="text-lg py-3 border-b">{{ .User.ID }}</td>
@@ -44,21 +45,25 @@
                 <div class="text-sm text-gray-600">{{ .TotalPenalty }}</div>
                 {{ end }}
             </td>
-            {{ range .ProblemResults }}
+            {{ range $.Problems }}
             <td class="py-3 border-b text-center" style="width: 3rem;">
+                {{ with (index $user.ProblemResults .ID) }}
                 {{ if eq $contestType "weighted" }}
                 <div class="text-lg">{{ .Score }}</div>
                 {{ else }}
-                    {{ if .Solved }}
-                    <div class="text-lg">+{{ add .FailedAttempts 1 }}</div>
-                    {{ else }}
-                    <div class="text-lg">
-                        {{ if eq .FailedAttempts 0}} 0 {{ else }} - {{ .FailedAttempts }} {{ end }}
-                    </div>
-                    {{ end }}
+                {{ if .Solved }}
+                <div class="text-lg">+{{ add .FailedAttempts 1 }}</div>
+                {{ else }}
+                <div class="text-lg">
+                    {{ if eq .FailedAttempts 0}} 0 {{ else }} - {{ .FailedAttempts }} {{ end }}
+                </div>
+                {{ end }}
                 {{ end }}
                 {{ if .Penalty }}
                 <div class="text-sm text-gray-600">{{ .Penalty }}</div>
+                {{ end }}
+                {{ else }}
+                0
                 {{ end }}
             </td>
             {{ end }}
