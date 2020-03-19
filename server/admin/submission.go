@@ -1,7 +1,9 @@
 package admin
 
 import (
+	"bytes"
 	"database/sql"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -24,7 +26,7 @@ type SubmissionCtx struct {
 
 // Render renders the context.
 func (s *SubmissionCtx) Render(c echo.Context) error {
-    return c.Render(http.StatusOK, "admin/submission", s)
+	return c.Render(http.StatusOK, "admin/submission", s)
 }
 
 // Collect a SubmissionCtx.
@@ -74,11 +76,25 @@ func getSubmissionCtx(db db.DBContext, c echo.Context) (*SubmissionCtx, error) {
 
 // SubmissionGet implement GET /admin/submissions/:id
 func (g *Group) SubmissionGet(c echo.Context) error {
-    ctx, err := getSubmissionCtx(g.db, c)
-    if err != nil {
-        return err
-    }
-    return ctx.Render(c)
+	ctx, err := getSubmissionCtx(g.db, c)
+	if err != nil {
+		return err
+	}
+	return ctx.Render(c)
+}
+
+// SubmissionBinaryGet implements GET /admin/submissions/:id/binary
+func (g *Group) SubmissionBinaryGet(c echo.Context) error {
+	ctx, err := getSubmissionCtx(g.db, c)
+	if err != nil {
+		return err
+	}
+	if ctx.Submission.CompiledSource != nil {
+		http.ServeContent(c.Response(), c.Request(), fmt.Sprintf("compiled_s%d", ctx.Submission.ID), ctx.Submission.SubmittedAt, bytes.NewReader(ctx.Submission.CompiledSource))
+		return nil
+	} else {
+		return echo.NewHTTPError(http.StatusBadRequest, "Compiled binary not available")
+	}
 }
 
 // SubmissionVerdictGet implements GET /admin/submissions/:id/verdict
