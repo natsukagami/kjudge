@@ -111,8 +111,8 @@
             <td class="my-1 border-b text-center">{{ template "submission-verdict" . }}</td>
             <td class="my-1 border-b text-center">
                 {{ $link := printf "%s/submissions/%d" $contest_link .ID }}
-                <a href="{{$link}}" class="hover:bg-blue-600" title="View the submission's details">[v]</a>
-                <a href="{{$link}}/download" class="hover:bg-green-600" title="Download">[d]</a>
+                <a href="{{$link}}" class="hover:text-blue-600" title="View the submission's details">[v]</a>
+                <a href="{{$link}}/download" class="hover:text-green-600" title="Download">[d]</a>
             </td>
         </tr>
         {{ else }}
