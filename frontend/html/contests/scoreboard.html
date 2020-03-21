@@ -52,10 +52,12 @@
                 <div class="text-lg">{{ .Score }}</div>
                 {{ else }}
                 {{ if .Solved }}
-                <div class="text-lg">+{{ add .FailedAttempts 1 }}</div>
+                <div class="text-lg">
+                    {{ if .FailedAttempts }} +{{ .FailedAttempts }} {{ else }} + {{ end }}
+                </div>
                 {{ else }}
                 <div class="text-lg">
-                    {{ if eq .FailedAttempts 0}} 0 {{ else }} - {{ .FailedAttempts }} {{ end }}
+                    {{ if eq .FailedAttempts 0}} 0 {{ else }} -{{ .FailedAttempts }} {{ end }}
                 </div>
                 {{ end }}
                 {{ end }}
