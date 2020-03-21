@@ -200,7 +200,7 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 					(1.0-0.1*float64(counted)))
 			fallthrough
 		case models.ScoringModeBest:
-			if which == nil || score >= which.Score.Float64 {
+			if which == nil || score > which.Score.Float64 {
 				which = sub
 				maxScore = score
 			}
@@ -216,6 +216,9 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 			continue
 		}
 		if sub == which {
+			if which.Verdict != VerdictAccepted {
+				failedAttempts++
+			}
 			break
 		} else {
 			failedAttempts++
