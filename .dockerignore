@@ -1,0 +1,16 @@
+# Generated files
+static
+models/*_generated.go
+
+# Database
+kjudge.db
+
+kjudge
+templates
+
+# Front-end node_modules
+frontend/node_modules
+
+# Dockerfiles
+
+docker
