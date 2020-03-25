@@ -11,6 +11,7 @@ package raw
 
 import (
 	"bytes"
+	"context"
 	"log"
 	"os"
 	"os/exec"
@@ -49,7 +50,10 @@ func (s *Sandbox) RunFrom(cwd string, input *worker.SandboxInput) (*worker.Sandb
 	if !strings.HasPrefix(input.Command, "/") {
 		input.Command = "./" + input.Command
 	}
-	cmd := exec.Command(input.Command, input.Args...)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, input.Command, input.Args...)
 	cmd.Dir = cwd
 	cmd.Env = []string{"ONLINE_JUDGE=true", "KJUDGE=true"} // No env access
 	cmd.Stdin = bytes.NewBuffer(input.Input)
@@ -67,7 +71,8 @@ func (s *Sandbox) RunFrom(cwd string, input *worker.SandboxInput) (*worker.Sandb
 
 	select {
 	case <-time.After(input.TimeLimit):
-		cmd.Process.Kill()
+		cancel()
+		<-done
 		return &worker.SandboxOutput{
 			Success:      false,
 			MemoryUsed:   0,
