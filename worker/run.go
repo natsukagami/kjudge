@@ -141,6 +141,9 @@ func Run(sandbox Sandbox, r *RunContext) error {
 
 	if !output.Success {
 		result.Verdict = "Runtime Error"
+		if output.ErrorMessage != "" {
+			result.Verdict = output.ErrorMessage
+		}
 		// If running the source did not succeed, we stop here and be happy with the test result.
 		return result.Write(r.DB)
 	}
