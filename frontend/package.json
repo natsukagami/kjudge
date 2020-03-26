@@ -5,7 +5,7 @@
     "main": "index.js",
     "repository": "https://git.nkagami.me/natsukagami/kjudge",
     "author": "Natsu Kagami",
-    "license": "MIT ",
+    "license": "GPLv3",
     "private": true,
     "devDependencies": {
         "@types/humanize-duration": "^3.18.0",
