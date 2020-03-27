@@ -148,4 +148,4 @@ server:        # Root of server logic
 
 ## License
 
-[**GNU General Public License v3.0**](https://choosealicense.com/licenses/gpl-3.0), which **disallows distributing closed-source versions**, so don't do it.
+[**GNU Affero General Public License v3.0**](https://choosealicense.com/licenses/agpl-3.0), which **disallows distributing closed-source versions**, so don't do it.
