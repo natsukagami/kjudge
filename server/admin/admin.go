@@ -67,6 +67,8 @@ func New(db *db.DB, unauthed *echo.Group) (*Group, error) {
 	g.GET("/submissions/:id/verdict", grp.SubmissionVerdictGet)
 	g.GET("/submissions/:id/binary", grp.SubmissionBinaryGet)
 	g.POST("/rejudge", grp.RejudgePost)
+	// Jobs
+	g.GET("/jobs", grp.JobsGet)
 
 	return grp, nil
 }

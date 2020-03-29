@@ -210,6 +210,34 @@ func GetAll{{$name}}s(db db.DBContext) ([]*{{$name}}, error) {
     return result, nil
 }
 
+{{/* Collect getter */}}
+{{ if (index .PrimaryKeys "id") }}
+{{ $idTyp := index .PrimaryKeys "id" }}
+// Collect{{$name}}sByID collects all {{$name}}s by their IDs.
+func Collect{{$name}}sByID(db db.DBContext, id... {{$idTyp}}) (map[{{$idTyp}}]*{{$name}}, error) {
+    res := make(map[{{$idTyp}}]*{{$name}})
+    if len(id) == 0 {
+        return res, nil
+    }
+    var keys []interface{}
+    for _, key := range id {
+        keys = append(keys, key)
+    }
+    var rows []*{{$name}}
+    query, args, err := sqlx.In("SELECT * FROM {{.Name}} WHERE id IN (?)", keys)
+    if err != nil {
+        return nil, errors.WithStack(err)
+    }
+    if err := db.Select(&rows, query, args...); err != nil {
+        return nil, errors.WithStack(err)
+    }
+    for _, row := range rows {
+        res[row.ID] = row
+    }
+    return res, nil
+}
+{{ end }}
+
 {{/* Primary Key getter */}}
 {{$fn_name := print "Get" $name}}
 // {{$fn_name}} gets a {{$name}} from the Database.

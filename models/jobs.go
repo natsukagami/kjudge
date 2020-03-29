@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"strings"
+	"time"
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"github.com/pkg/errors"
@@ -34,6 +35,7 @@ func NewJobCompile(subID int) *Job {
 		Priority:     compilePriority,
 		Type:         JobTypeCompile,
 		SubmissionID: subID,
+		CreatedAt:    time.Now(),
 	}
 }
 
@@ -44,6 +46,7 @@ func NewJobRun(subID int, testID int) *Job {
 		Type:         JobTypeRun,
 		SubmissionID: subID,
 		TestID:       sql.NullInt64{Int64: int64(testID), Valid: true},
+		CreatedAt:    time.Now(),
 	}
 }
 
@@ -53,6 +56,7 @@ func NewJobScore(subID int) *Job {
 		Priority:     scorePriority,
 		Type:         JobTypeScore,
 		SubmissionID: subID,
+		CreatedAt:    time.Now(),
 	}
 }
 

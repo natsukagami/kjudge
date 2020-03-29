@@ -78,6 +78,7 @@ priority = "int"
 type = "JobType"
 submission_id = "int"
 test_id = "sql.NullInt64"
+created_at = "time.Time"
 _order_by = "priority DESC, id ASC"
 
 [files]
