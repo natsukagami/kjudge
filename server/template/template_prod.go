@@ -3,10 +3,12 @@
 package template
 
 import (
+	"fmt"
 	"html/template"
 	"io"
 	"log"
 
+	"git.nkagami.me/natsukagami/kjudge"
 	"github.com/pkg/errors"
 )
 
@@ -19,6 +21,8 @@ func init() {
 		log.Fatalf("%+v", err)
 	}
 }
+
+func version() string { return fmt.Sprintf("%s \"%s\"", kjudge.Version, kjudge.Codename) }
 
 // Render renders a template available in the compiled binary.
 func Render(w io.Writer, name string, root interface{}) error {
