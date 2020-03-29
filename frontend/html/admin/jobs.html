@@ -1,0 +1,56 @@
+{{ define "admin-title" }}Jobs{{ end }}
+
+{{ define "admin-content" }}
+<div class="text-4xl my-4 ml-2">Jobs</div>
+
+<div class="mx-2">
+    <table class="table table-auto w-full">
+        <thead>
+            <tr>
+                <th class="py-1 border-b text-center">ID</th>
+                <th class="py-1 border-b text-center">Priority</th>
+                <th class="py-1 border-b text-center">Type</th>
+                <th class="py-1 border-b text-center">Submission</th>
+                <th class="py-1 border-b text-center">Test</th>
+                <th class="py-1 border-b text-center">Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Jobs }}
+            <tr>
+                <td class="py-1 border-b text-center">{{.ID}}</td>
+                <td class="py-1 border-b text-center">{{.Priority}}</td>
+                <td class="py-1 border-b text-center">{{.Type}}</td>
+                <td class="py-1 border-b text-center">
+                    {{ $link := printf "/admin/submissions/%d" .SubmissionID }}
+                    <a href="{{$link}}" class="hover:text-blue-600">{{.SubmissionID}}</a>
+                </td>
+                {{ if .TestID.Valid }}
+                {{ $test := index $.Tests .TestID.Int64 }}
+                {{ $tg := index $.TestGroups $test.TestGroupID }}
+                {{ $problem := index $.Problems $tg.ProblemID }}
+                {{ $link = printf "/admin/problems/%d" $problem.ID }}
+                <td class="py-1 border-b text-center">
+                    <a href="{{$link}}" class="hover:text-blue-600">
+                        [
+                        <span title="Problem: {{$problem.Name}}. {{$problem.DisplayName}}">{{$problem.Name}}</span> /
+                        <span title="Test Group">{{$tg.Name}}</span> /
+                        <span title="Test">{{$test.Name}}</span>
+                        ]
+                    </a>
+                </td>
+                {{ else }}
+                <td class="py-1 border-b text-center">-</td>
+                {{ end }}
+                <td class="py-1 border-b text-center display-time" data-time="{{.CreatedAt | time}}">{{.CreatedAt}}</td>
+            </tr>
+            {{ else }}
+            <tr>
+                <td colspan="6" class="py-1 border-b text-center">No jobs</td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</div>
+
+{{ end }}
