@@ -28,12 +28,7 @@
         <hr>
         {{ block "admin-nav" . }}{{ end }}
         <hr>
-        {{/* Footer */}}
-        <div class="mt-5 mx-auto text-center">
-            <div class="my-2">
-                <b>kjudge</b> made with ❤️ by <a href="https://github.com/natsukagami">natsukagami</a>
-            </div>
-        </div>
+        {{ template "footer" . }}
     </div>
     <div class="flex-grow overflow-auto border-l px-4 mb-2">
         {{ block "admin-content" . }}{{ end }}

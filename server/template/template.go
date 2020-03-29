@@ -91,18 +91,20 @@ func parseRootTemplate() (*template.Template, error) {
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	tRoot, err := template.New("").Parse(string(root))
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	// Include a time-parsing func
+	tRoot := template.New("")
+	// Include a bunch of funcs
 	tRoot.Funcs(map[string]interface{}{
 		"time":     func(t time.Time) string { return t.Format(time.RFC1123) },
 		"isFuture": func(t time.Time) bool { return t.After(time.Now()) },
 		"join":     strings.Join,
 		"add":      func(a, b int) int { return a + b },
+		"version":  version,
 		"loggedIn": loggedIn,
 	})
+	tRoot, err = tRoot.Parse(string(root))
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
 	return tRoot, nil
 }
 
