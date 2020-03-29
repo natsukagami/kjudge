@@ -92,7 +92,7 @@ func GetProblemsSubmissions(db db.DBContext, problemID ...int) ([]*Submission, e
 	if len(problemID) == 0 {
 		return nil, nil
 	}
-	query, args, err := sqlx.In("SELECT * FROM submissions WHERE problem_id IN (?)", problemID)
+	query, args, err := sqlx.In("SELECT * FROM submissions WHERE problem_id IN (?)"+querySubmissionOrderBy, problemID)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -108,7 +108,7 @@ func GetUserProblemSubmissions(db db.DBContext, userID string, problemID ...int)
 	if len(problemID) == 0 {
 		return nil, nil
 	}
-	query, args, err := sqlx.In("SELECT * FROM submissions WHERE problem_id IN (?) AND user_id = ?", problemID, userID)
+	query, args, err := sqlx.In("SELECT * FROM submissions WHERE problem_id IN (?) AND user_id = ?"+querySubmissionOrderBy, problemID, userID)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
