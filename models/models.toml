@@ -4,6 +4,7 @@ name = "string"
 start_time = "time.Time"
 end_time = "time.Time"
 contest_type = "ContestType"
+_order_by = "datetime(start_time) ASC, id DESC"
 
 [problems]
 id = "int"
@@ -14,6 +15,7 @@ time_limit = "int"
 memory_limit = "int"
 scoring_mode = "ScoringMode"
 penalty_policy = "PenaltyPolicy"
+_order_by = "contest_id ASC, name ASC"
 
 [test_groups]
 id = "int"
@@ -23,6 +25,7 @@ time_limit = "sql.NullInt64"
 memory_limit = "sql.NullInt64"
 score = "float64"
 scoring_mode = "TestScoringMode"
+_order_by = "problem_id ASC, name ASC"
 
 [tests]
 id = "int"
@@ -30,11 +33,13 @@ test_group_id = "int"
 name = "string"
 input = "[]byte"
 output = "[]byte"
+_order_by = "name ASC"
 
 [users]
 id = "string"
 password = "string"
 hidden = "bool"
+_order_by = "id ASC"
 
 [submissions]
 id = "int"
@@ -48,6 +53,7 @@ compiler_output = "[]byte"
 verdict = "string"
 score = "sql.NullFloat64"
 penalty = "sql.NullInt64"
+_order_by = "id DESC"
 
 [test_results]
 submission_id = "int"
@@ -72,6 +78,7 @@ priority = "int"
 type = "JobType"
 submission_id = "int"
 test_id = "sql.NullInt64"
+_order_by = "priority DESC, id ASC"
 
 [files]
 id = "int"

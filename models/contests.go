@@ -35,7 +35,7 @@ func (c *Contest) Verify() error {
 // GetContestsUnfinished gets a list of contests that are unfinished (upcoming or pending).
 func GetContestsUnfinished(db db.DBContext) ([]*Contest, error) {
 	var res []*Contest
-	if err := db.Select(&res, "SELECT * FROM contests WHERE datetime(end_time) > datetime('now') ORDER BY datetime(start_time) ASC"); err != nil {
+	if err := db.Select(&res, "SELECT * FROM contests WHERE datetime(end_time) > datetime('now')"+queryContestOrderBy); err != nil {
 		return nil, errors.WithStack(err)
 	}
 	return res, nil
@@ -44,7 +44,7 @@ func GetContestsUnfinished(db db.DBContext) ([]*Contest, error) {
 // GetContestsFinished gets a list of contests that are finished (past contests).
 func GetContestsFinished(db db.DBContext) ([]*Contest, error) {
 	var res []*Contest
-	if err := db.Select(&res, "SELECT * FROM contests WHERE datetime(end_time) <= datetime('now') ORDER BY datetime(start_time) ASC"); err != nil {
+	if err := db.Select(&res, "SELECT * FROM contests WHERE datetime(end_time) <= datetime('now')"+queryContestOrderBy); err != nil {
 		return nil, errors.WithStack(err)
 	}
 	return res, nil
@@ -62,7 +62,7 @@ func GetContests(db db.DBContext) ([]*Contest, error) {
 // GetNearestOngoingContest return the nearest ongoing contest
 func GetNearestOngoingContest(db db.DBContext) (*Contest, error) {
 	var res Contest
-	if err := db.Get(&res, "SELECT * FROM contests WHERE datetime(end_time) > datetime('now') AND date(start_time) <= datetime('now') ORDER BY datetime(start_time) LIMIT 1"); err != nil {
+	if err := db.Get(&res, "SELECT * FROM contests WHERE datetime(end_time) > datetime('now') AND date(start_time) <= datetime('now')"+queryContestOrderBy+" LIMIT 1"); err != nil {
 		return nil, errors.WithStack(err)
 	}
 	return &res, nil

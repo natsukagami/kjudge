@@ -102,7 +102,7 @@
             <th class="my-1 border-b text-center">Actions</th>
         </tr>
     </thead>
-    <tbody class="table-reverse">
+    <tbody>
         {{ $contest_link := printf "/contests/%d" .Contest.ID }}
         {{ range .Submissions }}
         <tr>

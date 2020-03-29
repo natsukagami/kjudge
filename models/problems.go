@@ -112,7 +112,7 @@ func CollectTestGroups(db db.DBContext, problems []*Problem, private bool) ([]*P
 		privateQuery = " AND score >= 0"
 	}
 	var tgs []*TestGroup
-	query, args, err := sqlx.In("SELECT * FROM test_groups WHERE problem_id IN (?)"+privateQuery+" ORDER BY name", IDs)
+	query, args, err := sqlx.In("SELECT * FROM test_groups WHERE problem_id IN (?)"+privateQuery+queryTestGroupOrderBy, IDs)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

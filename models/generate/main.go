@@ -126,6 +126,9 @@ type Table struct {
 	Fields      map[string]string
 	PrimaryKeys map[string]string
 	ForeignKeys map[string]string
+
+	// Handles the order of items.
+	OrderBy string
 }
 
 // FieldsWithoutID returns a map of fields excluding the ID row.
@@ -140,29 +143,34 @@ func (t *Table) FieldsWithoutID() map[string]string {
 }
 
 // TableFromToml parses out a Table from its TOML.
-func TableFromToml(tables TomlTables, name string, t TomlTable) *Table {
-	pks := make(map[string]string)
-	fks := make(map[string]string)
-	upsert := true
-	for field, typ := range t {
+func TableFromToml(tables TomlTables, name string, tomlTable TomlTable) *Table {
+	t := &Table{
+		Name:        name,
+		Upsert:      true,
+		Fields:      make(map[string]string),
+		PrimaryKeys: make(map[string]string),
+		ForeignKeys: make(map[string]string),
+	}
+	for field, typ := range tomlTable {
+		// Append key
 		if strings.HasSuffix(field, "_id") {
 			if _, ok := tables[field[:len(field)-len("_id")]+"s"]; ok {
-				pks[field] = typ
-				fks[field] = typ
+				t.PrimaryKeys[field] = typ
+				t.ForeignKeys[field] = typ
 			}
 		}
+		// Append field
+		if field == "_order_by" {
+			t.OrderBy = typ
+		} else {
+			t.Fields[field] = typ
+		}
 	}
-	if v, ok := t["id"]; ok {
-		pks = map[string]string{"id": v}
-		upsert = !(v == "int")
+	if v, ok := tomlTable["id"]; ok {
+		t.PrimaryKeys = map[string]string{"id": v}
+		t.Upsert = !(v == "int")
 	}
-	return &Table{
-		Name:        name,
-		Upsert:      upsert,
-		Fields:      t,
-		PrimaryKeys: pks,
-		ForeignKeys: fks,
-	}
+	return t
 }
 
 const FileTemplate = `
@@ -189,11 +197,14 @@ type {{$name}} struct {
 {{- end}}
 }
 
+// The "order by" sub-statement of the table.
+const query{{$name}}OrderBy = "{{if eq .OrderBy ""}}{{else}} ORDER BY {{.OrderBy}}{{end}}"
+
 {{/* All getter */}}
 // GetAll{{$name}}s returns all available {{$name}}s.
 func GetAll{{$name}}s(db db.DBContext) ([]*{{$name}}, error) {
     var result []*{{$name}}
-    if err := db.Select(&result, "SELECT * FROM {{.Name}}"); err != nil {
+    if err := db.Select(&result, "SELECT * FROM {{.Name}}" + query{{$name}}OrderBy); err != nil {
         return nil, errors.WithStack(err)
     }
     return result, nil
@@ -217,7 +228,7 @@ func {{$fn_name}}(db db.DBContext {{- range $field, $type := .PrimaryKeys -}} , 
 // {{$fn_name}} gets a list of {{$name}} belonging to a {{$fk | fkey}}.
 func {{$fn_name}}(db db.DBContext, {{param $fk}} {{$fktype}}) ([]*{{$name}}, error) {
     var result []*{{$name}}
-    if err := db.Select(&result, "SELECT * FROM {{.Name}} WHERE {{$fk}} = ?", {{param $fk}}); err != nil {
+    if err := db.Select(&result, "SELECT * FROM {{.Name}} WHERE {{$fk}} = ?" + query{{$name}}OrderBy, {{param $fk}}); err != nil {
         return nil, errors.WithStack(err)
     }
     return result, nil

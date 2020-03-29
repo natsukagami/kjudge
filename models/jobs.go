@@ -73,7 +73,7 @@ func (r *Job) Verify() error {
 // FirstJob returns the first job that needs to be done.
 func FirstJob(db db.DBContext) (*Job, error) {
 	var j Job
-	if err := db.Get(&j, "SELECT * FROM jobs ORDER BY priority DESC, id ASC LIMIT 1"); err != nil {
+	if err := db.Get(&j, "SELECT * FROM jobs"+queryJobOrderBy+" LIMIT 1"); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}

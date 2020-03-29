@@ -43,7 +43,7 @@ func getProblemTests(db db.DBContext, problemID int, cols string) ([]*TestGroupW
 		return nil, nil
 	}
 	// Query the tests
-	query, params, err := sqlx.In("SELECT "+cols+" FROM tests WHERE test_group_id IN (?) ORDER BY name", IDs)
+	query, params, err := sqlx.In("SELECT "+cols+" FROM tests WHERE test_group_id IN (?)"+queryTestOrderBy, IDs)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

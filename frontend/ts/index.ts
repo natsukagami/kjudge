@@ -176,12 +176,3 @@ import hd from "humanize-duration";
         (input as HTMLInputElement).value = document.URL;
     }
 })();
-
-// Handle table-reverse
-(() => {
-    for (const tbody of document.getElementsByClassName("table-reverse")) {
-        for (let i = 1; i < tbody.childNodes.length; ++i) {
-            tbody.insertBefore(tbody.childNodes[i], tbody.firstChild);
-        }
-    }
-})();
