@@ -51,7 +51,7 @@ func LanguageByExt(ext string) (Language, error) {
 func init() {
 	for _, l := range []Language{LanguageCpp, LanguagePas, LanguageJava, LanguagePy2, LanguagePy3, LanguageGo, LanguageRust} {
 		ok := false
-		for _, versionArg := range []string{"--version", "-version", "version"} {
+		for _, versionArg := range []string{"--version", "-version", "version", "-iW"} {
 			if exec.Command(string(l), versionArg).Run() == nil {
 				availableLanguages = append(availableLanguages, string(l))
 				ok = true
