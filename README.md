@@ -3,7 +3,7 @@
 [![Build Status](https://ci.nkagami.me/api/badges/natsukagami/kjudge/status.svg)](https://ci.nkagami.me/natsukagami/kjudge)
 [![Docker Image Version (latest semver)](https://img.shields.io/docker/v/natsukagami/kjudge?logo=Docker)](https://hub.docker.com/r/natsukagami/kjudge)
 [![godoc](https://godoc.org/git.nkagami.me/natsukagami/kjudge?status.svg)](https://godoc.org/git.nkagami.me/natsukagami/kjudge)
-[![License is GPLv3](https://img.shields.io/badge/license-GPLv3-blue)](https://git.nkagami.me/natsukagami/kjudge/src/branch/master/LICENSE)
+[![License is AGPLv3](https://img.shields.io/badge/license-AGPLv3-blue)](https://git.nkagami.me/natsukagami/kjudge/src/branch/master/LICENSE)
 
 - [kjudge](#kjudge)
   - [Project Goals](#project-goals)
