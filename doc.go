@@ -6,5 +6,5 @@ package kjudge
 // We typically pick an anime JK name as the codename for every minor version.
 const (
 	Version  = "0.2.0"
-	Codename = "Mikasa Mikoto"
+	Codename = "Misaka Mikoto"
 )
