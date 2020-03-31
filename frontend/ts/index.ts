@@ -176,3 +176,15 @@ import hd from "humanize-duration";
         (input as HTMLInputElement).value = document.URL;
     }
 })();
+
+// Links going back
+(() => {
+    for (const item of document.getElementsByClassName("link-back")) {
+        const link = item as HTMLAnchorElement;
+        link.href = document.referrer;
+        link.addEventListener("click", e => {
+            e.preventDefault();
+            history.back(); // don't push the current page into history
+        });
+    }
+})();

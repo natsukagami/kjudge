@@ -39,6 +39,8 @@ var templateList = map[string][]string{
 	"contests/problem":    []string{"contests/root"},
 	"contests/submission": []string{"contests/root"},
 	"contests/scoreboard": []string{"contests/root"},
+
+	"error": []string{},
 }
 
 // From a single template name, resolve the requirement tree into a list of template names.

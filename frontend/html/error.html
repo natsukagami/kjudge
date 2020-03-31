@@ -1,0 +1,59 @@
+{{ define "title" }}
+{{ if eq .Code 500 }}
+An error has occured
+{{ else }}
+{{.StatusText}}
+{{ end }}
+{{ end }}
+
+{{ define "main" }}
+<div class="w-1/2 mx-auto mt-16">
+    <div class="flex flex-row items-center">
+        <div class="w-1/4 flex-shrink-0">
+            <img class="rounded" src="../img/confused_kanna.png" title="Source: 小林さんちのメイドラゴン">
+        </div>
+        <div class="flex-grow ml-8">
+            {{ if eq .Code 500 }}
+            {{ template "internal-error" . }}
+            {{ else }}
+            {{ template "normal-error" . }}
+            {{ end }}
+        </div>
+    </div>
+    <div class="my-4">
+        <hr>
+        {{ template "footer" . }}
+    </div>
+</div>
+{{ end }}
+
+{{ define "internal-error" }}
+<div class="text-4xl font-semibold my-2">
+    An internal server error has occured
+</div>
+<div class="my-2">
+    As an user, please do not worry. Software breaks and you are not responsible.
+    <div>Perhaps try <a class="hover:text-green-600 font-semibold link-back">going back</a> or <a
+            class="hover:text-green-600 font-semibold" href="/">going home</a>?</div>
+</div>
+<div class="my-2 text-gray-600">
+    As an administrator, please have a look at <span class="text-gray-800 font-semibold">the
+        application output log</span>, to see if the error was important.
+    Yes or no, feel welcome to <a href="https://git.nkagami.me/natsukagami/kjudge/issues/new"
+        class="hover:text-green-600 text-gray-800">file a new issue</a>!
+</div>
+{{ end }}
+
+{{ define "normal-error" }}
+<div class="text-4xl font-semibold my-2">
+    {{.StatusText}}
+</div>
+<div class="my-2">
+    Our server says
+    <pre class="p-2 my-1 rounded bg-gray-200">{{.Message}}</pre>
+</div>
+<div class="my-2">
+    Maybe try <a class="hover:text-green-600 font-semibold link-back">going back</a> or <a
+        class="hover:text-teal-600 font-semibold" href="/">going home</a>?
+</div>
+{{ end }}
