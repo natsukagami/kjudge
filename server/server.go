@@ -63,6 +63,8 @@ func New(db *db.DB) (*Server, error) {
 	s.echo.Use(middleware.Recover())
 	s.echo.Use(middleware.Gzip())
 
+	s.SetupProfiling()
+
 	if _, err := admin.New(s.db, s.echo.Group("/admin")); err != nil {
 		return nil, err
 	}
