@@ -1,6 +1,7 @@
 package template
 
 import (
+	"encoding/json"
 	"html/template"
 	"io"
 	"log"
@@ -102,6 +103,7 @@ func parseRootTemplate() (*template.Template, error) {
 		"add":      func(a, b int) int { return a + b },
 		"version":  version,
 		"loggedIn": loggedIn,
+		"json":     func(item interface{}) (string, error) { b, err := json.Marshal(item); return string(b), err },
 	})
 	tRoot, err = tRoot.Parse(string(root))
 	if err != nil {

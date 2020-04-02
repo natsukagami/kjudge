@@ -9,6 +9,8 @@
     "private": true,
     "devDependencies": {
         "@types/humanize-duration": "^3.18.0",
+        "@types/node": "^13.11.0",
+        "@types/react": "^16.9.32",
         "autoprefixer": "^9.7.4",
         "parcel-bundler": "^1.12.4",
         "parcel-plugin-purgecss": "^2.1.3",
@@ -24,10 +26,17 @@
         "dev": "parcel watch -d ../templates \"html/**/*.html\"",
         "build": "mkdir -p ../templates && rm -rf ../templates/* && parcel build --no-source-maps -d ../templates \"html/**/*.html\""
     },
+    "alias": {
+        "react": "preact/compat",
+        "react-dom/test-utils": "preact/test-utils",
+        "react-dom": "preact/compat"
+    },
     "dependencies": {
         "@types/highlight.js": "^9.12.3",
         "highlight.js": "^9.18.1",
         "humanize-duration": "^3.22.0",
+        "preact": "^10.3.4",
+        "react-flip-move": "^3.0.4",
         "regenerator-runtime": "^0.13.5"
     }
 }

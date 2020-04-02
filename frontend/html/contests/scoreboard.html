@@ -13,65 +13,10 @@
 
 {{ if (isFuture .Contest.StartTime) }}
 {{ else }}
-<table class="table table-auto w-full">
-    <thead>
-        <tr>
-            <th class="text-lg py-3 border-b text-center">Rank</th>
-            <th class="text-lg py-3 border-b text-center">Username</th>
-            <th class="text-lg py-3 border-b text-center">Total Score</th>
-            {{ range .Problems }}
-            {{ $link := printf "/contests/%d/problems/%s" .ContestID .Name }}
-            <th class="text-lg py-3 border-b text-center">
-                <a href="{{$link}}#statements" title="View statements"
-                    class="cursor-pointer hover:text-blue-600">{{ .Name }}</a>
-            </th>
-            {{ end }}
-        </tr>
-    </thead>
-    <tbody>
-        {{ $contestType := .Contest.ContestType }}
-        {{ range .UserResults }}
-        {{ $user := . }}
-        <tr>
-            <td class="text-lg py-3 border-b text-center" style="width: 3rem;">{{ .Rank }}</td>
-            <td class="text-lg py-3 border-b">{{ .User.ID }}</td>
-            <td class="text-lg py-3 border-b text-center">
-                {{ if eq $contestType "weighted" }}
-                <div>{{ .TotalScore }}</div>
-                {{ else }}
-                <div>{{ .SolvedProblems }}</div>
-                {{ end }}
-                {{ if .TotalPenalty }}
-                <div class="text-sm text-gray-600">{{ .TotalPenalty }}</div>
-                {{ end }}
-            </td>
-            {{ range $.Problems }}
-            <td class="py-3 border-b text-center" style="width: 3rem;">
-                {{ with (index $user.ProblemResults .ID) }}
-                {{ if eq $contestType "weighted" }}
-                <div class="text-lg">{{ .Score }}</div>
-                {{ else }}
-                {{ if .Solved }}
-                <div class="text-lg">
-                    {{ if .FailedAttempts }} +{{ .FailedAttempts }} {{ else }} + {{ end }}
-                </div>
-                {{ else }}
-                <div class="text-lg">
-                    {{ if eq .FailedAttempts 0}} 0 {{ else }} -{{ .FailedAttempts }} {{ end }}
-                </div>
-                {{ end }}
-                {{ end }}
-                {{ if .Penalty }}
-                <div class="text-sm text-gray-600">{{ .Penalty }}</div>
-                {{ end }}
-                {{ else }}
-                0
-                {{ end }}
-            </td>
-            {{ end }}
-        </tr>
-        {{ end }}
-    </tbody>
-</table>
+<div id="scoreboard"></div>
+<script>
+    document.initialScoreboard = JSON.parse("{{ json .JSON }}");
+</script>
+<script src="../../ts/scoreboard/index.tsx"></script>
 {{ end }}
 {{ end }}
