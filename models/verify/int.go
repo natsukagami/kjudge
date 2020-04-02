@@ -2,8 +2,6 @@ package verify
 
 import (
 	"database/sql"
-
-	"github.com/pkg/errors"
 )
 
 // IntVerify are int verifiers.
@@ -43,7 +41,7 @@ func IntRange(low, high int) IntVerify {
 func IntMin(l int) IntVerify {
 	return func(i int) error {
 		if i < l {
-			return errors.Errorf("must be at least %v", l)
+			return Errorf("must be at least %v", l)
 		}
 		return nil
 	}
@@ -53,7 +51,7 @@ func IntMin(l int) IntVerify {
 func IntMax(l int) IntVerify {
 	return func(i int) error {
 		if i > l {
-			return errors.Errorf("must be at most %v", l)
+			return Errorf("must be at most %v", l)
 		}
 		return nil
 	}

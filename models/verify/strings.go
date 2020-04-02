@@ -4,8 +4,6 @@ package verify
 import (
 	"regexp"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // StringVerify are string verifiers.
@@ -40,7 +38,7 @@ func StringNonEmpty(s string) error {
 func StringMinLength(l int) StringVerify {
 	return func(s string) error {
 		if len(s) < l {
-			return errors.Errorf("must have a length of at least %v", l)
+			return Errorf("must have a length of at least %v", l)
 		}
 		return nil
 	}
@@ -50,7 +48,7 @@ func StringMinLength(l int) StringVerify {
 func StringMaxLength(l int) StringVerify {
 	return func(s string) error {
 		if len(s) > l {
-			return errors.Errorf("must have a length of at most %v", l)
+			return Errorf("must have a length of at most %v", l)
 		}
 		return nil
 	}
@@ -61,7 +59,7 @@ func Regexp(r *regexp.Regexp) StringVerify {
 	return func(s string) error {
 		loc := r.FindStringIndex(s)
 		if loc == nil || s[loc[0]:loc[1]] != s {
-			return errors.Errorf("must match the regular expression `%s`", r.String())
+			return Errorf("must match the regular expression `%s`", r.String())
 		}
 		return nil
 	}
@@ -75,6 +73,6 @@ func Enum(values ...string) StringVerify {
 				return nil
 			}
 		}
-		return errors.Errorf("value must be in [%v]", strings.Join(values, ", "))
+		return Errorf("value must be in [%v]", strings.Join(values, ", "))
 	}
 }
