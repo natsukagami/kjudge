@@ -12,6 +12,7 @@ import (
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/models/verify"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
@@ -152,6 +153,9 @@ func (g *Group) SubmitPost(c echo.Context) error {
 	}
 
 	if err := sub.Write(tx); err != nil {
+		if errors.As(err, &verify.Error{}) {
+			return echo.NewHTTPError(http.StatusBadRequest, err)
+		}
 		return err
 	}
 

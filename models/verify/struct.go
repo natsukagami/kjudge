@@ -1,6 +1,8 @@
 package verify
 
-import "github.com/pkg/errors"
+import (
+	"github.com/pkg/errors"
+)
 
 // All verifies a map of fields.
 func All(fields map[string]error) error {

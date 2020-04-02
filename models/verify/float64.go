@@ -1,7 +1,5 @@
 package verify
 
-import "github.com/pkg/errors"
-
 // FloatVerify are float64 verifiers.
 type FloatVerify func(float64) error
 
@@ -31,7 +29,7 @@ func FloatRange(low, high float64) FloatVerify {
 func FloatMin(l float64) FloatVerify {
 	return func(i float64) error {
 		if i < l {
-			return errors.Errorf("must be at least %v", l)
+			return Errorf("must be at least %v", l)
 		}
 		return nil
 	}
@@ -41,7 +39,7 @@ func FloatMin(l float64) FloatVerify {
 func FloatMax(l float64) FloatVerify {
 	return func(i float64) error {
 		if i > l {
-			return errors.Errorf("must be at most %v", l)
+			return Errorf("must be at most %v", l)
 		}
 		return nil
 	}
