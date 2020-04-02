@@ -1,5 +1,12 @@
-import hs from "highlight.js";
+const hs = require("highlight.js/lib/highlight.js");
 import "regenerator-runtime/runtime";
+
+hs.registerLanguage("cpp", require("highlight.js/lib/languages/cpp"));
+hs.registerLanguage("python", require("highlight.js/lib/languages/python"));
+hs.registerLanguage("java", require("highlight.js/lib/languages/java"));
+hs.registerLanguage("rust", require("highlight.js/lib/languages/rust"));
+hs.registerLanguage("go", require("highlight.js/lib/languages/go"));
+hs.registerLanguage("pascal", require("highlight.js/lib/languages/delphi"));
 
 hs.initHighlightingOnLoad();
 

@@ -52,6 +52,7 @@ func New(db *db.DB, g *echo.Group) (*Group, error) {
 
 	g.GET("", grp.ContestsGet)
 	g.GET("/:id/scoreboard", grp.ScoreboardGet)
+	g.GET("/:id/scoreboard/json", grp.ScoreboardJSONGet)
 	authed := g.Group("/", auth.MustAuth(db))
 	authed.GET(":id", grp.OverviewGet)
 	authed.GET(":id/problems/:problem", grp.ProblemGet)

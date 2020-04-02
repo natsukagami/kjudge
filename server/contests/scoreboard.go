@@ -22,6 +22,74 @@ type UserResult struct {
 	ProblemResults map[int]*models.ProblemResult
 }
 
+// JSONScoreboard represents a JSON encoded scoreboard.
+type JSONScoreboard struct {
+	ContestID   int                `json:"contest_id"`
+	ContestType models.ContestType `json:"contest_type"`
+	Problems    []JSONProblem      `json:"problems"`
+	Users       []JSONUserResult   `json:"users"`
+}
+
+// JSONUserResult represents a JSON encoded user in the scoreboard.
+type JSONUserResult struct {
+	ID             string                    `json:"id"`
+	Rank           int                       `json:"rank"`
+	TotalPenalty   int                       `json:"total_penalty"`
+	SolvedProblems int                       `json:"solved_problems"`
+	TotalScore     float64                   `json:"total_score"`
+	ProblemResults map[int]JSONProblemResult `json:"problem_results"`
+}
+
+func jsonUserResult(u *UserResult, ps []JSONProblem) JSONUserResult {
+	problems := make(map[int]JSONProblemResult)
+	for _, p := range ps {
+		problems[p.ID] = jsonProblemResult(u.ProblemResults[p.ID])
+	}
+	return JSONUserResult{
+		ID:             u.User.ID,
+		Rank:           u.Rank,
+		TotalPenalty:   u.TotalPenalty,
+		SolvedProblems: u.SolvedProblems,
+		TotalScore:     u.TotalScore,
+		ProblemResults: problems,
+	}
+}
+
+// JSONProblemResult represents a JSON encoded user's result of a problem in the scoreboard.
+type JSONProblemResult struct {
+	Score          float64 `json:"score"`
+	Solved         bool    `json:"solved"`
+	Penalty        int     `json:"penalty"`
+	FailedAttempts int     `json:"failed_attempts"`
+}
+
+func jsonProblemResult(p *models.ProblemResult) JSONProblemResult {
+	if p == nil {
+		return JSONProblemResult{}
+	}
+	return JSONProblemResult{
+		Score:          p.Score,
+		Solved:         p.Solved,
+		Penalty:        p.Penalty,
+		FailedAttempts: p.FailedAttempts,
+	}
+}
+
+// JSONProblem represents a JSON encoded problem metadata.
+type JSONProblem struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	DisplayName string `json:"display_name"`
+}
+
+func jsonProblem(p *models.Problem) JSONProblem {
+	return JSONProblem{
+		ID:          p.ID,
+		Name:        p.Name,
+		DisplayName: p.DisplayName,
+	}
+}
+
 // ScoreboardCtx is the context required to display the scoreboard page
 type ScoreboardCtx struct {
 	*ContestCtx
@@ -32,6 +100,26 @@ type ScoreboardCtx struct {
 // Render renders the scoreboard context
 func (s *ScoreboardCtx) Render(c echo.Context) error {
 	return c.Render(http.StatusOK, "contests/scoreboard", s)
+}
+
+// JSON returns the JSON representation of the scoreboard.
+func (s *ScoreboardCtx) JSON() JSONScoreboard {
+	sb := JSONScoreboard{
+		ContestID:   s.Contest.ID,
+		ContestType: s.Contest.ContestType,
+	}
+	for _, p := range s.Problems {
+		sb.Problems = append(sb.Problems, jsonProblem(p))
+	}
+	for _, u := range s.UserResults {
+		sb.Users = append(sb.Users, jsonUserResult(u, sb.Problems))
+	}
+	return sb
+}
+
+// RenderJSON renders a scoreboard in JSON.
+func (s *ScoreboardCtx) RenderJSON(c echo.Context) error {
+	return c.JSON(http.StatusOK, s.JSON())
 }
 
 // compareUserRanking checks if ranking of user[i] is strictly less than the ranking of user[j]
@@ -144,4 +232,13 @@ func (g *Group) ScoreboardGet(c echo.Context) error {
 		return err
 	}
 	return ctx.Render(c)
+}
+
+// ScoreboardJSONGet implements GET /contest/:id/scoreboard/json
+func (g *Group) ScoreboardJSONGet(c echo.Context) error {
+	ctx, err := getScoreboardCtx(g.db, c)
+	if err != nil {
+		return err
+	}
+	return ctx.RenderJSON(c)
 }
