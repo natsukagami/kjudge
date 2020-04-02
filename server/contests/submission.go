@@ -95,6 +95,15 @@ func (g *Group) SubmissionGet(c echo.Context) error {
 	return ctx.Render(c)
 }
 
+// SubmissionDownload implements GET /contests/:id/submissions/:submission/download
+func (g *Group) SubmissionDownload(c echo.Context) error {
+	ctx, err := getSubmissionCtx(g.db, c)
+	if err != nil {
+		return err
+	}
+	return c.Blob(http.StatusOK, "text/plain", ctx.Submission.Source)
+}
+
 // SubmissionVerdictGet implements GET /contests/:id/submissions/:submission/verdict
 func (g *Group) SubmissionVerdictGet(c echo.Context) error {
 	ctx, err := getSubmissionCtx(g.db, c)

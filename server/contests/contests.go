@@ -58,6 +58,7 @@ func New(db *db.DB, g *echo.Group) (*Group, error) {
 	authed.GET(":id/problems/:problem/files/:file", grp.FileGet)
 	authed.POST(":id/problems/:problem/submit", grp.SubmitPost)
 	authed.GET(":id/submissions/:submission", grp.SubmissionGet)
+	authed.GET(":id/submissions/:submission/download", grp.SubmissionDownload)
 	authed.GET(":id/submissions/:submission/verdict", grp.SubmissionVerdictGet)
 
 	return grp, nil
