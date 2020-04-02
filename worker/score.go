@@ -173,12 +173,19 @@ func scoreOf(sub *models.Submission) (float64, int, bool) {
 
 // CompareScores compare the submission results and return the best one.
 // If nil is returned, then the problem result should just be removed.
+// The submissions list passed in must be sorted in the OrderBy order.
 func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemResult {
 	maxScore := 0.0
 	var which *models.Submission
 	contestTime := float64(s.Contest.EndTime.Sub(s.Contest.StartTime))
 	counted := 0
 	failedAttempts := 0
+
+	// Since the submissions' order are by submit time desc, we need to reverse the list.
+	for i, j := 0, len(subs)-1; i < j; i, j = i+1, j-1 {
+		subs[i], subs[j] = subs[j], subs[i]
+	}
+
 	for _, sub := range subs {
 		score, _, counts := scoreOf(sub)
 		if !counts {
