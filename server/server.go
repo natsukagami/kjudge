@@ -12,6 +12,7 @@ import (
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/models/verify"
 	"git.nkagami.me/natsukagami/kjudge/server/admin"
 	"git.nkagami.me/natsukagami/kjudge/server/contests"
 	"git.nkagami.me/natsukagami/kjudge/server/template"
@@ -91,6 +92,12 @@ func (s *Server) HandleError(err error, c echo.Context) {
 	// the convention is:
 	// - if err is *echo.HTTPError, it is a "normal error" with its own message and everything.
 	// - otherwise, it is an unexpected error.
+
+	// if err is verify.Error, it is a "normal error" with statusCode = 400 Bad Request
+	if errors.As(err, &verify.Error{}) {
+		err = echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
 	if e, ok := err.(*echo.HTTPError); ok {
 		// Just handle it gracefully
 		c.Render(e.Code, "error", errCtx{Code: e.Code, Message: fmt.Sprint(e.Message), StatusText: http.StatusText(e.Code)})
