@@ -35,15 +35,27 @@ func (s *ScoreboardCtx) Render(c echo.Context) error {
 }
 
 // compareUserRanking checks if ranking of user[i] is strictly less than the ranking of user[j]
-func compareUserRanking(userResult []*UserResult, contestType models.ContestType, i, j int) bool {
+// Returns (comparison, is it just tie-breaking)
+func compareUserRanking(userResult []*UserResult, contestType models.ContestType, i, j int) (bool, bool) {
+	a, b := userResult[i], userResult[j]
 	if contestType == models.ContestTypeWeighted {
 		// sort based on totalScore if two users have same totalScore sort based on totalPenalty in an ascending order
-		return (userResult[i].TotalScore > userResult[j].TotalScore ||
-			(userResult[i].TotalScore == userResult[j].TotalScore && userResult[i].TotalPenalty < userResult[j].TotalPenalty))
+		if a.TotalScore != b.TotalScore {
+			return a.TotalScore > b.TotalScore, false
+		}
+		if a.TotalPenalty != b.TotalPenalty {
+			return a.TotalPenalty < b.TotalPenalty, false
+		}
+		return a.User.ID < b.User.ID, true
 	} else {
 		// sort based on solvedProblems if two users have same solvedProblems sort based on totalPenalty in an ascending order
-		return (userResult[i].SolvedProblems > userResult[j].SolvedProblems ||
-			(userResult[i].SolvedProblems == userResult[j].SolvedProblems && userResult[i].TotalPenalty < userResult[j].TotalPenalty))
+		if a.SolvedProblems != b.SolvedProblems {
+			return a.SolvedProblems > b.SolvedProblems, false
+		}
+		if a.TotalPenalty != b.TotalPenalty {
+			return a.TotalPenalty < b.TotalPenalty, false
+		}
+		return a.User.ID < b.User.ID, true
 	}
 }
 
@@ -103,15 +115,18 @@ func getScoreboardCtx(db db.DBContext, c echo.Context) (*ScoreboardCtx, error) {
 		}
 	}
 
-	sort.SliceStable(userResults, func(i, j int) bool {
-		return compareUserRanking(userResults, contestType, i, j)
+	sort.Slice(userResults, func(i, j int) bool {
+		r, _ := compareUserRanking(userResults, contestType, i, j)
+		return r
 	})
 
 	// after sorting users, we need to calculate users' ranking
 	rank := 0
 	for i, userCtx := range userResults {
-		if i == 0 || compareUserRanking(userResults, contestType, i-1, i) {
-			rank = rank + 1
+		if i == 0 {
+			rank = i + 1
+		} else if r, tie := compareUserRanking(userResults, contestType, i-1, i); r && !tie {
+			rank = i + 1
 		}
 		userCtx.Rank = rank
 	}
