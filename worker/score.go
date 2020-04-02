@@ -222,14 +222,10 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 		if !counts {
 			continue
 		}
-		if sub == which {
-			if which.Verdict != VerdictAccepted {
-				failedAttempts++
-			}
+		if sub.Verdict == VerdictAccepted {
 			break
-		} else {
-			failedAttempts++
 		}
+		failedAttempts++
 	}
 
 	_, penalty, counts := scoreOf(which)
