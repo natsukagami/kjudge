@@ -41,10 +41,10 @@
         if (!tab) {
             continue;
         }
-        t.addEventListener("click", _ => render(t.getAttribute("data-tab")));
+        t.addEventListener("click", (_) => render(t.getAttribute("data-tab")));
     }
 
-    window.addEventListener("hashchange", _ =>
+    window.addEventListener("hashchange", (_) =>
         render(window.location.hash.substr(1)),
     );
 })();

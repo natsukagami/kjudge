@@ -8,7 +8,7 @@
             "table-row",
         ) as HTMLCollectionOf<HTMLTableRowElement>;
         const checkboxesArray = Array.of(...rows).map(
-            v =>
+            (v) =>
                 v.getElementsByClassName(
                     "select-to-rejudge",
                 )[0] as HTMLInputElement,
@@ -62,7 +62,7 @@
                 problemFilter?.options[
                     problemFilter.selectedIndex
                 ].value?.split(",") ?? []
-            ).filter(v => v !== "");
+            ).filter((v) => v !== "");
             for (const row of rows) {
                 if (
                     (userID === "" ||
@@ -126,12 +126,12 @@
         });
 
         // Handle filters
-        userFilter?.addEventListener("change", _ => {
+        userFilter?.addEventListener("change", (_) => {
             const [yes, no] = filterRows();
             setVisible(yes, no);
             updateInputs();
         });
-        problemFilter?.addEventListener("change", _ => {
+        problemFilter?.addEventListener("change", (_) => {
             const [yes, no] = filterRows();
             setVisible(yes, no);
             updateInputs();
