@@ -12,7 +12,8 @@ import (
 
 // ScoringMode dictates how the best submission is chosen.
 // There are:
-// - Best: The submission with the highest score is chosen. If on a tie, choose the one with largest penalty.
+// - Min: The submission with the lowest score is chosen. If on a tie, choose the one with the highest penalty
+// - Best: The submission with the highest score is chosen. If on a tie, choose the one with lowest penalty.
 // - Once: The first (successfully compiled) submission is the best one.
 // - Last: The last submission is the best one.
 // - Decay: The last submission is the best one. The score is modified by the number of submissions before it (0.1 * count), and the
@@ -21,6 +22,7 @@ type ScoringMode string
 
 // Defined values for ScoringMode.
 const (
+	ScoringModeMin   ScoringMode = "min"
 	ScoringModeBest  ScoringMode = "best"
 	ScoringModeOnce  ScoringMode = "once"
 	ScoringModeLast  ScoringMode = "last"
@@ -28,7 +30,7 @@ const (
 )
 
 func (s ScoringMode) verify() error {
-	return verify.String(string(s), verify.Enum(string(ScoringModeBest), string(ScoringModeOnce), string(ScoringModeLast), string(ScoringModeDecay)))
+	return verify.String(string(s), verify.Enum(string(ScoringModeMin), string(ScoringModeBest), string(ScoringModeOnce), string(ScoringModeLast), string(ScoringModeDecay)))
 }
 
 // PenaltyPolicy dictates how the penalty is calculated.

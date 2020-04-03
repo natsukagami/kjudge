@@ -211,6 +211,11 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 				which = sub
 				maxScore = score
 			}
+		case models.ScoringModeMin:
+			if which == nil || score <= which.Score.Float64 {
+				which = sub
+				maxScore = score // this is literally min score
+			}
 		default:
 			panic(s)
 		}
@@ -222,7 +227,14 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 		if !counts {
 			continue
 		}
-		if sub.Verdict == VerdictAccepted {
+		if s.Problem.ScoringMode == models.ScoringModeMin {
+			if sub == which {
+				if sub.Verdict != VerdictAccepted {
+					failedAttempts++
+				}
+				break
+			}
+		} else if sub.Verdict == VerdictAccepted {
 			break
 		}
 		failedAttempts++
