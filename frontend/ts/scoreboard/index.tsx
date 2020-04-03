@@ -70,7 +70,7 @@ const App = ({ initScoreboard }: { initScoreboard: Scoreboard }) => {
         <div class="w-full">
             <Headers {...scoreboard} />
             <FlipMove>
-                {scoreboard.users.map(u => (
+                {scoreboard.users.map((u) => (
                     <div key={u.id}>
                         <Row key={u.id} user={u} {...scoreboard} />
                     </div>
@@ -114,7 +114,7 @@ const Headers = ({
             >
                 Total Score
             </div>
-            {problems.map(p => (
+            {problems.map((p) => (
                 <div
                     key={p.id}
                     class="text-lg py-1 flex-table-cell border-b border-l text-center px-1 flex-shrink-0"
@@ -169,7 +169,7 @@ const Row = ({
                     </div>
                 ) : null}
             </div>
-            {problems.map(p => (
+            {problems.map((p) => (
                 <Cell
                     key={p.id}
                     contest_type={contest_type}

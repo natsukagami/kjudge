@@ -5,7 +5,7 @@ import "typeface-muli";
 import hd from "humanize-duration";
 
 // Set timezone
-(function() {
+(function () {
     setInterval(() => {
         // Parse and update the "the current time is" nodes.
         const now = new Date();
@@ -32,9 +32,9 @@ import hd from "humanize-duration";
 })();
 
 // require-confirm forms
-(function() {
+(function () {
     for (const elem of document.getElementsByClassName("require-confirm")) {
-        (elem as HTMLFormElement).addEventListener("submit", ev => {
+        (elem as HTMLFormElement).addEventListener("submit", (ev) => {
             if (!confirm("Are you sure you want to delete this item?"))
                 ev.preventDefault();
         });
@@ -42,7 +42,7 @@ import hd from "humanize-duration";
 })();
 
 // load the list of tests
-(function() {
+(function () {
     const SHOW = "[show]";
     const HIDE = "[hide]";
     const SHOW_ALL = "[show all]";
@@ -62,7 +62,7 @@ import hd from "humanize-duration";
         const e = elem as HTMLDivElement;
         const group = e.getAttribute("data-test-group");
         const toggle = toggles.find(
-            t => t.getAttribute("data-test-group") == group,
+            (t) => t.getAttribute("data-test-group") == group,
         );
         if (group && toggle) m.set(group, [e, toggle]);
         return m;
@@ -98,7 +98,7 @@ import hd from "humanize-duration";
         toggle.addEventListener("click", () => doToggle(table, toggle));
     }
 
-    allToggle.addEventListener("click", _ => {
+    allToggle.addEventListener("click", (_) => {
         const switchOn = allToggle.innerHTML === SHOW_ALL;
         for (const [table, toggle] of items) {
             doToggle(table, toggle, switchOn);
@@ -182,7 +182,7 @@ import hd from "humanize-duration";
     for (const item of document.getElementsByClassName("link-back")) {
         const link = item as HTMLAnchorElement;
         link.href = document.referrer;
-        link.addEventListener("click", e => {
+        link.addEventListener("click", (e) => {
             e.preventDefault();
             history.back(); // don't push the current page into history
         });

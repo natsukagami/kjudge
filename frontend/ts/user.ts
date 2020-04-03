@@ -15,7 +15,7 @@
         "match_warning",
     ) as HTMLSpanElement;
 
-    form.addEventListener("submit", e => {
+    form.addEventListener("submit", (e) => {
         if (newPassword.value !== confirmPassword.value) {
             e.preventDefault();
             matchWarning.style.display = "inline";
