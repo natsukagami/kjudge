@@ -17,7 +17,13 @@
         {{ else }}
     <option value="best">
         {{ end }}
-        Best <span>[Highest score, highest penalty]</span></option>
+        Best <span>[Highest score, lowest penalty]</span></option>
+    {{ if (eq .ScoringMode "min") }}
+    <option selected value="min">
+        {{ else }}
+    <option value="min">
+        {{ end }}
+        Min Mode <span>[Lowest score, highest penalty]</span></option>
     {{ if (eq .ScoringMode "once") }}
     <option selected value="once">
         {{ else }}
@@ -40,7 +46,8 @@
 <div class="p-1 text-sm text-gray-600">
     There are:
     <ul class="list-inside list-disc">
-        <li>Best: The submission with the highest score is chosen. If on a tie, choose the one with largest penalty.
+        <li>Best: The submission with the highest score is chosen. If on a tie, choose the one with lowest penalty.
+        <li>Min: The submission with the lowest score is chosen. If on a tie, choose the one with highest penalty.
         </li>
         <li>Once: The first (successfully compiled) submission is the best one.</li>
         <li>Last: The last submission is the best one.</li>
