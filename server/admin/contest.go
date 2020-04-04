@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/server/httperr"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
@@ -47,11 +48,11 @@ func (g *Group) getContest(c echo.Context) (*models.Contest, error) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return nil, echo.ErrNotFound
+		return nil, httperr.NotFoundf("Contest not found: %s", idStr)
 	}
 	contest, err := models.GetContest(g.db, id)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, echo.ErrNotFound
+		return nil, httperr.NotFoundf("Contest not found: %d", id)
 	} else if err != nil {
 		return nil, err
 	}
@@ -99,7 +100,7 @@ func (g *Group) ContestDelete(c echo.Context) error {
 		return err
 	}
 	if err := contest.Delete(g.db); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return err
 	}
 	return c.Redirect(http.StatusSeeOther, "/admin/contests")
 }
@@ -113,7 +114,7 @@ func (g *Group) ContestEdit(c echo.Context) error {
 	original := *contest
 	var form ContestForm
 	if err := c.Bind(&form); err != nil {
-		return err
+		return httperr.BindFail(err)
 	}
 	form.Bind(contest)
 	if err := contest.Write(g.db); err != nil {
@@ -133,7 +134,7 @@ func (g *Group) ContestAddProblem(c echo.Context) error {
 		problem models.Problem
 	)
 	if err := c.Bind(&form); err != nil {
-		return err
+		return httperr.BindFail(err)
 	}
 	problem.ContestID = contest.ID
 	form.Bind(&problem)

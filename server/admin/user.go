@@ -7,6 +7,7 @@ import (
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/server/httperr"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
@@ -26,7 +27,7 @@ func getUser(db db.DBContext, c echo.Context) (*UserCtx, error) {
 	id := c.Param("id")
 	u, err := models.GetUser(db, id)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, echo.ErrNotFound
+		return nil, httperr.NotFoundf("User not found: %v", id)
 	} else if err != nil {
 		return nil, err
 	}
@@ -78,7 +79,7 @@ func (g *Group) UserGet(c echo.Context) error {
 func (g *Group) UserEdit(c echo.Context) error {
 	tx, err := g.db.Beginx()
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	defer tx.Rollback()
 	ctx, err := getUser(tx, c)
@@ -88,11 +89,11 @@ func (g *Group) UserEdit(c echo.Context) error {
 	nw := *ctx.User
 	var form UserForm
 	if err := c.Bind(&form); err != nil {
-		return err
+		return httperr.BindFail(err)
 	}
 	form.IsUpdate = true
 	if form.ID != nw.ID {
-		return echo.NewHTTPError(http.StatusBadRequest, "cannot change user id")
+		return httperr.BadRequestf("cannot change user id")
 	}
 	if err := form.Bind(&nw); err != nil {
 		ctx.EditForm = &form
@@ -107,7 +108,7 @@ func (g *Group) UserEdit(c echo.Context) error {
 	}
 
 	if err := tx.Commit(); err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/users/%s", nw.ID))

@@ -70,7 +70,7 @@ func (g *Group) HomeGet(c echo.Context) error {
 func (g *Group) ChangePassword(c echo.Context) error {
 	tx, err := g.db.Beginx()
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	defer tx.Rollback()
 
@@ -90,7 +90,7 @@ func (g *Group) ChangePassword(c echo.Context) error {
 			return err
 		}
 		if err := tx.Commit(); err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 		return nil
 	}

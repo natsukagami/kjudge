@@ -7,6 +7,7 @@ import (
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/server/httperr"
 	"git.nkagami.me/natsukagami/kjudge/worker"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
@@ -31,12 +32,12 @@ func getSubmissionCtx(db db.DBContext, c echo.Context) (*SubmissionCtx, error) {
 	idStr := c.Param("submission")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return nil, echo.ErrNotFound
+		return nil, httperr.NotFoundf("Submission not found: %v", idStr)
 	}
 
 	sub, err := models.GetSubmission(db, id)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, echo.ErrNotFound
+		return nil, httperr.NotFoundf("Submission not found: %v", idStr)
 	} else if err != nil {
 		return nil, err
 	}
@@ -52,7 +53,7 @@ func getSubmissionCtx(db db.DBContext, c echo.Context) (*SubmissionCtx, error) {
 	}
 	// Disallow submissions outside of current contest
 	if problem.ContestID != contest.Contest.ID {
-		return nil, echo.ErrNotFound
+		return nil, httperr.NotFoundf("Submission not found: %v", idStr)
 	}
 
 	testGroups, err := models.GetProblemTestsMeta(db, problem.ID)

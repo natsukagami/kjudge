@@ -8,6 +8,7 @@ import (
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/server/httperr"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
@@ -16,11 +17,11 @@ func getTest(db db.DBContext, c echo.Context) (*models.Test, error) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return nil, echo.ErrNotFound
+		return nil, httperr.BadRequestf("Test not found: %v", idStr)
 	}
 	test, err := models.GetTest(db, id)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, echo.ErrNotFound
+		return nil, httperr.BadRequestf("Test not found: %v", idStr)
 	} else if err != nil {
 		return nil, err
 	}

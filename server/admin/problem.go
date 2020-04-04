@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/server/httperr"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
@@ -32,7 +33,7 @@ func (o *OptionalInt64) UnmarshalParam(src string) error {
 	}
 	n, err := strconv.Atoi(src)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "expected a number, number not given")
+		return httperr.BadRequestf("expected a number, number not given")
 	}
 	o.Valid = true
 	o.Int64 = int64(n)
@@ -76,11 +77,11 @@ func (g *Group) getProblem(c echo.Context) (*ProblemCtx, error) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return nil, echo.ErrNotFound
+		return nil, httperr.NotFoundf("Problem not found: %v", idStr)
 	}
 	problem, err := models.GetProblem(g.db, id)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, echo.ErrNotFound
+		return nil, httperr.NotFoundf("Problem not found: %v", idStr)
 	} else if err != nil {
 		return nil, err
 	}
@@ -197,7 +198,7 @@ func (g *Group) ProblemAddFile(c echo.Context) error {
 	makePublic := c.FormValue("public") == "true"
 	form, err := c.MultipartForm()
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httperr.BindFail(err)
 	}
 	var files []*models.File
 	for _, file := range form.File["file"] {
@@ -221,7 +222,7 @@ func (g *Group) ProblemAddFile(c echo.Context) error {
 		files[0].Filename = rename
 	}
 	if err := ctx.Problem.WriteFiles(g.db, files); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httperr.BadRequestf("cannot write files: %v", err)
 	}
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d#files", ctx.Problem.ID))
 }

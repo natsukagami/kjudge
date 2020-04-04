@@ -114,6 +114,9 @@ func (s *Server) HandleError(err error, c echo.Context) {
 Please check out the open issues and help opening a new one if possible on https://git.nkagami.me/natsukagami/kjudge/issues/new`, path)
 		}
 		log.Println(errStr)
+		if s.echo.Debug {
+			log.Printf("Error dump:\n%+v\n", err)
+		}
 	}
 }
 

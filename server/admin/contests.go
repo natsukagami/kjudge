@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/server/httperr"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
@@ -23,7 +24,7 @@ func (t Timestamp) String() string {
 func (t *Timestamp) UnmarshalParam(src string) error {
 	ts, err := time.Parse(timeFormat, src)
 	*t = Timestamp(ts)
-	return err
+	return errors.WithStack(err)
 }
 
 // ContestsCtx is a context for rendering contests.
@@ -82,7 +83,7 @@ func (g *Group) contestsWithFormError(formError error, form ContestForm, c echo.
 func (g *Group) ContestsPost(c echo.Context) error {
 	var form ContestForm
 	if err := c.Bind(&form); err != nil {
-		return errors.WithStack(err)
+		return httperr.BindFail(err)
 	}
 	var contest models.Contest
 	form.Bind(&contest)

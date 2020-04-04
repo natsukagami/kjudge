@@ -6,6 +6,7 @@ import (
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
 	"git.nkagami.me/natsukagami/kjudge/server/auth"
+	"git.nkagami.me/natsukagami/kjudge/server/httperr"
 	"github.com/labstack/echo/v4"
 )
 
@@ -74,7 +75,7 @@ func (g *Group) UsersGet(c echo.Context) error {
 func (g *Group) UsersAdd(c echo.Context) error {
 	var form UserForm
 	if err := c.Bind(&form); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httperr.BindFail(err)
 	}
 	var u models.User
 	if err := form.Bind(&u); err != nil {

@@ -9,6 +9,7 @@ import (
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/server/httperr"
 	"git.nkagami.me/natsukagami/kjudge/worker"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
@@ -34,11 +35,11 @@ func getSubmissionCtx(db db.DBContext, c echo.Context) (*SubmissionCtx, error) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return nil, echo.ErrNotFound
+		return nil, httperr.NotFoundf("Submission not found: %v", idStr)
 	}
 	sub, err := models.GetSubmission(db, id)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, echo.ErrNotFound
+		return nil, httperr.NotFoundf("Submission not found: %v", idStr)
 	} else if err != nil {
 		return nil, err
 	}
@@ -93,7 +94,7 @@ func (g *Group) SubmissionBinaryGet(c echo.Context) error {
 		http.ServeContent(c.Response(), c.Request(), fmt.Sprintf("compiled_s%d", ctx.Submission.ID), ctx.Submission.SubmittedAt, bytes.NewReader(ctx.Submission.CompiledSource))
 		return nil
 	} else {
-		return echo.NewHTTPError(http.StatusBadRequest, "Compiled binary not available")
+		return httperr.BadRequestf("Compiled binary not available")
 	}
 }
 

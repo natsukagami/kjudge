@@ -11,6 +11,7 @@ import (
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/server/httperr"
 	"git.nkagami.me/natsukagami/kjudge/tests"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
@@ -20,11 +21,11 @@ func getTestGroup(db db.DBContext, c echo.Context) (*models.TestGroup, error) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return nil, echo.ErrNotFound
+		return nil, httperr.NotFoundf("Test group not found: %v", idStr)
 	}
 	tg, err := models.GetTestGroup(db, id)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, echo.ErrNotFound
+		return nil, httperr.NotFoundf("Test group not found: %v", idStr)
 	} else if err != nil {
 		return nil, err
 	}
@@ -46,7 +47,7 @@ func (g *Group) TestGroupUploadSingle(c echo.Context) error {
 	name := c.FormValue("name")
 	mp, err := c.MultipartForm()
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httperr.BindFail(err)
 	}
 	input, err := readFromForm("input", mp)
 	if err != nil {
@@ -64,7 +65,7 @@ func (g *Group) TestGroupUploadSingle(c echo.Context) error {
 		Output:      output,
 	}
 	if err := test.Write(tx); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httperr.BadRequestf("Cannot write test: %v", err)
 	}
 	if err := tx.Commit(); err != nil {
 		return errors.WithStack(err)
@@ -87,7 +88,7 @@ func (g *Group) TestGroupUploadMultiple(c echo.Context) error {
 	override := c.FormValue("override") == "true"
 	mp, err := c.MultipartForm()
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httperr.BindFail(err)
 	}
 	file, err := readFromForm("file", mp)
 	if err != nil {
@@ -95,10 +96,10 @@ func (g *Group) TestGroupUploadMultiple(c echo.Context) error {
 	}
 	tests, err := tests.Unpack(bytes.NewReader(file), int64(len(file)), c.FormValue("input"), c.FormValue("output"))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httperr.BadRequestf("cannot unpack tests: %v", err)
 	}
 	if err := tg.WriteTests(tx, tests, override); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httperr.BadRequestf("Cannot write tests: %v", err)
 	}
 	if err := tx.Commit(); err != nil {
 		return err
@@ -114,11 +115,11 @@ func (g *Group) TestGroupEdit(c echo.Context) error {
 	}
 	var form TestGroupForm
 	if err := c.Bind(&form); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httperr.BindFail(err)
 	}
 	form.Bind(tg)
 	if err := tg.Write(g.db); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httperr.BadRequestf("Cannot update test group: %v", err)
 	}
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d", tg.ProblemID))
 }
@@ -138,10 +139,10 @@ func (g *Group) TestGroupDelete(c echo.Context) error {
 func readFromForm(name string, form *multipart.Form) ([]byte, error) {
 	file, ok := form.File[name]
 	if !ok {
-		return nil, echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("file %s not found", name))
+		return nil, httperr.BadRequestf("file %s not found", name)
 	}
 	if len(file) != 1 {
-		return nil, echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("file %s: expected one file, got %d", name, len(file)))
+		return nil, httperr.BadRequestf("file %s: expected one file, got %d", name, len(file))
 	}
 	f, err := file[0].Open()
 	if err != nil {
