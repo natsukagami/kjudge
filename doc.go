@@ -5,6 +5,6 @@ package kjudge
 // The version and codename of the system.
 // We typically pick an anime JK name as the codename for every minor version.
 const (
-	Version  = "0.2.0"
-	Codename = "Misaka Mikoto"
+	Version  = "0.3.0"
+	Codename = "Kuroko Shirai"
 )
