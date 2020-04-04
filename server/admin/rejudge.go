@@ -1,12 +1,12 @@
 package admin
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/server/httperr"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
@@ -19,7 +19,7 @@ func (g *Group) RejudgePost(c echo.Context) error {
 	for _, i := range idStr {
 		v, err := strconv.Atoi(i)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("id `%s`: %v", i, err.Error()))
+			return httperr.BadRequestf("submission id `%s`: %v", i, err)
 		}
 		id = append(id, v)
 	}
@@ -37,10 +37,10 @@ func (g *Group) RejudgePost(c echo.Context) error {
 	case "compile":
 		err = models.RejudgeCompile(tx, id...)
 	default:
-		err = echo.NewHTTPError(http.StatusBadRequest, "Invalid rejudge stage")
+		err = httperr.BadRequestf("Invalid rejudge stage: %s", stage)
 	}
 	if err != nil {
-		return err
+		return httperr.BadRequestf("Cannot rejudge: %v", err)
 	}
 	if err := tx.Commit(); err != nil {
 		return errors.WithStack(err)

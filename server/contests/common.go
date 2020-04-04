@@ -6,6 +6,7 @@ import (
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/server/httperr"
 	"git.nkagami.me/natsukagami/kjudge/server/user"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
@@ -28,11 +29,11 @@ func getContestCtx(db db.DBContext, c echo.Context) (*ContestCtx, error) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return nil, echo.ErrNotFound
+		return nil, httperr.NotFoundf("Contest not found: %v", idStr)
 	}
 	contest, err := models.GetContest(db, id)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, echo.ErrNotFound
+		return nil, httperr.NotFoundf("Contest not found: %v", idStr)
 	} else if err != nil {
 		return nil, errors.WithStack(err)
 	}

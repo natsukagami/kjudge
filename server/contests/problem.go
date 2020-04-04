@@ -12,6 +12,7 @@ import (
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/server/httperr"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
@@ -39,13 +40,13 @@ func getProblemCtx(db db.DBContext, c echo.Context) (*ProblemCtx, error) {
 
 	// If the contest has not started, throw
 	if contest.Contest.StartTime.After(time.Now()) {
-		return nil, echo.NewHTTPError(http.StatusBadRequest, "Contest has not started")
+		return nil, httperr.BadRequestf("Contest has not started")
 	}
 
 	name := c.Param("problem")
 	problem, err := models.GetProblemByName(db, contest.Contest.ID, name)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, echo.ErrNotFound
+		return nil, httperr.NotFoundf("Problem not found: %s", name)
 	} else if err != nil {
 		return nil, err
 	}
@@ -87,17 +88,17 @@ func (g *Group) FileGet(c echo.Context) error {
 	fileIDStr := c.Param("file")
 	fileID, err := strconv.Atoi(fileIDStr)
 	if err != nil {
-		return echo.ErrNotFound
+		return httperr.NotFoundf("File not found: %v", fileID)
 	}
 	file, err := models.GetFile(g.db, fileID)
 	if errors.Is(err, sql.ErrNoRows) {
-		return echo.ErrNotFound
+		return httperr.NotFoundf("File not found: %v", fileID)
 	} else if err != nil {
 		return err
 	}
 
 	if file.ProblemID != ctx.Problem.ID || !file.Public {
-		return echo.ErrNotFound
+		return httperr.NotFoundf("File not found: %v", fileID)
 	}
 	http.ServeContent(c.Response(), c.Request(), file.Filename, time.Now(), bytes.NewReader(file.Content))
 	return nil
@@ -117,7 +118,7 @@ func (g *Group) SubmitPost(c echo.Context) error {
 	}
 
 	if ctx.Contest.EndTime.Before(time.Now()) {
-		return echo.NewHTTPError(http.StatusBadRequest, "Contest has already ended")
+		return httperr.BadRequestf("Contest has already ended")
 	}
 
 	form, err := c.MultipartForm()
@@ -126,12 +127,12 @@ func (g *Group) SubmitPost(c echo.Context) error {
 	}
 	files, ok := form.File["file"]
 	if !ok || len(files) != 1 {
-		return echo.NewHTTPError(http.StatusBadRequest, "One file must be attached")
+		return httperr.BadRequestf("One file must be attached")
 	}
 	file := files[0]
 	lang, err := models.LanguageByExt(filepath.Ext(file.Filename))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httperr.BadRequestf("Cannot resolve language: %v", err)
 	}
 	fileContent, err := file.Open()
 	if err != nil {
@@ -161,7 +162,7 @@ func (g *Group) SubmitPost(c echo.Context) error {
 	}
 
 	if err := tx.Commit(); err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/contests/%d/problems/%s#submissions", ctx.Contest.ID, ctx.Problem.Name))
 }

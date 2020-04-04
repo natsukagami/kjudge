@@ -7,6 +7,7 @@ import (
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
+	"git.nkagami.me/natsukagami/kjudge/server/httperr"
 	"github.com/labstack/echo/v4"
 )
 
@@ -156,7 +157,7 @@ func getScoreboardCtx(db db.DBContext, c echo.Context) (*ScoreboardCtx, error) {
 
 	// If the contest has not started, throw
 	if contest.Contest.StartTime.After(time.Now()) {
-		return nil, echo.NewHTTPError(http.StatusBadRequest, "Contest has not started")
+		return nil, httperr.BadRequestf("Contest has not started")
 	}
 
 	// get contestType (weighted and unweighted)
