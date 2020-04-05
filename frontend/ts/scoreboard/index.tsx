@@ -15,6 +15,7 @@ interface Scoreboard {
     contest_type: "weighted" | "unweighted";
     problems: Problem[];
     users: User[];
+    problem_best_submissions: { [key: number]: number };
 }
 
 interface Problem {
@@ -37,6 +38,7 @@ interface ProblemResult {
     solved: boolean;
     penalty: number;
     failed_attempts: number;
+    best_submission: number;
 }
 
 /**
@@ -140,10 +142,12 @@ const Row = ({
     contest_type,
     problems,
     user,
+    problem_best_submissions,
 }: {
     contest_type: Scoreboard["contest_type"];
     problems: Scoreboard["problems"];
     user: User;
+    problem_best_submissions: Scoreboard["problem_best_submissions"];
 }) => {
     const totalScore =
         contest_type === "unweighted" ? user.solved_problems : user.total_score;
@@ -174,6 +178,7 @@ const Row = ({
                     key={p.id}
                     contest_type={contest_type}
                     result={user.problem_results[p.id]}
+                    best_submission={problem_best_submissions[p.id]}
                 ></Cell>
             ))}
         </div>
@@ -186,9 +191,11 @@ const Row = ({
 const Cell = ({
     contest_type,
     result,
+    best_submission,
 }: {
     contest_type: Scoreboard["contest_type"];
     result: ProblemResult;
+    best_submission: number | undefined;
 }) => {
     let score: string = "";
     let color_class: string = "";
@@ -200,6 +207,10 @@ const Cell = ({
                 result.failed_attempts > 0 ? result.failed_attempts : ""
             }`;
             color_class = "text-green-700";
+            if (result.best_submission === best_submission) {
+                color_class += " bg-green-100 hover:bg-green-200";
+                title = "first to solve";
+            }
         } else if (result.failed_attempts > 0) {
             score = `-${result.failed_attempts}`;
             color_class = "text-red-600";
@@ -209,8 +220,12 @@ const Cell = ({
     } else {
         score = `${result.score}`;
         if (result.solved) {
-            color_class = "text-green-700";
             title = `${result.failed_attempts + 1} attempts`;
+            color_class = "text-green-700";
+            if (result.best_submission === best_submission) {
+                color_class += " bg-green-100 hover:bg-green-200";
+                title = "first to solve, " + title;
+            }
         } else if (result.score > 0) {
             color_class = "text-orange-400";
             title = `${result.failed_attempts} attempts`;
@@ -229,10 +244,9 @@ const Cell = ({
                 color_class
             }
             style="width: 4rem;"
+            title={title}
         >
-            <div class="text-lg" title={title}>
-                {score}
-            </div>
+            <div class="text-lg">{score}</div>
             {result.penalty > 0 ? (
                 <div class="font-normal text-sm text-gray-600">
                     {result.penalty}
