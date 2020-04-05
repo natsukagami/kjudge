@@ -25,10 +25,11 @@ type UserResult struct {
 
 // JSONScoreboard represents a JSON encoded scoreboard.
 type JSONScoreboard struct {
-	ContestID   int                `json:"contest_id"`
-	ContestType models.ContestType `json:"contest_type"`
-	Problems    []JSONProblem      `json:"problems"`
-	Users       []JSONUserResult   `json:"users"`
+	ContestID              int                `json:"contest_id"`
+	ContestType            models.ContestType `json:"contest_type"`
+	Problems               []JSONProblem      `json:"problems"`
+	Users                  []JSONUserResult   `json:"users"`
+	ProblemBestSubmissions map[int]int64      `json:"problem_best_submissions"`
 }
 
 // JSONUserResult represents a JSON encoded user in the scoreboard.
@@ -62,17 +63,26 @@ type JSONProblemResult struct {
 	Solved         bool    `json:"solved"`
 	Penalty        int     `json:"penalty"`
 	FailedAttempts int     `json:"failed_attempts"`
+	BestSubmission int64   `json:"best_submission"`
 }
 
 func jsonProblemResult(p *models.ProblemResult) JSONProblemResult {
 	if p == nil {
 		return JSONProblemResult{}
 	}
+
+	var bestSubmission int64
+	if p.BestSubmissionID.Valid {
+		bestSubmission = p.BestSubmissionID.Int64
+	} else {
+		bestSubmission = -1
+	}
 	return JSONProblemResult{
 		Score:          p.Score,
 		Solved:         p.Solved,
 		Penalty:        p.Penalty,
 		FailedAttempts: p.FailedAttempts,
+		BestSubmission: bestSubmission,
 	}
 }
 
@@ -95,7 +105,8 @@ func jsonProblem(p *models.Problem) JSONProblem {
 type ScoreboardCtx struct {
 	*ContestCtx
 
-	UserResults []*UserResult
+	UserResults            []*UserResult
+	ProblemBestSubmissions map[int]int64
 }
 
 // Render renders the scoreboard context
@@ -106,8 +117,9 @@ func (s *ScoreboardCtx) Render(c echo.Context) error {
 // JSON returns the JSON representation of the scoreboard.
 func (s *ScoreboardCtx) JSON() JSONScoreboard {
 	sb := JSONScoreboard{
-		ContestID:   s.Contest.ID,
-		ContestType: s.Contest.ContestType,
+		ContestID:              s.Contest.ID,
+		ContestType:            s.Contest.ContestType,
+		ProblemBestSubmissions: s.ProblemBestSubmissions,
 	}
 	for _, p := range s.Problems {
 		sb.Problems = append(sb.Problems, jsonProblem(p))
@@ -148,6 +160,17 @@ func compareUserRanking(userResult []*UserResult, contestType models.ContestType
 	}
 }
 
+// compare two users performance in a problem
+func compareProblemResult(r1, r2 *models.ProblemResult) bool {
+	if r1.Score != r2.Score {
+		return r1.Score > r2.Score
+	} else if r1.Penalty != r2.Penalty {
+		return r1.Penalty < r2.Penalty
+	} else {
+		return r1.UserID < r2.UserID
+	}
+}
+
 // Collect a ScoreboardCtx
 func getScoreboardCtx(db db.DBContext, c echo.Context) (*ScoreboardCtx, error) {
 	contest, err := getContestCtx(db, c)
@@ -171,12 +194,12 @@ func getScoreboardCtx(db db.DBContext, c echo.Context) (*ScoreboardCtx, error) {
 		return nil, err
 	}
 
-	userResults := []*UserResult{}
 	contestProblemResults, err := models.CollectContestProblemResults(db, problems)
 	if err != nil {
 		return nil, err
 	}
 
+	userResults := []*UserResult{}
 	userProblemResults := make(map[string]*UserResult)
 	for _, user := range users {
 		userProblemResults[user.ID] = &UserResult{
@@ -204,6 +227,28 @@ func getScoreboardCtx(db db.DBContext, c echo.Context) (*ScoreboardCtx, error) {
 		}
 	}
 
+	// get bestSubmission ID for each problem
+	problemBestSubmissions := make(map[int]int64)
+	problemBestResults := make(map[int]*models.ProblemResult)
+
+	for _, userProblemResult := range userProblemResults {
+		// not consider users with no submissions and hidden users
+		if len(userProblemResult.ProblemResults) == 0 || userProblemResult.User.Hidden {
+			continue
+		}
+
+		problemResults := userProblemResult.ProblemResults
+		for _, problemResult := range problemResults {
+			problemID := problemResult.ProblemID
+			bestResult, ok := problemBestResults[problemID]
+
+			if !ok || compareProblemResult(problemResult, bestResult) {
+				problemBestResults[problemID] = problemResult
+				problemBestSubmissions[problemID] = problemResult.BestSubmissionID.Int64
+			}
+		}
+	}
+
 	sort.Slice(userResults, func(i, j int) bool {
 		r, _ := compareUserRanking(userResults, contestType, i, j)
 		return r
@@ -221,8 +266,9 @@ func getScoreboardCtx(db db.DBContext, c echo.Context) (*ScoreboardCtx, error) {
 	}
 
 	return &ScoreboardCtx{
-		ContestCtx:  contest,
-		UserResults: userResults,
+		ContestCtx:             contest,
+		UserResults:            userResults,
+		ProblemBestSubmissions: problemBestSubmissions,
 	}, nil
 }
 
