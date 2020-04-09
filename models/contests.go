@@ -17,6 +17,19 @@ const (
 	ContestTypeWeighted ContestType = "weighted"
 )
 
+// ScoreboardViewStatus is the enum representing the scoreboard view status.
+// scoreboard view status type determines how the scoreboard is accessed.
+type ScoreboardViewStatus string
+
+const (
+	// This allowes everyone to see the scoreboard
+	ScoreboardViewStatusPublic ScoreboardViewStatus = "public"
+	// This only allowes registered users to see the scoreboard
+	ScoreboardViewStatusUser ScoreboardViewStatus = "user"
+	// There is no scoreboard rendered during the contest
+	ScoreboardViewStatusNoScoreboard ScoreboardViewStatus = "no_scoreboard"
+)
+
 // Verify tries to verify the values of a Contest struct.
 func (c *Contest) Verify() error {
 	if err := verify.Names(c.Name); err != nil {

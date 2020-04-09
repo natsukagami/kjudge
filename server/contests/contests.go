@@ -89,7 +89,12 @@ func (g *Group) ConestsGetNearestOngoingContest(c echo.Context) error {
 		return err
 	}
 	if user.Me == nil {
-		return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/contests/%d/scoreboard", contest.ID))
+		// redirect to contests/ if scoreboard view status is not public
+		if contest.ScoreboardViewStatus != models.ScoreboardViewStatusPublic {
+			return c.Redirect(http.StatusSeeOther, "/contests")
+		} else {
+			return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/contests/%d/scoreboard", contest.ID))
+		}
 	}
 
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/contests/%d", contest.ID))

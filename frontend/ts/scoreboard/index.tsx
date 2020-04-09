@@ -7,6 +7,7 @@ import { useEffect } from "react";
 declare global {
     interface Document {
         initialScoreboard: Scoreboard;
+        scoreboardJSONLink: string;
     }
 }
 
@@ -44,21 +45,29 @@ interface ProblemResult {
 /**
  * Updates the scoreboard, given the old one.
  */
-async function updateScoreboard(old: Scoreboard): Promise<Scoreboard> {
-    return (await fetch(`/contests/${old.contest_id}/scoreboard/json`)).json();
+async function updateScoreboard(
+    scoreboardJSONLink: string,
+): Promise<Scoreboard> {
+    return (await fetch(scoreboardJSONLink)).json();
 }
 
 /**
  * The main scoreboard component.
  * */
-const App = ({ initScoreboard }: { initScoreboard: Scoreboard }) => {
+const App = ({
+    initScoreboard,
+    scoreboardJSONLink,
+}: {
+    initScoreboard: Scoreboard;
+    scoreboardJSONLink: string;
+}) => {
     const [[scoreboard, lastUpdated], update] = useState([
         initScoreboard,
         new Date(),
     ]);
     const fetchScoreboard = async () => {
         try {
-            const sb = await updateScoreboard(scoreboard);
+            const sb = await updateScoreboard(scoreboardJSONLink);
             update([sb, new Date()]);
         } catch (e) {
             console.error(`Scoreboard update failed: ${e}`);
@@ -258,5 +267,12 @@ const Cell = ({
 
 (() => {
     const elem = document.getElementById("scoreboard");
-    if (elem) render(<App initScoreboard={document.initialScoreboard} />, elem);
+    if (elem)
+        render(
+            <App
+                initScoreboard={document.initialScoreboard}
+                scoreboardJSONLink={document.scoreboardJSONLink}
+            />,
+            elem,
+        );
 })();
