@@ -1,7 +1,13 @@
 {{ define "admin-title" }}{{ .Name }} [e]{{ end }}
 
 {{ define "admin-content" }}
-<div class="py-4 mx-auto text-4xl">{{.Name}}</div>
+{{ $contest_link := printf "/admin/contests/%d" .Contest.ID }}
+<div class="py-4 mx-auto text-4xl">{{.Name}}
+    <span class="text-2xl">(
+        <a href="{{$contest_link}}/scoreboard" title="View contest's scoreboard" class="hover:text-blue-600 cursor-pointer">Scoreboard</a> | 
+        <a href="{{$contest_link}}/submissions" title="See submissions for contest" class="hover:text-blue-600 cursor-pointer">Submissions</a>
+    )</span>
+</div>
 
 {{/* Problem List */}}
 <div class="subheader" id="problems">Problems</div>

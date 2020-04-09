@@ -1,0 +1,26 @@
+{{ define "admin-title" }}Scoreboard{{ end }}
+
+{{ define "admin-content" }}
+{{ $contest_link := printf "/admin/contests/%d" .Contest.ID }}
+<div class="text-4xl py-4">
+    <a class="text-4xl hover:text-blue-600 cursor-pointer" title="Edit Contest" href="{{$contest_link}}">
+        {{.Contest.Name}}
+    </a>
+    : Scoreboard
+</div>
+
+<div class="text-xl my-2 text-gray-800 timer" data-start="{{.Contest.StartTime | time}}"
+    data-end="{{.Contest.EndTime | time}}"><span class="font-semibold"></span></div>
+
+<div class="text-xl my-2">
+    The contest starts at <span class="font-semibold display-time" data-time="{{.Contest.StartTime | time}}"></span> and
+    ends at <span class="font-semibold display-time" data-time="{{.Contest.EndTime | time}}"></span>.
+</div>
+
+<div id="scoreboard"></div>
+<script>
+    document.initialScoreboard = JSON.parse("{{ json .JSON }}");
+    document.scoreboardJSONLink = '/admin/contests/{{.Contest.ID}}/scoreboard/json';
+</script>
+<script src="../../ts/scoreboard/index.tsx"></script>
+{{ end }}

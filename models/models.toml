@@ -4,6 +4,7 @@ name = "string"
 start_time = "time.Time"
 end_time = "time.Time"
 contest_type = "ContestType"
+scoreboard_view_status = "ScoreboardViewStatus"
 _order_by = "datetime(start_time) ASC, id DESC"
 
 [problems]

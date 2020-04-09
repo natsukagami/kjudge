@@ -29,6 +29,9 @@ func New(db *db.DB, unauthed *echo.Group) (*Group, error) {
 	// Contest List
 	g.GET("/contests", grp.ContestsGet)
 	g.POST("/contests", grp.ContestsPost)
+	// Contest Scoreboard
+	g.GET("/contests/:id/scoreboard", grp.ScoreboardGet)
+	g.GET("/contests/:id/scoreboard/json", grp.ScoreboardJSONGet)
 	// Contest Management
 	g.GET("/contests/:id", grp.ContestGet)
 	g.GET("/contests/:id/submissions", grp.ContestSubmissionsGet)

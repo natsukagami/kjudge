@@ -18,6 +18,30 @@
         {{ end }}
         Weighted</option>
 </select>
+<label for="scoreboard_view_status" class="text-sm block">Scoreboard View Status</label>
+<select required class="form-input" name="scoreboard_view_status">
+    {{ if (eq .ScoreboardViewStatus "public") }}
+    <option selected value="public">
+        {{ else }}
+    <option value="public">
+        {{ end }}
+        Public view <span>[Everyone can see the scoreboard]</span></option>
+    {{ if (eq .ScoreboardViewStatus "user") }}
+    <option selected value="user">
+        {{ else }}
+    <option value="user">
+        {{ end }}
+        User view <span>[Only registered users can see the scoreboard]</span></option>
+    {{ if (eq .ScoreboardViewStatus "no_scoreboard") }}
+    <option selected value="no_scoreboard">
+        {{ else }}
+    <option value="no_scoreboard">
+        {{ end }}
+        No scoreboard <span>[There is no scoreboard during the contest]</span></option>
+</select>
+<div class="text-sm text-gray-600">
+    Scoreboard will be public after the contest.
+</div>
 <label for="start_time" class="text-sm block">Start Time (UTC)</label>
 <input required class="form-input" name="start_time" type="datetime-local" placeholder="2020-01-01T00:00:00"
     value="{{ .StartTime }}" />
@@ -55,6 +79,7 @@
             <td class="text-center">
                 <a href="{{$link}}/submissions" title="See submissions for contest"
                     class="cursor-pointer hover:text-green-600">[s]</a>
+                <a href="{{$link}}\scoreboard" title="View contest's scoreboard" class="hover:text-blue-600">[v]</a>
                 <a href="{{$link}}" title="Edit Contest" class="hover:text-blue-600">[e]</a>
                 <form method="POST" action="/admin/contests/{{ .ID }}/delete" class="inline require-confirm">
                     <input required type="submit" title="Delete Contest" class="cursor-pointer hover:text-red-600"

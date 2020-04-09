@@ -37,19 +37,21 @@ type ContestsCtx struct {
 
 // ContestForm is a form for uploading a new contest.
 type ContestForm struct {
-	Name        string             `form:"name"`
-	StartTime   Timestamp          `form:"start_time"`
-	EndTime     Timestamp          `form:"end_time"`
-	ContestType models.ContestType `form:"contest_type"`
+	Name                 string                      `form:"name"`
+	StartTime            Timestamp                   `form:"start_time"`
+	EndTime              Timestamp                   `form:"end_time"`
+	ContestType          models.ContestType          `form:"contest_type"`
+	ScoreboardViewStatus models.ScoreboardViewStatus `form:"scoreboard_view_status"`
 }
 
 // ContestToForm creates a form with the initial values of the contest.
 func ContestToForm(c *models.Contest) *ContestForm {
 	return &ContestForm{
-		Name:        c.Name,
-		StartTime:   Timestamp(c.StartTime),
-		EndTime:     Timestamp(c.EndTime),
-		ContestType: c.ContestType,
+		Name:                 c.Name,
+		StartTime:            Timestamp(c.StartTime),
+		EndTime:              Timestamp(c.EndTime),
+		ContestType:          c.ContestType,
+		ScoreboardViewStatus: c.ScoreboardViewStatus,
 	}
 }
 
@@ -59,6 +61,7 @@ func (f *ContestForm) Bind(c *models.Contest) {
 	c.StartTime = time.Time(f.StartTime)
 	c.EndTime = time.Time(f.EndTime)
 	c.ContestType = f.ContestType
+	c.ScoreboardViewStatus = f.ScoreboardViewStatus
 }
 
 // ContestsGet handles GET /admin/contests

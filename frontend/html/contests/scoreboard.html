@@ -13,10 +13,26 @@
 
 {{ if (isFuture .Contest.StartTime) }}
 {{ else }}
+{{ if (isPast .Contest.EndTime) }}
 <div id="scoreboard"></div>
 <script>
     document.initialScoreboard = JSON.parse("{{ json .JSON }}");
+    document.scoreboardJSONLink = '/contests/{{.Contest.ID}}/scoreboard/json';
 </script>
 <script src="../../ts/scoreboard/index.tsx"></script>
+{{ else }}
+{{ if eq .Contest.ScoreboardViewStatus "no_scoreboard" }}
+{{ else }}
+{{ if ( and (eq .Contest.ScoreboardViewStatus "user") (not (loggedIn .)) ) }}
+{{ else }}
+<div id="scoreboard"></div>
+<script>
+    document.initialScoreboard = JSON.parse("{{ json .JSON }}");
+    document.scoreboardJSONLink = '/contests/{{.Contest.ID}}/scoreboard/json';
+</script>
+<script src="../../ts/scoreboard/index.tsx"></script>
+{{ end }}
+{{ end }}
+{{ end }}
 {{ end }}
 {{ end }}

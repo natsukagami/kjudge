@@ -1,24 +1,25 @@
-package contests
+package admin
 
 import (
+	"database/sql"
 	"net/http"
-	"time"
+	"strconv"
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
-	"git.nkagami.me/natsukagami/kjudge/server/user"
+	"git.nkagami.me/natsukagami/kjudge/server/httperr"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 )
 
 // ScoreboardCtx is the context required to display the scoreboard page
 type ScoreboardCtx struct {
-	*user.AuthCtx
 	*models.Scoreboard
 }
 
 // Render renders the scoreboard context
 func (s *ScoreboardCtx) Render(c echo.Context) error {
-	return c.Render(http.StatusOK, "contests/scoreboard", s)
+	return c.Render(http.StatusOK, "admin/contest_scoreboard", s)
 }
 
 // RenderJSON renders a scoreboard in JSON.
@@ -28,15 +29,24 @@ func (s *ScoreboardCtx) RenderJSON(c echo.Context) error {
 
 // Collect a ScoreboardCtx
 func getScoreboardCtx(db db.DBContext, c echo.Context) (*ScoreboardCtx, error) {
-	contestCtx, err := getContestCtx(db, c)
+	// get contest information
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
 	if err != nil {
+		return nil, httperr.NotFoundf("Contest not found: %s", idStr)
+	}
+	contest, err := models.GetContest(db, id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, httperr.NotFoundf("Contest not found: %d", id)
+	} else if err != nil {
 		return nil, err
 	}
 
 	// get contest's problems
-	contest := contestCtx.Contest
-	// get contest information
-	problems := contestCtx.Problems
+	problems, err := models.GetContestProblems(db, contest.ID)
+	if err != nil {
+		return nil, err
+	}
 
 	scoreboard, err := models.GetScoreboard(db, contest, problems)
 	if err != nil {
@@ -44,12 +54,11 @@ func getScoreboardCtx(db db.DBContext, c echo.Context) (*ScoreboardCtx, error) {
 	}
 
 	return &ScoreboardCtx{
-		AuthCtx:    contestCtx.AuthCtx,
 		Scoreboard: scoreboard,
 	}, nil
 }
 
-// ScoreboardGet implements GET /contest/:id/scoreboard
+// ScoreboardGet implements GET /admin/contests/:id/scoreboard
 func (g *Group) ScoreboardGet(c echo.Context) error {
 	ctx, err := getScoreboardCtx(g.db, c)
 	if err != nil {
@@ -58,22 +67,11 @@ func (g *Group) ScoreboardGet(c echo.Context) error {
 	return ctx.Render(c)
 }
 
-// ScoreboardJSONGet implements GET /contest/:id/scoreboard/json
+// ScoreboardJSONGet implements GET /admin/contests/:id/scoreboard/json
 func (g *Group) ScoreboardJSONGet(c echo.Context) error {
 	ctx, err := getScoreboardCtx(g.db, c)
 	if err != nil {
 		return err
 	}
-	// if contest has ended, scoreboard should be accessible to everyone
-	if ctx.Contest.EndTime.Before(time.Now()) {
-		return ctx.RenderJSON(c)
-	}
-
-	// allow users to access scoreboard JSON based on ScoreboardViewStatus
-	if ctx.Contest.ScoreboardViewStatus == models.ScoreboardViewStatusNoScoreboard ||
-		ctx.Contest.ScoreboardViewStatus == models.ScoreboardViewStatusUser && ctx.AuthCtx.Me == nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "Scoreboard access is not granted")
-	} else {
-		return ctx.RenderJSON(c)
-	}
+	return ctx.RenderJSON(c)
 }

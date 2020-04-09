@@ -21,7 +21,9 @@
             <td class="text-center display-time" data-time="{{.EndTime | time}}">{{.EndTime}}</td>
             <td class="text-center">
                 <a href="{{$link}}" title="Enter Contest"
-                    class="cursor-pointer hover:text-green-600">Enter Contest</a>
+                    class="cursor-pointer hover:text-green-600">[e]</a>
+                <a href="{{$link}}/scoreboard" title="View Scoreboard"
+                    class="cursor-pointer hover:text-green-600">[v]</a>
             </td>
         </tr>
         {{ else }}

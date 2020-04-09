@@ -29,6 +29,7 @@ var templateList = map[string][]string{
 	"admin/submissions":         []string{"admin/root", "admin/submission_inputs"},
 	"admin/submission":          []string{"admin/root"},
 	"admin/jobs":                []string{"admin/root"},
+	"admin/contest_scoreboard":  []string{"admin/root"},
 	"admin/login":               []string{},
 
 	"user/login": []string{"user_root"},
@@ -99,6 +100,7 @@ func parseRootTemplate() (*template.Template, error) {
 	tRoot.Funcs(map[string]interface{}{
 		"time":     func(t time.Time) string { return t.Format(time.RFC1123) },
 		"isFuture": func(t time.Time) bool { return t.After(time.Now()) },
+		"isPast":   func(t time.Time) bool { return t.Before(time.Now()) },
 		"join":     strings.Join,
 		"add":      func(a, b int) int { return a + b },
 		"version":  version,
