@@ -43,6 +43,13 @@ interface ProblemResult {
 }
 
 /**
+ * Formats the score into a friendlier string.
+ */
+function fmtScore(s: number): string {
+    return `${Math.round(s * 100) / 100}`;
+}
+
+/**
  * Updates the scoreboard, given the old one.
  */
 async function updateScoreboard(
@@ -175,7 +182,7 @@ const Row = ({
                 class="text-lg py-3 border-b text-center font-semibold border-l flex-table-cell flex-shrink-0"
                 style="width: 6rem;"
             >
-                <div class="font-mono">{totalScore}</div>
+                <div class="font-mono">{fmtScore(totalScore)}</div>
                 {user.total_penalty > 0 ? (
                     <div class="text-sm text-gray-600">
                         {user.total_penalty}
@@ -228,7 +235,7 @@ const Cell = ({
             score = "-";
         }
     } else {
-        score = `${result.score}`;
+        score = `${fmtScore(result.score)}`;
         if (result.solved) {
             title = `${result.failed_attempts + 1} attempts`;
             color_class = "text-green-700";

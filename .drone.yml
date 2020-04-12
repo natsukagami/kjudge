@@ -73,6 +73,7 @@ steps:
     commands:
       - go generate
       - go vet ./...
+      - scripts/setup_db.sh # Ensure the database test data is loaded
       - go test ./...
     depends_on:
       - backend-install

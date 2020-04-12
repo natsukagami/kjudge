@@ -202,7 +202,7 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 			which = sub
 			maxScore = score
 		case models.ScoringModeDecay:
-			score = math.Min(0.3,
+			score = score * math.Max(0.3,
 				(1.0-0.7*float64(sub.SubmittedAt.Sub(s.Contest.StartTime))/contestTime)*
 					(1.0-0.1*float64(counted)))
 			fallthrough

@@ -4,6 +4,7 @@ models/*_generated.go
 
 # Database
 kjudge.db
+kjudge.db.bak
 
 kjudge
 templates
