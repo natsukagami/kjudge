@@ -29,10 +29,14 @@ const (
 	scorePriority   = 1
 )
 
+const roundHashMod = 10052000 // ;)
+
+func hashSubID(id int) int { return 3 * (roundHashMod - (id % roundHashMod)) }
+
 // NewJobCompile creates a new Compile job.
 func NewJobCompile(subID int) *Job {
 	return &Job{
-		Priority:     compilePriority,
+		Priority:     hashSubID(subID) + compilePriority,
 		Type:         JobTypeCompile,
 		SubmissionID: subID,
 		CreatedAt:    time.Now(),
@@ -42,7 +46,7 @@ func NewJobCompile(subID int) *Job {
 // NewJobRun creates a new Run job.
 func NewJobRun(subID int, testID int) *Job {
 	return &Job{
-		Priority:     runPriority,
+		Priority:     hashSubID(subID) + runPriority,
 		Type:         JobTypeRun,
 		SubmissionID: subID,
 		TestID:       sql.NullInt64{Int64: int64(testID), Valid: true},
@@ -53,7 +57,7 @@ func NewJobRun(subID int, testID int) *Job {
 // NewJobScore creates a new Score job.
 func NewJobScore(subID int) *Job {
 	return &Job{
-		Priority:     scorePriority,
+		Priority:     hashSubID(subID) + scorePriority,
 		Type:         JobTypeScore,
 		SubmissionID: subID,
 		CreatedAt:    time.Now(),
@@ -91,16 +95,16 @@ func BatchInsertJobs(db db.DBContext, jobs ...*Job) error {
 	if len(jobs) == 0 {
 		return nil // No inserts needed
 	}
-	rowMarks := "(?, ?, ?, ?)"
+	rowMarks := "(?, ?, ?, ?, ?)"
 	command := strings.Builder{}
-	command.WriteString("INSERT INTO jobs(priority, submission_id, test_id, type) VALUES ")
+	command.WriteString("INSERT INTO jobs(priority, submission_id, test_id, type, created_at) VALUES ")
 	var values []interface{}
 	for id, r := range jobs {
 		if id > 0 {
 			command.WriteString(", ")
 		}
 		command.WriteString(rowMarks)
-		values = append(values, r.Priority, r.SubmissionID, r.TestID, r.Type)
+		values = append(values, r.Priority, r.SubmissionID, r.TestID, r.Type, r.CreatedAt)
 	}
 	res, err := db.Exec(command.String(), values...)
 	if err != nil {
