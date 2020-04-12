@@ -17,6 +17,17 @@
     ends at <span class="font-semibold display-time" data-time="{{.Contest.EndTime | time}}"></span>.
 </div>
 
+<div class="my-2 text-lg">
+    <a href="{{$contest_link}}/scoreboard?wide=true" class="text-btn hover:text-blue-600">[wide version]</a>
+    | Download as:
+    <a href="{{$contest_link}}/scoreboard/json" download="scoreboard.json"
+        class="text-btn hover:text-green-600">[JSON]</a>
+    <a href="{{$contest_link}}/scoreboard/csv" download="scoreboard.json"
+        class="text-btn hover:text-green-600">[CSV]</a>
+    <a href="{{$contest_link}}/scoreboard/csv?scores_only=true" download="scoreboard.json"
+        class="text-btn hover:text-green-600">[CSV (scores only)]</a>
+</div>
+
 <div id="scoreboard"></div>
 <script>
     document.initialScoreboard = JSON.parse("{{ json .JSON }}");
