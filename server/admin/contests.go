@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -89,7 +90,6 @@ func (g *Group) contestsWithFormError(formError error, form ContestForm, c echo.
 }
 
 // ContestsPost handles POST /admin/contests.
-// TODO: redirect to /admin/contests/[id]
 func (g *Group) ContestsPost(c echo.Context) error {
 	var form ContestForm
 	if err := c.Bind(&form); err != nil {
@@ -100,5 +100,5 @@ func (g *Group) ContestsPost(c echo.Context) error {
 	if err := contest.Write(g.db); err != nil {
 		return g.contestsWithFormError(err, form, c)
 	}
-	return g.ContestsGet(c)
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/contests/%d", contest.ID))
 }
