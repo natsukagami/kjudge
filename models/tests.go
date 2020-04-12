@@ -91,7 +91,7 @@ func (tg *TestGroupWithTests) ComputeScore(results map[int]*TestResult) float64 
 		ratio := 1.0
 		for _, test := range tg.Tests {
 			result := results[test.ID]
-			if ratio < result.Score {
+			if ratio > result.Score {
 				ratio = result.Score
 			}
 		}
