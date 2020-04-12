@@ -1,0 +1,64 @@
+{{ define "admin-title" }}Test Group {{.Name}} [e]{{ end }}
+
+{{ define "admin-nav" }}
+<nav>
+    <a href="#tests">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Tests</div>
+    </a>
+    <a href="#upload-single">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Upload Single Test</div>
+    </a>
+    <a href="#upload-multiple">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Upload Multiple Tests</div>
+    </a>
+    <a href="#edit">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Edit Test Group</div>
+    </a>
+</nav>
+{{ end }}
+
+{{ define "admin-content" }}
+{{ $link := printf "/admin/test_groups/%d" .ID }}
+<div class="py-4 mx-auto">
+    {{ $contest_link := printf "/admin/contests/%d" .Contest.ID }}
+    <a class="text-3xl text-gray-600 hover:text-blue-600 cursor-pointer" href="{{$contest_link}}">
+        {{.Contest.Name}}
+    </a>
+    <span>>></span>
+    {{ $problem_link := printf "/admin/problems/%d" .Problem.ID }}
+    <a href="{{$problem_link}}" class="text-3xl text-gray-600 hover:text-blue-600">{{.Problem.Name}}.
+        {{.Problem.DisplayName}}</a>
+    <span>>></span>
+    <span class="text-4xl text-gray-800">Test Group </span>
+    <span class="text-4xl font-semibold">
+        {{ if .Hidden }}
+        <span class="text-gray-600">{{.Name}} [hidden]</span>
+        {{ else }}
+        {{.Name}}
+        {{ end }}
+    </span>
+</div>
+
+<div class="subheader">Rejudge:
+    <form class="inline" method="POST" action="{{$link}}/rejudge">
+        <input type="submit" value="[Re-run all tests]" class="text-btn hover:text-blue-600 text-lg">
+    </form>
+</div>
+
+<div id="tests" class="subheader">Tests</div>
+<div class="p-2">
+    {{ template "test-table" .Tests }}
+</div>
+
+<div id="upload-single" class="p-2">{{ template "test-upload-single" .}}</div>
+
+<div id="upload-multiple" class="p-2">{{ template "test-upload-multiple" .}}</div>
+
+{{/* Edit test group */}}
+<div id="edit" class="p-2">
+    <div class="subheader">Edit Test Group</div>
+    <form method="POST" action="{{ $link }}" class="form-block">
+        {{ template "test-group-inputs" .ToForm }}
+    </form>
+</div>
+{{ end }}

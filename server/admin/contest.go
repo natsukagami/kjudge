@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
 	"git.nkagami.me/natsukagami/kjudge/server/httperr"
 	"github.com/labstack/echo/v4"
@@ -44,21 +45,6 @@ func ProblemToForm(p *models.Problem) ProblemForm {
 	return f
 }
 
-func (g *Group) getContest(c echo.Context) (*models.Contest, error) {
-	idStr := c.Param("id")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		return nil, httperr.NotFoundf("Contest not found: %s", idStr)
-	}
-	contest, err := models.GetContest(g.db, id)
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, httperr.NotFoundf("Contest not found: %d", id)
-	} else if err != nil {
-		return nil, err
-	}
-	return contest, nil
-}
-
 // ContestCtx is the context for rendering admin/contest.
 type ContestCtx struct {
 	*models.Contest
@@ -70,22 +56,36 @@ type ContestCtx struct {
 	ProblemFormError error
 }
 
-// ContestGet implements GET /admin/contest/:id
-func (g *Group) ContestGet(c echo.Context) error {
-	contest, err := g.getContest(c)
+func getContest(db db.DBContext, c echo.Context) (*ContestCtx, error) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return err
+		return nil, httperr.NotFoundf("Contest not found: %s", idStr)
 	}
-	ctx := &ContestCtx{Contest: contest, Form: *ContestToForm(contest)}
-	return g.contestGetRender(ctx, c)
+	contest, err := models.GetContest(db, id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, httperr.NotFoundf("Contest not found: %d", id)
+	} else if err != nil {
+		return nil, err
+	}
+	problems, err := models.GetContestProblems(db, contest.ID)
+	if err != nil {
+		return nil, err
+	}
+	return &ContestCtx{
+		Contest:  contest,
+		Problems: problems,
+		Form:     *ContestToForm(contest),
+		ProblemForm: ProblemForm{
+			TimeLimit:     1000,
+			MemoryLimit:   262144,
+			ScoringMode:   models.ScoringModeBest,
+			PenaltyPolicy: models.PenaltyPolicyNone,
+		},
+	}, nil
 }
 
-func (g *Group) contestGetRender(ctx *ContestCtx, c echo.Context) error {
-	problems, err := models.GetContestProblems(g.db, ctx.Contest.ID)
-	if err != nil {
-		return err
-	}
-	ctx.Problems = problems
+func (ctx *ContestCtx) Render(c echo.Context) error {
 	code := http.StatusOK
 	if ctx.FormError != nil || ctx.ProblemFormError != nil {
 		code = http.StatusBadRequest
@@ -93,13 +93,22 @@ func (g *Group) contestGetRender(ctx *ContestCtx, c echo.Context) error {
 	return c.Render(code, "admin/contest", ctx)
 }
 
-// ContestDelete implement POST /admin/contest/:id/delete
-func (g *Group) ContestDelete(c echo.Context) error {
-	contest, err := g.getContest(c)
+// ContestGet implements GET /admin/contest/:id
+func (g *Group) ContestGet(c echo.Context) error {
+	ctx, err := getContest(g.db, c)
 	if err != nil {
 		return err
 	}
-	if err := contest.Delete(g.db); err != nil {
+	return ctx.Render(c)
+}
+
+// ContestDelete implement POST /admin/contest/:id/delete
+func (g *Group) ContestDelete(c echo.Context) error {
+	ctx, err := getContest(g.db, c)
+	if err != nil {
+		return err
+	}
+	if err := ctx.Delete(g.db); err != nil {
 		return err
 	}
 	return c.Redirect(http.StatusSeeOther, "/admin/contests")
@@ -107,25 +116,27 @@ func (g *Group) ContestDelete(c echo.Context) error {
 
 // ContestEdit implements POST /admin/contest/:id
 func (g *Group) ContestEdit(c echo.Context) error {
-	contest, err := g.getContest(c)
+	ctx, err := getContest(g.db, c)
 	if err != nil {
 		return err
 	}
-	original := *contest
+	nw := *ctx.Contest
 	var form ContestForm
 	if err := c.Bind(&form); err != nil {
 		return httperr.BindFail(err)
 	}
-	form.Bind(contest)
-	if err := contest.Write(g.db); err != nil {
-		return g.contestGetRender(&ContestCtx{Contest: &original, Form: form, FormError: err}, c)
+	form.Bind(&nw)
+	if err := nw.Write(g.db); err != nil {
+		ctx.Form = form
+		ctx.FormError = err
+		return ctx.Render(c)
 	}
-	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/contests/%d", contest.ID))
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/contests/%d", ctx.ID))
 }
 
 // ContestAddProblem implements POST /admin/contest/:id/add_problem
 func (g *Group) ContestAddProblem(c echo.Context) error {
-	contest, err := g.getContest(c)
+	ctx, err := getContest(g.db, c)
 	if err != nil {
 		return err
 	}
@@ -136,23 +147,57 @@ func (g *Group) ContestAddProblem(c echo.Context) error {
 	if err := c.Bind(&form); err != nil {
 		return httperr.BindFail(err)
 	}
-	problem.ContestID = contest.ID
+	problem.ContestID = ctx.ID
 	form.Bind(&problem)
 	if err := problem.Write(g.db); err != nil {
-		return g.contestGetRender(&ContestCtx{Contest: contest, ProblemForm: form, ProblemFormError: err}, c)
+		ctx.ProblemForm = form
+		ctx.ProblemFormError = err
+		return ctx.Render(c)
 	}
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d", problem.ID))
 }
 
 // ContestSubmissionsGet implements GET /admin/contests/:id/submissions.
 func (g *Group) ContestSubmissionsGet(c echo.Context) error {
-	contest, err := g.getContest(c)
+	ctx, err := getContest(g.db, c)
 	if err != nil {
 		return err
 	}
-	subs, err := SubmissionsBy(g.db, nil, contest, nil)
+	subs, err := SubmissionsBy(g.db, nil, ctx.Contest, nil)
 	if err != nil {
 		return err
 	}
 	return c.Render(http.StatusOK, "admin/contest_submissions", subs)
+}
+
+// ContestRejudgePost implements POST /admin/contests/:id/rejudge
+func (g *Group) ContestRejudgePost(c echo.Context) error {
+	ctx, err := getContest(g.db, c)
+	if err != nil {
+		return err
+	}
+	tx, err := g.db.Beginx()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	defer tx.Rollback()
+	var problemIDs []int
+	for _, p := range ctx.Problems {
+		problemIDs = append(problemIDs, p.ID)
+	}
+	subs, err := models.GetProblemsSubmissions(tx, problemIDs...)
+	if err != nil {
+		return err
+	}
+	var id []int
+	for _, sub := range subs {
+		id = append(id, sub.ID)
+	}
+	if err := DoRejudge(tx, id, c.FormValue("stage")); err != nil {
+		return err
+	}
+	if err := tx.Commit(); err != nil {
+		return errors.WithStack(err)
+	}
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/contests/%d/submissions", ctx.ID))
 }

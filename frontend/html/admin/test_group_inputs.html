@@ -2,69 +2,48 @@
 <table class="table table-auto w-full">
     <thead>
         <tr>
-            <th class="py-1 border-b"><span id="toggle-all-tests" class="cursor-pointer hover:text-blue-600">[show
-                    all]</span>
-            </th>
-            <th class="py-1 border-b">Name</th>
-            <th class="py-1 border-b"># Tests</th>
-            <th class="py-1 border-b">Score</th>
-            <th class="py-1 border-b">Time Limit</th>
-            <th class="py-1 border-b">Memory Limit</th>
-            <th class="py-1 border-b">Scoring Mode</th>
-            <th class="py-1 border-b">Actions</th>
+            <th class="py-2 border-b">Name</th>
+            <th class="py-2 border-b"># Tests</th>
+            <th class="py-2 border-b">Score</th>
+            <th class="py-2 border-b">Time Limit</th>
+            <th class="py-2 border-b">Memory Limit</th>
+            <th class="py-2 border-b">Scoring Mode</th>
+            <th class="py-2 border-b">Actions</th>
         </tr>
     </thead>
     <tbody>
         {{ range . }}
         {{ $link := printf "/admin/test_groups/%d" .ID }}
-        <tr class="{{ if lt .Score 0.0 }} text-gray-600 {{end}}">
-            <td class="py-1 border-b text-center">
-                <span class="toggle-tests hover:text-blue-600 cursor-pointer"
-                    title="Show and edit details of the test group" data-test-group="{{.ID}}">[show]</span>
+        <tr class="{{ if lt .Score 0.0 }} text-gray-600 {{end}} hover:bg-gray-200">
+            <td class="py-2 border-b pl-4">
+                <a href="{{$link}}" class="hover:text-blue-600">{{.Name}}</a>
             </td>
-            <td class="py-1 border-b">
-                {{.Name}}
-            </td>
-            <td class="text-center py-1 border-b">
+            <td class="text-center py-2 border-b">
                 {{ len .Tests }}
             </td>
-            <td class="text-center py-1 border-b">
+            <td class="text-center py-2 border-b">
                 {{if lt .Score 0.0}}hidden{{else}}{{.Score}}{{end}}
             </td>
-            <td class="text-center py-1 border-b">
+            <td class="text-center py-2 border-b">
                 {{if .TimeLimit.Valid}}{{.TimeLimit.Int64}}{{else}}-{{end}}
             </td>
-            <td class="text-center py-1 border-b">
+            <td class="text-center py-2 border-b">
                 {{if .MemoryLimit.Valid}}{{.MemoryLimit.Int64}}{{else}}-{{end}}
             </td>
-            <td class="text-center py-1 border-b">{{.ScoringMode}}</td>
-            <td class="text-center py-1 border-b">
-                <form class="inline require-confirm" method="POST" action="{{$link}}/delete">
-                    <input class="cursor-pointer hover:text-red-600" value="[d]" type="submit"
-                        title="Delete Test Group">
+            <td class="text-center py-2 border-b">{{.ScoringMode}}</td>
+            <td class="text-center py-2 border-b">
+                <a href="{{$link}}" class="text-btn hover:text-blue-600" title="Edit Test Group">[e]</a>
+                <form class="inline" method="POST" action="{{$link}}/rejudge">
+                    <input class="text-btn hover:text-blue-600" value="[r]" type="submit" title="Re-run tests">
                 </form>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="8">
-                <div class="tests-list" data-test-group="{{.ID}}" style="max-height: 0; overflow-y: hidden;">
-                    <div class="p-2">{{ template "test-table" .Tests }}</div>
-                    <div class="p-2">{{ template "test-upload-single" .}}</div>
-                    <div class="p-2">{{ template "test-upload-multiple" .}}</div>
-                    {{/* Edit test group */}}
-                    <div class="p-2">
-                        <div class="subheader">Edit Test Group</div>
-                        <form method="POST" action="{{ $link }}" class="form-block">
-                            {{ template "test-group-inputs" .ToForm }}
-                        </form>
-                    </div>
-                    <hr>
-                </div>
+                <form class="inline require-confirm" method="POST" action="{{$link}}/delete">
+                    <input class="text-btn hover:text-red-600" value="[d]" type="submit" title="Delete Test Group">
+                </form>
             </td>
         </tr>
         {{ else }}
         <tr>
-            <td class="border-b py-1 text-center" colspan="8">No Test Groups</td>
+            <td class="border-b py-2 text-center" colspan="8">No Test Groups</td>
         </tr>
         {{ end }}
     </tbody>

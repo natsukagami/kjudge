@@ -1,5 +1,6 @@
 // Muli font
 import "typeface-muli";
+import "typeface-ibm-plex-mono";
 
 // Moment.js
 import hd from "humanize-duration";
@@ -39,71 +40,6 @@ import hd from "humanize-duration";
                 ev.preventDefault();
         });
     }
-})();
-
-// load the list of tests
-(function () {
-    const SHOW = "[show]";
-    const HIDE = "[hide]";
-    const SHOW_ALL = "[show all]";
-    const HIDE_ALL = "[hide all]";
-
-    const allToggle = document.getElementById("toggle-all-tests");
-    if (!allToggle) {
-        // Not where we need. Return.
-        return;
-    }
-
-    const testTables = Array.from(
-        document.getElementsByClassName("tests-list"),
-    );
-    const toggles = Array.from(document.getElementsByClassName("toggle-tests"));
-    const groups = testTables.reduce((m, elem) => {
-        const e = elem as HTMLDivElement;
-        const group = e.getAttribute("data-test-group");
-        const toggle = toggles.find(
-            (t) => t.getAttribute("data-test-group") == group,
-        );
-        if (group && toggle) m.set(group, [e, toggle]);
-        return m;
-    }, new Map<string, [HTMLDivElement, Element]>());
-    let opening = 0;
-    const doToggle = (
-        table: HTMLDivElement,
-        toggle: Element,
-        force?: boolean,
-    ) => {
-        const current = table.style.maxHeight === ""; // table showing?
-        if (force === undefined) {
-            force = !current;
-        }
-        if (force === current) return;
-        if (force) {
-            toggle.innerHTML = HIDE;
-            table.style.maxHeight = "";
-            ++opening;
-        } else {
-            toggle.innerHTML = SHOW;
-            table.style.maxHeight = "0";
-            --opening;
-        }
-        if (opening > 0) {
-            allToggle.innerHTML = HIDE_ALL;
-        } else {
-            allToggle.innerHTML = SHOW_ALL;
-        }
-    };
-    const items = Array.from(groups.values());
-    for (const [table, toggle] of items) {
-        toggle.addEventListener("click", () => doToggle(table, toggle));
-    }
-
-    allToggle.addEventListener("click", (_) => {
-        const switchOn = allToggle.innerHTML === SHOW_ALL;
-        for (const [table, toggle] of items) {
-            doToggle(table, toggle, switchOn);
-        }
-    });
 })();
 
 // Handle login button: set href = login address + back-ref

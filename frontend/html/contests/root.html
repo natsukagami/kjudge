@@ -23,25 +23,20 @@
         {{ $ended := (isFuture .Contest.EndTime) }}
         {{ range .Problems }}
         {{ $link := printf "%s/problems/%s" $contest_link .Name }}
-        <a href="{{$link}}">
-            <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 px-4 flex flex-row justify-between">
-                <div>
-                    {{.Name}}. {{.DisplayName}}
-                </div>
-                <div>
-                    <a href="{{$link}}#statements" title="View statements"
-                        class="cursor-pointer hover:text-blue-600">[v]</a>
-                    <a href="{{$link}}#files" title="Download files"
-                        class="cursor-pointer hover:text-yellow-600">[f]</a>
-                    {{ if $ended }}
-                    <a href="{{$link}}#submit" title="Submit a solution"
-                        class="cursor-pointer hover:text-green-600">[s]</a>
-                    {{ end }}
-                    <a href="{{$link}}#submissions" title="View your submissions"
-                        class="cursor-pointer hover:text-red-600">[l]</a>
-                </div>
+        <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 px-4 flex flex-row justify-between">
+            <a class="flex-grow" href="{{$link}}">
+                {{.Name}}. {{.DisplayName}}
+            </a>
+            <div class="flex-shrink-0">
+                <a href="{{$link}}#statements" title="View statements" class="text-btn hover:text-blue-600">[v]</a>
+                <a href="{{$link}}#files" title="Download files" class="text-btn hover:text-yellow-600">[f]</a>
+                {{ if $ended }}
+                <a href="{{$link}}#submit" title="Submit a solution" class="text-btn hover:text-green-600">[s]</a>
+                {{ end }}
+                <a href="{{$link}}#submissions" title="View your submissions"
+                    class="text-btn hover:text-red-600">[l]</a>
             </div>
-        </a>
+        </div>
         {{ end }}
         {{ end }}
     </nav>

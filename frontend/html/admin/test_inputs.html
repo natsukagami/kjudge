@@ -60,16 +60,17 @@
 {{ end }}
 
 {{ define "test-table" }}
-<div class="flex flex-row flex-wrap items-start justify-around">
+<div class="flex flex-row flex-wrap items-start justify-left">
     {{ range . }}
     {{ $link := printf "/admin/tests/%d" .ID }}
-    <div class="min-w-fit-5 m-1 text-sm font-mono rounded bg-gray-200 flex flex-row justify-between items-center p-2">
+    <div
+        class="min-w-fit-5 m-1 text-sm font-mono rounded bg-gray-200 hover:bg-blue-200 flex flex-row justify-between items-center p-2">
         <div class="mx-1 px-1 bg-gray-400">{{.Name}}</div>
         <div class="mx-1">
-            <a href="{{$link}}/input" class="cursor-pointer hover:text-green-600" title="Get the test's input">[i]</a>
-            <a href="{{$link}}/output" class="cursor-pointer hover:text-green-600" title="Get the test's output">[o]</a>
+            <a href="{{$link}}/input" class="text-btn hover:text-green-600" title="Get the test's input">[i]</a>
+            <a href="{{$link}}/output" class="text-btn hover:text-green-600" title="Get the test's output">[o]</a>
             <form class="inline require-confirm" method="POST" action="{{$link}}/delete">
-                <input class="cursor-pointer hover:text-red-600" value="[d]" type="submit" title="Delete Test">
+                <input class="text-btn hover:text-red-600" value="[d]" type="submit" title="Delete Test">
             </form>
         </div>
     </div>

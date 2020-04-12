@@ -91,7 +91,7 @@ const App = ({
                 <span>Last updated: {lastUpdated.toString()}. </span>
                 <a
                     href="#"
-                    class="hover:text-green-600"
+                    class="text-btn hover:text-green-600"
                     onClick={fetchScoreboard}
                 >
                     [update]
@@ -161,7 +161,7 @@ const Row = ({
     const totalScore =
         contest_type === "unweighted" ? user.solved_problems : user.total_score;
     return (
-        <div class="flex flex-row items-stretch w-full">
+        <div class="flex flex-row items-stretch w-full hover:bg-teal-100">
             <div
                 class="text-lg py-3 border-b text-center flex-table-cell flex-shrink-0"
                 style="width: 4rem;"
@@ -175,7 +175,7 @@ const Row = ({
                 class="text-lg py-3 border-b text-center font-semibold border-l flex-table-cell flex-shrink-0"
                 style="width: 6rem;"
             >
-                <div>{totalScore}</div>
+                <div class="font-mono">{totalScore}</div>
                 {user.total_penalty > 0 ? (
                     <div class="text-sm text-gray-600">
                         {user.total_penalty}
@@ -208,6 +208,7 @@ const Cell = ({
 }) => {
     let score: string = "";
     let color_class: string = "";
+    let bg_class = "";
     let title: string = "";
 
     if (contest_type === "unweighted") {
@@ -217,7 +218,7 @@ const Cell = ({
             }`;
             color_class = "text-green-700";
             if (result.best_submission === best_submission) {
-                color_class += " bg-green-100 hover:bg-green-200";
+                bg_class = " bg-green-200 hover:bg-green-300";
                 title = "first to solve";
             }
         } else if (result.failed_attempts > 0) {
@@ -232,7 +233,7 @@ const Cell = ({
             title = `${result.failed_attempts + 1} attempts`;
             color_class = "text-green-700";
             if (result.best_submission === best_submission) {
-                color_class += " bg-green-100 hover:bg-green-200";
+                bg_class = " bg-green-200 hover:bg-green-300";
                 title = "first to solve, " + title;
             }
         } else if (result.score > 0) {
@@ -250,12 +251,14 @@ const Cell = ({
         <div
             class={
                 "py-3 border-b font-semibold text-center border-l flex-table-cell flex-shrink-0 " +
-                color_class
+                color_class +
+                " " +
+                bg_class
             }
             style="width: 4rem;"
             title={title}
         >
-            <div class="text-lg">{score}</div>
+            <div class="text-lg font-mono">{score}</div>
             {result.penalty > 0 ? (
                 <div class="font-normal text-sm text-gray-600">
                     {result.penalty}

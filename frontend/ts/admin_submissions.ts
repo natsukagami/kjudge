@@ -113,7 +113,7 @@
         }
 
         // Handle select-all
-        selectAll.addEventListener("click", () => {
+        selectAll.addEventListener("click", (e) => {
             const [yes, no] = filterRows();
             if (selectedInputs[0].value === "") {
                 // SELECT all
@@ -123,6 +123,7 @@
                 setChecked([], [...yes, ...no]);
             }
             updateInputs();
+            e.preventDefault();
         });
 
         // Handle filters

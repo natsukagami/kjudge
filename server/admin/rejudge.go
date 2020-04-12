@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
 	"git.nkagami.me/natsukagami/kjudge/server/httperr"
 	"github.com/labstack/echo/v4"
@@ -29,25 +30,37 @@ func (g *Group) RejudgePost(c echo.Context) error {
 	}
 	defer tx.Rollback()
 
+	if err := DoRejudge(tx, id, stage); err != nil {
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return errors.WithStack(err)
+	}
+
+	last := c.FormValue("last")
+	if last == "" {
+		last = "/admin/submissions"
+	}
+	return c.Redirect(http.StatusSeeOther, last)
+
+}
+
+// DoRejudge performs rejudge on a given stage and list of IDs.
+func DoRejudge(db db.DBContext, id []int, stage string) error {
+	var err error
 	switch stage {
 	case "score":
-		err = models.RejudgeScore(tx, id...)
+		err = models.RejudgeScore(db, id...)
 	case "run":
-		err = models.RejudgeRun(tx, id...)
+		err = models.RejudgeRun(db, id...)
 	case "compile":
-		err = models.RejudgeCompile(tx, id...)
+		err = models.RejudgeCompile(db, id...)
 	default:
 		err = httperr.BadRequestf("Invalid rejudge stage: %s", stage)
 	}
 	if err != nil {
 		return httperr.BadRequestf("Cannot rejudge: %v", err)
 	}
-	if err := tx.Commit(); err != nil {
-		return errors.WithStack(err)
-	}
-	last := c.FormValue("last")
-	if last == "" {
-		last = "/admin/submissions"
-	}
-	return c.Redirect(http.StatusSeeOther, last)
+	return nil
 }

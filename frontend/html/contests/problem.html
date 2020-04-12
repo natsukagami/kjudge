@@ -62,20 +62,20 @@
 <table class="table table-auto w-full">
     <thead>
         <tr>
-            <th class="my-2 border-b text-center">Filename</th>
-            <th class="my-2 border-b text-center">Download</th>
+            <th class="py-2 border-b text-center">Filename</th>
+            <th class="py-2 border-b text-center">Download</th>
         </tr>
     </thead>
     <tbody>
         {{ range .Files }}
         {{ $link :=  printf "%s/files/%d" $problem_link .ID }}
-        <tr>
-            <td class="my-2 border-b font-mono">{{.Filename}}</td>
-            <td class="my-2 border-b text-center"><a href="{{$link}}" class="hover:text-blue-600">Download</a></td>
+        <tr class="hover:bg-gray-200">
+            <td class="py-2 border-b font-mono pl-4">{{.Filename}}</td>
+            <td class="py-2 border-b text-center"><a href="{{$link}}" class="hover:text-blue-600">Download</a></td>
         </tr>
         {{ else }}
         <tr>
-            <td colspan="2" class="my-2 border-b text-center">No Files</td>
+            <td colspan="2" class="py-2 border-b text-center">No Files</td>
         </tr>
         {{ end }}
     </tbody>
@@ -96,28 +96,32 @@
 <table class="table table-auto w-full">
     <thead>
         <tr>
-            <th class="my-1 border-b text-center">ID</th>
-            <th class="my-1 border-b text-center">Submitted At</th>
-            <th class="my-1 border-b text-center">Verdict</th>
-            <th class="my-1 border-b text-center">Actions</th>
+            <th class="py-2 border-b text-center">ID</th>
+            <th class="py-2 border-b text-center">Submitted At</th>
+            <th class="py-2 border-b text-center">Verdict</th>
+            <th class="py-2 border-b text-center">Actions</th>
         </tr>
     </thead>
     <tbody>
         {{ $contest_link := printf "/contests/%d" .Contest.ID }}
         {{ range .Submissions }}
-        <tr>
-            <td class="my-1 border-b text-center">{{.ID}}</td>
-            <td class="my-1 border-b text-center display-time" data-time="{{.SubmittedAt | time}}"></td>
-            <td class="my-1 border-b text-center">{{ template "submission-verdict" . }}</td>
-            <td class="my-1 border-b text-center">
-                {{ $link := printf "%s/submissions/%d" $contest_link .ID }}
-                <a href="{{$link}}" class="hover:text-blue-600" title="View the submission's details">[v]</a>
-                <a href="{{$link}}/download" class="hover:text-green-600" title="Download">[d]</a>
+        {{ $link := printf "%s/submissions/%d" $contest_link .ID }}
+        <tr class="hover:bg-gray-200">
+            <td class="py-2 border-b text-center">
+                <a href="{{$link}}" class="hover:text-blue-600">{{.ID}}</a>
+            </td>
+            <td class="py-2 border-b text-center display-time" data-time="{{.SubmittedAt | time}}"></td>
+            <td class="py-2 border-b text-center">
+                <a href="{{$link}}" class="hover:text-blue-600">{{ template "submission-verdict" . }}</a></td>
+            <td class="py-2 border-b text-center">
+                <a href="{{$link}}" class="text-btn hover:text-blue-600"
+                    title="View the submission's details">[view]</a>
+                <a href="{{$link}}/download" class="text-btn hover:text-green-600" title="Download">[download]</a>
             </td>
         </tr>
         {{ else }}
         <tr>
-            <td colspan="4" class="my-1 border-b text-center">No Submissions</td>
+            <td colspan="4" class="py-2 border-b text-center">No Submissions</td>
         </tr>
         {{ end }}
     </tbody>

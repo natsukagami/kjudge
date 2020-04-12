@@ -1,12 +1,46 @@
 {{ define "admin-title" }}{{ .Name }} [e]{{ end }}
 
+{{ define "admin-nav" }}
+<nav>
+    <a href="#overview">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-2 pl-4">{{.Name}}</div>
+    </a>
+    <a href="#problems">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Problems</div>
+    </a>
+    <a href="#add-problem">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Add a Problem</div>
+    </a>
+    <a href="#edit">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Edit Contest</div>
+    </a>
+</nav>
+{{ end }}
+
 {{ define "admin-content" }}
 {{ $contest_link := printf "/admin/contests/%d" .Contest.ID }}
-<div class="py-4 mx-auto text-4xl">{{.Name}}
+<div id="overview" class="py-4 mx-auto text-4xl">{{.Name}}
     <span class="text-2xl">(
-        <a href="{{$contest_link}}/scoreboard" title="View contest's scoreboard" class="hover:text-blue-600 cursor-pointer">Scoreboard</a> | 
-        <a href="{{$contest_link}}/submissions" title="See submissions for contest" class="hover:text-blue-600 cursor-pointer">Submissions</a>
-    )</span>
+        <a href="{{$contest_link}}/scoreboard" title="View contest's scoreboard"
+            class="hover:text-blue-600 cursor-pointer">Scoreboard</a> |
+        <a href="{{$contest_link}}/submissions" title="See submissions for contest"
+            class="hover:text-green-600 cursor-pointer">Submissions</a>
+        )</span>
+</div>
+
+<div class="subheader">Rejudge:
+    <form class="inline" method="POST" action="{{$contest_link}}/rejudge">
+        <input type="hidden" name="stage" value="compile">
+        <input type="submit" value="[Recompile]" class="text-btn hover:text-blue-900 text-lg">
+    </form>
+    <form class="inline" method="POST" action="{{$contest_link}}/rejudge">
+        <input type="hidden" name="stage" value="run">
+        <input type="submit" value="[Re-run all tests]" class="text-btn hover:text-blue-600 text-lg">
+    </form>
+    <form class="inline" method="POST" action="{{$contest_link}}/rejudge">
+        <input type="hidden" name="stage" value="score">
+        <input type="submit" value="[Recalculate score]" class="text-btn hover:text-blue-300 text-lg">
+    </form>
 </div>
 
 {{/* Problem List */}}
@@ -15,14 +49,14 @@
     {{ template "problem-table" .Problems }}
 </div>
 
-<div class="text-xl mx-2 mt-2 mb-4 font-bold">Add a Problem</div>
+<div id="add-problem" class="text-xl mx-2 mt-2 mb-4 font-bold">Add a Problem</div>
 {{ template "form-error" .ProblemFormError }}
 <form method="POST" action="/admin/contests/{{.Contest.ID}}/add_problem" class="form-block">
     {{ template "problem-inputs" .ProblemForm }}
 </form>
 
 {{/* Update */}}
-<div class="subheader">Edit</div>
+<div id="edit" class="subheader">Edit</div>
 {{ template "form-error" .FormError }}
 <form method="POST" action="/admin/contests/{{.Contest.ID}}" class="form-block">
     {{ template "contest-inputs" .Form }}

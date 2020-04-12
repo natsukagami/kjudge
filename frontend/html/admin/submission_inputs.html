@@ -13,12 +13,13 @@
 <table class="submissions-table table table-auto w-full">
     <thead>
         <tr>
-            <th class="py-1 border-b select-all cursor-pointer hover:text-blue-600">[all]</th>
-            <th class="py-1 border-b">ID</th>
+            <th class="py-2 border-b">
+                <a href="#" class="select-all cursor-pointer hover:text-blue-600">[all]</a></th>
+            <th class="py-2 border-b">ID</th>
             {{ if .User }}
             {{ else }}
             {{ $cols = add 1 $cols }}
-            <th class="py-1 border-b">
+            <th class="py-2 border-b">
                 <select class="user-filter" data-field="user">
                     <option value="" selected>All Users</option>
                     {{ range .Users }}
@@ -31,7 +32,7 @@
             {{ else }}
             {{ $cols = add 1 $cols }}
             {{ if .Contest }}
-            <th class="py-1 border-b">
+            <th class="py-2 border-b">
                 <select class="problem-filter" data-field="problem">
                     <option value="" selected>All Problems</option>
                     {{ range .Contest.Problems }}
@@ -40,7 +41,7 @@
                 </select>
             </th>
             {{ else }}
-            <th class="py-1 border-b">
+            <th class="py-2 border-b">
                 <select class="problem-filter" data-field="problem">
                     <option value="" selected>All Contests</option>
                     {{ range .Contests }}
@@ -53,9 +54,9 @@
             </th>
             {{ end }}
             {{ end }}
-            <th class="py-1 border-b">Submit Time</th>
-            <th class="py-1 border-b">Verdict</th>
-            <th class="py-1 border-b">Actions</th>
+            <th class="py-2 border-b">Submit Time</th>
+            <th class="py-2 border-b">Verdict</th>
+            <th class="py-2 border-b">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -64,16 +65,17 @@
         {{ $problem := .Problem }}
         {{ $problemsMap := .ProblemsMap }}
         {{ range $sub := .Submissions }}
-        <tr class="table-row" data-id="{{$sub.ID}}" data-user="{{$sub.UserID}}" data-problem="{{$sub.ProblemID}}">
-            <td class="py-1 border-b text-center">
+        <tr class="table-row hover:bg-gray-200" data-id="{{$sub.ID}}" data-user="{{$sub.UserID}}"
+            data-problem="{{$sub.ProblemID}}">
+            <td class="py-2 border-b text-center">
                 <input class="select-to-rejudge" value="{{$sub.ID}}" type="checkbox">
             </td>
-            <td class="py-1 border-b text-center">{{$sub.ID}}</td>
+            <td class="py-2 border-b text-center">{{$sub.ID}}</td>
             {{ if $user }}
             {{  else  }}
             {{ with (index $users $sub.UserID) }}
             {{ $link := printf "/admin/users/%s" .ID }}
-            <td class="py-1 border-b">
+            <td class="py-2 border-b pl-4">
                 <a href="{{$link}}" class="cursor-pointer hover:text-blue-600">{{.ID}}</a>
             </td>
             {{ end }}
@@ -82,67 +84,64 @@
             {{ else }}
             {{ with (index $problemsMap $sub.ProblemID) }}
             {{ $link := printf "/admin/problems/%d" .ID }}
-            <td class="py-1 border-b"><a href="{{$link}}" class="cursor-pointer hover:text-blue-600">{{.Name}}.
+            <td class="py-2 border-b pl-4"><a href="{{$link}}" class="cursor-pointer hover:text-blue-600">{{.Name}}.
                     {{.DisplayName}}</a></td>
             {{ end }}
             {{ end }}
             {{ with $sub }}
-            <td class="py-1 border-b display-time" data-time="{{.SubmittedAt | time}}"></td>
-            <td class="py-1 border-b text-center">{{ template "submission-verdict" .}}</td>
-            <td class="py-1 border-b text-center">
+            <td class="py-2 border-b pl-4 display-time" data-time="{{.SubmittedAt | time}}"></td>
+            <td class="py-2 border-b text-center">{{ template "submission-verdict" .}}</td>
+            <td class="py-2 border-b text-center">
                 <form class="inline" method="POST" action="/admin/rejudge">
                     <input type="hidden" name="id" value="{{.ID}}">
                     <input type="hidden" name="stage" value="compile">
                     <input type="hidden" name="last" class="current-url">
-                    <input type="submit" value="[c]" title="Recompile" class="cursor-pointer hover:text-blue-900">
+                    <input type="submit" value="[c]" title="Recompile" class="text-btn hover:text-blue-900">
                 </form>
                 <form class="inline" method="POST" action="/admin/rejudge">
                     <input type="hidden" name="id" value="{{.ID}}">
                     <input type="hidden" name="stage" value="run">
                     <input type="hidden" name="last" class="current-url">
-                    <input type="submit" value="[r]" title="Re-run all tests"
-                        class="cursor-pointer hover:text-blue-600">
+                    <input type="submit" value="[r]" title="Re-run all tests" class="text-btn hover:text-blue-600">
                 </form>
                 <form class="inline" method="POST" action="/admin/rejudge">
                     <input type="hidden" name="id" value="{{.ID}}">
                     <input type="hidden" name="stage" value="score">
                     <input type="hidden" name="last" class="current-url">
-                    <input type="submit" value="[s]" title="Recalculate score"
-                        class="cursor-pointer hover:text-blue-300">
+                    <input type="submit" value="[s]" title="Recalculate score" class="text-btn hover:text-blue-300">
                 </form>
             </td>
             {{ end }}
         </tr>
         {{ else }}
         <tr>
-            <td class="py-1 border-b text-center" colspan="{{$cols}}">No Submissions</td>
+            <td class="py-2 border-b text-center" colspan="{{$cols}}">No Submissions</td>
         </tr>
         {{ end }}
     </tbody>
     <tfoot class="sticky bottom-0 bg-gray-200 text-lg">
         <tr>
-            <td class="py-1 border-b font-bold" colspan="{{add -1 $cols}}">With selected... <span
-                    class="selected-count"></span></td>
-            <td class="py-1 border-b font-bold text-center">
+            <!-- sticky bottom-0 for bad browsers -->
+            <td class="sticky bottom-0 bg-gray-200 py-2 border-b font-bold" colspan="{{add -1 $cols}}">With selected...
+                <span class="selected-count"></span></td>
+            <td class="sticky bottom-0 bg-gray-200 py-2 border-b font-bold text-center">
                 <form class="inline" method="POST" action="/admin/rejudge">
                     <input class="selected-submissions" type="hidden" name="id" value="" required>
                     <input type="hidden" name="stage" value="compile">
                     <input type="hidden" name="last" class="current-url">
-                    <input type="submit" value="[c]" title="Recompile" class="cursor-pointer hover:text-blue-900">
+                    <input type="submit" value="[c]" title="Recompile" class="text-btn hover:text-blue-900">
                 </form>
                 <form class="inline" method="POST" action="/admin/rejudge">
                     <input class="selected-submissions" type="hidden" name="id" value="" required>
                     <input type="hidden" name="stage" value="run">
                     <input type="hidden" name="last" class="current-url">
-                    <input type="submit" value="[r]" title="Re-run all tests"
-                        class="cursor-pointer hover:text-blue-600">
+                    <input type="submit" value="[r]" title="Re-run all tests" class="text-btn hover:text-blue-600">
                 </form>
                 <form class="inline" method="POST" action="/admin/rejudge">
                     <input class="selected-submissions" type="hidden" name="id" value="" required>
                     <input type="hidden" name="stage" value="score">
                     <input type="hidden" name="last" class="current-url">
-                    <input type="submit" value="[s]" title="Recalculate score"
-                        class="cursor-pointer hover:text-blue-300">
+                    <input type="submit" value="[s]" title="Recalculate score" class="text-btn hover:text-blue-300">
                 </form>
             </td>
         </tr>
