@@ -56,7 +56,9 @@ func getProblemCtx(db db.DBContext, c echo.Context) (*ProblemCtx, error) {
 	}
 	fm := make(map[string]*models.File)
 	for _, f := range files {
-		fm[f.Filename] = f
+		if f.Public {
+			fm[f.Filename] = f
+		}
 	}
 	subs, err := models.GetUserProblemSubmissions(db, contest.Me.ID, problem.ID)
 	if err != nil {

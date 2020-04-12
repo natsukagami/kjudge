@@ -75,8 +75,11 @@ func (s *Sandbox) Run(input *worker.SandboxInput) (*worker.SandboxOutput, error)
 	metaFile := filepath.Join(tmp, "meta.txt")
 	cmd := buildCmd(dir, metaFile, input)
 
-	stdout, err := cmd.Output()
-	if err != nil {
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
 		if e, ok := err.(*exec.ExitError); !ok || e.ExitCode() != 1 {
 			return nil, errors.WithStack(err)
 		}
@@ -84,7 +87,8 @@ func (s *Sandbox) Run(input *worker.SandboxInput) (*worker.SandboxOutput, error)
 
 	// Parse the meta file
 	output := &worker.SandboxOutput{
-		Stdout: stdout,
+		Stdout: stdout.Bytes(),
+		Stderr: stderr.Bytes(),
 	}
 	if err := parseMetaFile(metaFile, output); err != nil {
 		return nil, err

@@ -172,6 +172,9 @@ func parseComparatorOutput(s *SandboxOutput, result *models.TestResult, useCompa
 	if useComparator {
 		// Paste the comparator's output to result
 		result.Verdict = strings.TrimSpace(string(s.Stderr))
+		if result.Verdict == "" {
+			result.Verdict = "Compare returns no output."
+		}
 		score, err := strconv.ParseFloat(strings.TrimSpace(string(s.Stdout)), 64)
 		if err != nil {
 			return errors.WithStack(err)
