@@ -78,7 +78,7 @@
             Author: <a href="{{$user_link}}" class="font-semibold hover:text-blue-600">{{.Submission.UserID}}</a>
         </div>
         <div>
-            {{ $contest_link := printf "/admin/contest/%d" .Contest.ID }}
+            {{ $contest_link := printf "/admin/contests/%d" .Contest.ID }}
             Contest: <a href="{{$contest_link}}" class="font-semibold hover:text-blue-600">{{.Contest.Name}}</a>
         </div>
         <div>
