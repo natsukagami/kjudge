@@ -39,6 +39,7 @@
 <datalist id="sample-filenames">
     <option value="statements.pdf" />
     <option value="statements.md" />
+    <option value="compare" />
     <option value="compile_cc.sh" />
     <option value="compile_go.sh" />
     <option value="compile_rs.sh" />
@@ -59,6 +60,12 @@
             <span class="font-mono">statements.pdf</span>: A downloadable PDF statements file.</li>
         <li>
             <span class="font-mono">statements.md</span>: Statements that get rendered inline with Markdown + KaTeX.
+        </li>
+        <li>
+            <span class="font-mono">compare</span>: The custom compare (diff) binary. This has to match kjudge's binary
+            host (which
+            is most likely Linux), so one way to obtain it is through submitting the compare program's source code with
+            a hidden user.
         </li>
         <li>
             <span class="font-mono">compile_[language].sh</span>: Customized build script for
