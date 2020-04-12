@@ -6,6 +6,7 @@ import (
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models/verify"
+	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
 
@@ -68,6 +69,26 @@ func (r *TestGroup) WriteTests(db db.DBContext, tests []*Test, override bool) er
 	}
 	for i, test := range tests {
 		test.ID = int(id) - len(tests) + i + 1
+	}
+	return nil
+}
+
+// DeleteResults deletes all test results of a given test group.
+func (t *TestGroup) DeleteResults(db db.DBContext) error {
+	tests, err := GetTestGroupTests(db, t.ID)
+	if err != nil {
+		return err
+	}
+	var id []int
+	for _, test := range tests {
+		id = append(id, test.ID)
+	}
+	query, args, err := sqlx.In("DELETE FROM test_results WHERE test_id IN (?)", id)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	if _, err := db.Exec(query, args...); err != nil {
+		return errors.WithStack(err)
 	}
 	return nil
 }

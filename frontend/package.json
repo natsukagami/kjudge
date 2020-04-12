@@ -37,6 +37,7 @@
         "humanize-duration": "^3.22.0",
         "preact": "^10.3.4",
         "react-flip-move": "^3.0.4",
-        "regenerator-runtime": "^0.13.5"
+        "regenerator-runtime": "^0.13.5",
+        "typeface-ibm-plex-mono": "^0.0.61"
     }
 }

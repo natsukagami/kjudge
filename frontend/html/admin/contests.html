@@ -1,7 +1,18 @@
 {{ define "admin-title" }}Contests{{ end }}
 
+{{ define "admin-nav" }}
+<nav>
+    <a href="#contests">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Contests</div>
+    </a>
+    <a href="#new">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">New Contest</div>
+    </a>
+</nav>
+{{ end }}
+
 {{ define "admin-content" }}
-<div class="py-4 mx-auto text-4xl">Contests</div>
+<div id="contests" class="py-4 mx-auto text-4xl">Contests</div>
 <div class="p-2">
     {{ template "contests-table" .Contests }}
 </div>

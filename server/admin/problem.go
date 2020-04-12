@@ -57,21 +57,6 @@ func (f *TestGroupForm) Bind(t *models.TestGroup) {
 	t.MemoryLimit = f.MemoryLimit.NullInt64
 }
 
-// TestGroup is the wrapper for a TestGroupWithTests, with to-form conversion.
-type TestGroup struct {
-	*models.TestGroupWithTests
-}
-
-func (t TestGroup) ToForm() TestGroupForm {
-	return TestGroupForm{
-		Name:        t.Name,
-		Score:       t.Score,
-		ScoringMode: t.ScoringMode,
-		MemoryLimit: OptionalInt64{t.MemoryLimit},
-		TimeLimit:   OptionalInt64{t.TimeLimit},
-	}
-}
-
 // Collect the ID and get the corresponding problem.
 func (g *Group) getProblem(c echo.Context) (*ProblemCtx, error) {
 	idStr := c.Param("id")
@@ -93,22 +78,18 @@ func (g *Group) getProblem(c echo.Context) (*ProblemCtx, error) {
 	if err != nil {
 		return nil, err
 	}
-	var testGroups []TestGroup
-	for _, t := range tests {
-		testGroups = append(testGroups, TestGroup{t})
-	}
 	files, err := models.GetProblemFilesMeta(g.db, problem.ID)
 	if err != nil {
 		return nil, err
 	}
-	return &ProblemCtx{Problem: problem, Contest: contest, TestGroups: testGroups, Files: files}, err
+	return &ProblemCtx{Problem: problem, Contest: contest, TestGroups: tests, Files: files}, err
 }
 
 // ProblemCtx is the context for rendering admin/problem.
 type ProblemCtx struct {
 	*models.Problem
 	Contest    *models.Contest
-	TestGroups []TestGroup
+	TestGroups []*models.TestGroupWithTests
 	Files      []*models.File
 
 	// Edit Problem Form
@@ -174,7 +155,7 @@ func (g *Group) ProblemAddTestGroup(c echo.Context) error {
 		ctx.TestGroupFormError = err
 		return g.problemRender(ctx, c)
 	}
-	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d", ctx.Problem.ID))
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/test_groups/%d", tg.ID))
 }
 
 // ProblemDelete implements POST /admin/problems/:id/delete
@@ -238,4 +219,32 @@ func (g *Group) ProblemSubmissionsGet(c echo.Context) error {
 		return err
 	}
 	return c.Render(http.StatusOK, "admin/problem_submissions", subs)
+}
+
+// ProblemRejudgePost implements POST /admin/problems/:id/rejudge
+func (g *Group) ProblemRejudgePost(c echo.Context) error {
+	p, err := g.getProblem(c)
+	if err != nil {
+		return err
+	}
+	tx, err := g.db.Beginx()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	defer tx.Rollback()
+	subs, err := models.GetProblemSubmissions(tx, p.Problem.ID)
+	if err != nil {
+		return err
+	}
+	var id []int
+	for _, sub := range subs {
+		id = append(id, sub.ID)
+	}
+	if err := DoRejudge(tx, id, c.FormValue("stage")); err != nil {
+		return err
+	}
+	if err := tx.Commit(); err != nil {
+		return errors.WithStack(err)
+	}
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d/submissions", p.Problem.ID))
 }

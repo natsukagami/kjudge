@@ -70,7 +70,14 @@ func (g *Group) ContestsGet(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.Render(http.StatusOK, "admin/contests", &ContestsCtx{Contests: contests})
+	now := time.Now().UTC().Round(time.Hour)
+	return c.Render(http.StatusOK, "admin/contests", &ContestsCtx{
+		Contests: contests,
+		Form: ContestForm{
+			StartTime: Timestamp(now),
+			EndTime:   Timestamp(now.Add(time.Hour * 5)),
+		},
+	})
 }
 
 func (g *Group) contestsWithFormError(formError error, form ContestForm, c echo.Context) error {

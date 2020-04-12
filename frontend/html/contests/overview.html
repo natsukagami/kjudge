@@ -30,8 +30,8 @@
         {{ $ended := isFuture .Contest.EndTime }}
         {{ range .Problems }}
         {{ $link := printf "/contests/%d/problems/%s" .ContestID .Name }}
-        <tr>
-            <td class="text-lg py-3 border-b">
+        <tr class="hover:bg-gray-200">
+            <td class="text-lg py-3 border-b pl-4">
                 <a href="{{$link}}" class="hover:text-blue-600">{{.Name}}. {{.DisplayName}}</a>
             </td>
             <td class="text-lg py-3 border-b text-center">
@@ -57,14 +57,13 @@
                 {{ end }}
             </td>
             <td class="text-lg py-3 border-b text-center">
-                <a href="{{$link}}#statements" title="View statements"
-                    class="cursor-pointer hover:text-blue-600">[v]</a>
-                <a href="{{$link}}#files" title="Download files" class="cursor-pointer hover:text-yellow-600">[f]</a>
+                <a href="{{$link}}#statements" title="View statements" class="text-btn hover:text-blue-600">[v]</a>
+                <a href="{{$link}}#files" title="Download files" class="text-btn hover:text-yellow-600">[f]</a>
                 {{ if $ended }}
-                <a href="{{$link}}#submit" title="Submit a solution" class="cursor-pointer hover:text-green-600">[s]</a>
+                <a href="{{$link}}#submit" title="Submit a solution" class="text-btn hover:text-green-600">[s]</a>
                 {{ end }}
                 <a href="{{$link}}#submissions" title="View your submissions"
-                    class="cursor-pointer hover:text-red-600">[l]</a>
+                    class="text-btn hover:text-red-600">[l]</a>
             </td>
         </tr>
         {{ else }}

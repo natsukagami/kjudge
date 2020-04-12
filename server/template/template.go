@@ -23,6 +23,7 @@ var templateList = map[string][]string{
 	"admin/contest":             []string{"admin/root", "admin/contest_inputs", "admin/problem_inputs"},
 	"admin/contest_submissions": []string{"admin/root", "admin/submission_inputs"},
 	"admin/problem":             []string{"admin/root", "admin/problem_inputs", "admin/test_inputs", "admin/test_group_inputs", "admin/file_inputs"},
+	"admin/test_group":          []string{"admin/root", "admin/test_inputs", "admin/test_group_inputs"},
 	"admin/problem_submissions": []string{"admin/root", "admin/submission_inputs"},
 	"admin/users":               []string{"admin/root", "admin/user_inputs"},
 	"admin/user":                []string{"admin/root", "admin/user_inputs", "admin/submission_inputs"},

@@ -1,35 +1,46 @@
 {{ define "admin-title" }}Home{{ end }}
 
+{{ define "admin-nav" }}
+<nav>
+    <a href="#contests">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-2 ml-4 pl-4">Active Contests</div>
+    </a>
+    <a href="#queue">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-2 ml-4 pl-4">Queue Status</div>
+    </a>
+</nav>
+{{ end }}
+
 {{ define "admin-content" }}
 <div class="py-4 mx-auto text-4xl">Home</div>
 {{/* Contests overview */}}
-<div class="p-2">
+<div id="contests" class="p-2">
     <div class="text-2xl mx-2 my-4 font-bold">Active Contests</div>
     {{ template "contests-table" .Contests }}
     <a href="/admin/contests#new">
-        <button class="rounded bg-green-300 hover:bg-green-400 mx-2 mt-4 py-1 px-2">Create a new contest</button>
+        <button class="rounded bg-green-300 hover:bg-green-400 mx-2 mt-4 py-2 px-2">Create a new contest</button>
     </a>
 </div>
 
 {{/* Queue status */}}
-<div class="p-2">
+<div id="queue" class="p-2">
     <div class="text-2xl mx-2 my-4 font-bold">Queue Status</div>
     <table class="table table-auto w-full">
         <thead>
             <tr>
-                <th class="font-normal border-b py-1">Compile</th>
-                <th class="font-normal border-b py-1">Run</th>
-                <th class="font-normal border-b py-1">Score</th>
-                <th class="font-normal border-b py-1"><b>Total</b></th>
+                <th class="font-normal border-b py-2">Compile</th>
+                <th class="font-normal border-b py-2">Run</th>
+                <th class="font-normal border-b py-2">Score</th>
+                <th class="font-normal border-b py-2"><b>Total</b></th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 {{with .Queue}}
-                <td class="text-center border-b py-1">{{.Compile}}</td>
-                <td class="text-center border-b py-1">{{.Run}}</td>
-                <td class="text-center border-b py-1">{{.Score}}</td>
-                <td class="text-center border-b py-1"><b>{{.Total}}</b></td>
+                <td class="text-center border-b py-2">{{.Compile}}</td>
+                <td class="text-center border-b py-2">{{.Run}}</td>
+                <td class="text-center border-b py-2">{{.Score}}</td>
+                <td class="text-center border-b py-2"><b>{{.Total}}</b></td>
                 {{end}}
             </tr>
         </tbody>

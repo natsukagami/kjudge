@@ -2,29 +2,29 @@
 <table class="table table-auto w-full">
     <thead>
         <tr>
-            <th class="py-1 border-b">Username</th>
-            <th class="py-1 border-b">Hidden</th>
-            <th class="py-1 border-b">Actions</th>
+            <th class="py-2 border-b">Username</th>
+            <th class="py-2 border-b">Hidden</th>
+            <th class="py-2 border-b">Actions</th>
         </tr>
     </thead>
     <tbody>
         {{ range . }}
         {{ $link := printf "/admin/users/%s" .ID }}
-        <tr class="{{if .Hidden}} text-gray-600 {{end}}">
-            <td class="text-mono py-1 border-b">{{.ID}}</td>
-            <td class="py-1 border-b text-center">{{.Hidden}}</td>
-            <td class="py-1 border-b text-center">
+        <tr class="{{if .Hidden}} text-gray-600 {{end}} hover:bg-gray-200">
+            <td class="text-mono py-2 border-b pl-4">{{.ID}}</td>
+            <td class="py-2 border-b text-center">{{.Hidden}}</td>
+            <td class="py-2 border-b text-center">
                 <a href="{{$link}}#submissions" title="See user's submissions"
                     class="cursor-pointer hover:text-green-600">[s]</a>
-                <a href="{{$link}}#edit" title="Edit User" class="cursor-pointer hover:text-blue-600">[e]</a>
+                <a href="{{$link}}#edit" title="Edit User" class="text-btn hover:text-blue-600">[e]</a>
                 <form class="inline require-confirm" method="POST" action="{{$link}}/delete">
-                    <input type="submit" value="[d]" title="Delete User" class="cursor-pointer hover:text-red-600">
+                    <input type="submit" value="[d]" title="Delete User" class="text-btn hover:text-red-600">
                 </form>
             </td>
         </tr>
         {{ else }}
         <tr>
-            <td colspan="3" class="py-1 border-b text-center">No Users</td>
+            <td colspan="3" class="py-2 border-b text-center">No Users</td>
         </tr>
         {{ end }}
     </tbody>

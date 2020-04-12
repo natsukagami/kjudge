@@ -31,6 +31,10 @@
     @apply flex flex-col justify-center;
 }
 
+.text-btn {
+    @apply font-mono text-sm cursor-pointer bg-transparent;
+}
+
 @tailwind utilities;
 
 .overflow-auto {

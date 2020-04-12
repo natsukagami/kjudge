@@ -2,29 +2,29 @@
 <table class="table table-auto w-full">
     <thead>
         <tr>
-            <th class="py-1 border-b">Filename</th>
-            <th class="py-1 border-b">Public?</th>
-            <th class="py-1 border-b">Actions</th>
+            <th class="py-2 border-b">Filename</th>
+            <th class="py-2 border-b">Public?</th>
+            <th class="py-2 border-b">Actions</th>
         </tr>
     </thead>
     <tbody>
         {{ range . }}
         {{ $link := printf "/admin/files/%d" .ID }}
         <tr>
-            <td class="py-1 border-b font-mono">{{.Filename}}</td>
-            <td class="py-1 border-b text-center">{{.Public}}</td>
-            <td class="py-1 border-b text-center">
-                <a title="Save file" class="cursor-pointer hover:text-blue-600" href="{{$link}}">
+            <td class="py-2 border-b font-mono pl-4">{{.Filename}}</td>
+            <td class="py-2 border-b text-center">{{.Public}}</td>
+            <td class="py-2 border-b text-center">
+                <a title="Save file" class="text-btn hover:text-blue-600" href="{{$link}}">
                     [s]
                 </a>
                 <form class="inline require-confirm" method="POST" action="{{$link}}/delete">
-                    <input type="submit" class="hover:text-red-600 cursor-pointer" value="[d]" title="Delete file">
+                    <input type="submit" class="hover:text-red-600 text-btn" value="[d]" title="Delete file">
                 </form>
             </td>
         </tr>
         {{ else }}
         <tr>
-            <td colspan="3" class="py-1 border-b text-center">No Files</td>
+            <td colspan="3" class="py-2 border-b text-center">No Files</td>
         </tr>
         {{ end }}
     </tbody>

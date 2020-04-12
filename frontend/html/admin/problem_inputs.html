@@ -95,39 +95,39 @@
 {{ define "problem-table" }}
 <table class="table table-auto w-full">
     <thead>
-        <tr>
-            <th class="py-2 border-b">#</th>
-            <th class="py-2 border-b">Name</th>
-            <th class="py-2 border-b">TimeLimit (ms)</th>
-            <th class="py-2 border-b">Memory Limit (KBs)</th>
-            <th class="py-2 border-b">Scoring Mode</th>
-            <th class="py-2 border-b">Penalty Policy</th>
-            <th class="py-2 border-b">Actions</th>
+        <tr class="border-b">
+            <th class="py-2 text-center">#</th>
+            <th class="py-2 text-center">Name</th>
+            <th class="py-2 text-center">TimeLimit (ms)</th>
+            <th class="py-2 text-center">Memory Limit (KBs)</th>
+            <th class="py-2 text-center">Scoring Mode</th>
+            <th class="py-2 text-center">Penalty Policy</th>
+            <th class="py-2 text-center">Actions</th>
         </tr>
     </thead>
     <tbody>
         {{ range . }}
         {{ $link := printf "/admin/problems/%d" .ID }}
-        <tr>
-            <td class="text-center border-b py-1">{{.Name}}</td>
-            <td class="border-b py-1">{{.DisplayName}}</td>
-            <td class="text-center border-b py-1">{{.TimeLimit}}</td>
-            <td class="text-center border-b py-1">{{.MemoryLimit}}</td>
-            <td class="text-center border-b py-1">{{.ScoringMode}}</td>
-            <td class="text-center border-b py-1">{{.PenaltyPolicy}}</td>
-            <td class="text-center border-b py-1">
+        <tr class="hover:bg-gray-200">
+            <td class="text-center border-b py-2"><a href="{{$link}}" class="hover:text-blue-600">{{.Name}}</a></td>
+            <td class="border-b py-2 pl-4"><a href="{{$link}}" class="hover:text-blue-600">{{.DisplayName}}</a></td>
+            <td class="text-center border-b py-2">{{.TimeLimit}}</td>
+            <td class="text-center border-b py-2">{{.MemoryLimit}}</td>
+            <td class="text-center border-b py-2">{{.ScoringMode}}</td>
+            <td class="text-center border-b py-2">{{.PenaltyPolicy}}</td>
+            <td class="text-center border-b py-2">
                 <a href="{{$link}}/submissions" title="See submissions for problem"
-                    class="cursor-pointer hover:text-green-600">[s]</a>
-                <a class="hover:text-blue-600 cursor-pointer" href="{{$link}}" title="Edit problem">[e]</a>
+                    class="text-btn hover:text-green-600">[s]</a>
+                <a class="hover:text-blue-600 text-btn" href="{{$link}}" title="Edit problem">[e]</a>
                 <form class="inline require-confirm" action="{{$link}}/delete" method="POST">
-                    <input required type="submit" class="hover:text-red-600 cursor-pointer" title="Delete problem"
+                    <input required type="submit" class="hover:text-red-600 text-btn" title="Delete problem"
                         value="[d]">
                 </form>
             </td>
         </tr>
         {{ else }}
         <tr>
-            <td colspan="7" class="py-1 border-b text-center">No problems</td>
+            <td colspan="7" class="py-2 border-b text-center">No problems</td>
         </tr>
         {{ end }}
     </tbody>

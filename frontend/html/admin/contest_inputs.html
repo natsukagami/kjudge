@@ -61,35 +61,36 @@
 <table class="table table-auto w-full">
     <thead>
         <tr>
-            <th class="border-b py-1">ID</th>
-            <th class="border-b py-1">Name</th>
-            <th class="border-b py-1">Start Time</th>
-            <th class="border-b py-1">End Time</th>
-            <th class="border-b py-1">Actions</th>
+            <th class="border-b py-2">ID</th>
+            <th class="border-b py-2">Name</th>
+            <th class="border-b py-2">Start Time</th>
+            <th class="border-b py-2">End Time</th>
+            <th class="border-b py-2">Actions</th>
         </tr>
     </thead>
     <tbody>
         {{ range . }}
         {{ $link := printf "/admin/contests/%d" (.ID) }}
-        <tr class="border-b">
-            <td class="text-center">{{.ID}}</td>
-            <td>{{.Name}}</td>
-            <td class="text-center display-time" data-time="{{.StartTime | time}}">{{.StartTime}}</td>
-            <td class="text-center display-time" data-time="{{.EndTime | time}}">{{.EndTime}}</td>
-            <td class="text-center">
+        <tr class="border-b hover:bg-gray-200">
+            <td class="py-2 text-center"><a href="{{$link}}" class="hover:text-blue-600">{{.ID}}</a></td>
+            <td class="py-2 pl-4"><a href="{{$link}}" class="hover:text-blue-600">{{.Name}}</a></td>
+            <td class="py-2 text-center display-time" data-time="{{.StartTime | time}}">{{.StartTime}}</td>
+            <td class="py-2 text-center display-time" data-time="{{.EndTime | time}}">{{.EndTime}}</td>
+            <td class="py-2 text-center">
                 <a href="{{$link}}/submissions" title="See submissions for contest"
-                    class="cursor-pointer hover:text-green-600">[s]</a>
-                <a href="{{$link}}\scoreboard" title="View contest's scoreboard" class="hover:text-blue-600">[v]</a>
-                <a href="{{$link}}" title="Edit Contest" class="hover:text-blue-600">[e]</a>
+                    class="text-btn hover:text-green-600">[s]</a>
+                <a href="{{$link}}/scoreboard" title="View contest's scoreboard"
+                    class="text-btn hover:text-blue-600">[v]</a>
+                <a href="{{$link}}" title="Edit Contest" class="text-btn hover:text-blue-600">[e]</a>
                 <form method="POST" action="/admin/contests/{{ .ID }}/delete" class="inline require-confirm">
-                    <input required type="submit" title="Delete Contest" class="cursor-pointer hover:text-red-600"
+                    <input required type="submit" title="Delete Contest" class="text-btn hover:text-red-600"
                         value="[d]">
                 </form>
             </td>
         </tr>
         {{ else }}
         <tr class="border-b">
-            <td colspan="5" class="py-1 text-center">No contests.</td>
+            <td colspan="5" class="py-2 text-center">No contests.</td>
         </tr>
         {{ end }}
     </tbody>

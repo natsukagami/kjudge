@@ -1,15 +1,30 @@
 {{ define "admin-title" }}Users{{ end }}
 
+{{ define "admin-nav" }}
+<nav>
+    <a href="#users">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Users</div>
+    </a>
+    <a href="#registration">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Registration</div>
+    </a>
+    <a href="#new">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">New User</div>
+    </a>
+</nav>
+{{ end }}
+
 {{ define "admin-content" }}
 <div class="text-4xl mx-auto py-4">Users</div>
 
 {{/* Users list */}}
-<div class="p-2">
+<div id="users" class="p-2">
     {{ template "user-table" .Users }}
 </div>
 
-<div class="mt-4 mx-4 flex flex-row justify-around">
-    <div class="text-2xl">Registration is <span>{{ if .Config.EnableRegistration }}enabled{{ else }}disabled{{ end }}</span>.</div>
+<div id="registration" class="mt-4 mx-4 flex flex-row justify-around">
+    <div class="text-2xl">Registration is
+        <span>{{ if .Config.EnableRegistration }}enabled{{ else }}disabled{{ end }}</span>.</div>
     <div>
         <form class="inline" method="POST" action="/admin/config/toggle_enable_registration">
             <input class="text-lg p-2 bg-blue-200 hover:bg-blue-400 rounded" type="submit" value="Toggle Registration">
@@ -18,7 +33,7 @@
 </div>
 
 {{/* New User */}}
-<div class="subheader">New User</div>
+<div id="new" class="subheader">New User</div>
 {{ template "form-error" .FormError }}
 <form action="/admin/users" class="form-block" method="POST">
     {{ template "user-inputs" .Form }}

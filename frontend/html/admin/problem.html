@@ -28,6 +28,27 @@
     </a>
     <span>>></span>
     <span class="text-4xl">{{.Problem.Name}}. {{.Problem.DisplayName}}</span>
+    <span class="text-2xl">
+        (
+        {{ $problem_link := printf "/admin/problems/%d" .Problem.ID }}
+        <a href="{{$problem_link}}/submissions" class="hover:text-green-600"
+            title="See submissions for problem">Submissions</a> )
+    </span>
+</div>
+
+<div class="subheader">Rejudge:
+    <form class="inline" method="POST" action="{{$problem_link}}/rejudge">
+        <input type="hidden" name="stage" value="compile">
+        <input type="submit" value="[Recompile]" class="text-btn hover:text-blue-900 text-lg">
+    </form>
+    <form class="inline" method="POST" action="{{$problem_link}}/rejudge">
+        <input type="hidden" name="stage" value="run">
+        <input type="submit" value="[Re-run all tests]" class="text-btn hover:text-blue-600 text-lg">
+    </form>
+    <form class="inline" method="POST" action="{{$problem_link}}/rejudge">
+        <input type="hidden" name="stage" value="score">
+        <input type="submit" value="[Recalculate score]" class="text-btn hover:text-blue-300 text-lg">
+    </form>
 </div>
 
 {{/* Test Management */}}

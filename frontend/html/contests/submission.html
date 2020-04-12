@@ -90,7 +90,7 @@
         <tbody>
             {{ range .Tests }}
             {{ $tr := index $testResults .ID }}
-            <tr>
+            <tr class="hover:bg-gray-200">
                 <td class="my-1 border-b text-center">{{.Name}}</td>
                 <td class="my-1 border-b text-center">{{$tr.RunningTime}}</td>
                 <td class="my-1 border-b text-center">{{$tr.MemoryUsed}}</td>
@@ -100,7 +100,7 @@
             {{ end }}
         </tbody>
         <tfoot>
-            <tr class="bg-gray-200 text-lg">
+            <tr class="bg-gray-200 text-lg hover:bg-gray-300">
                 <td class="my-1 border-b text-center font-semibold" colspan="4">Total</td>
                 <td class="my-1 border-b text-center font-semibold">{{printf "%.1f" $score}}</td>
             </tr>

@@ -38,6 +38,7 @@ func New(db *db.DB, unauthed *echo.Group) (*Group, error) {
 	g.POST("/contests/:id", grp.ContestEdit)
 	g.POST("/contests/:id/delete", grp.ContestDelete)
 	g.POST("/contests/:id/add_problem", grp.ContestAddProblem)
+	g.POST("/contests/:id/rejudge", grp.ContestRejudgePost)
 	// Problem Management
 	g.GET("/problems/:id", grp.ProblemGet)
 	g.GET("/problems/:id/submissions", grp.ProblemSubmissionsGet)
@@ -45,11 +46,14 @@ func New(db *db.DB, unauthed *echo.Group) (*Group, error) {
 	g.POST("/problems/:id/add_test_group", grp.ProblemAddTestGroup)
 	g.POST("/problems/:id/add_file", grp.ProblemAddFile)
 	g.POST("/problems/:id/delete", grp.ProblemDelete)
+	g.POST("/problems/:id/rejudge", grp.ProblemRejudgePost)
 	// Test groups
+	g.GET("/test_groups/:id", grp.TestGroupGet)
 	g.POST("/test_groups/:id/upload_single", grp.TestGroupUploadSingle)
 	g.POST("/test_groups/:id/upload_multiple", grp.TestGroupUploadMultiple)
 	g.POST("/test_groups/:id", grp.TestGroupEdit)
 	g.POST("/test_groups/:id/delete", grp.TestGroupDelete)
+	g.POST("/test_groups/:id/rejudge", grp.TestGroupRejudgePost)
 	// Test
 	g.GET("/tests/:id/input", grp.TestInput)
 	g.GET("/tests/:id/output", grp.TestOutput)

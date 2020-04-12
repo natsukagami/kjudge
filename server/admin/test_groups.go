@@ -17,7 +17,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-func getTestGroup(db db.DBContext, c echo.Context) (*models.TestGroup, error) {
+// TestGroupCtx is the context for rendering test-group.
+type TestGroupCtx struct {
+	*models.TestGroupWithTests
+	Contest *models.Contest
+	Problem *models.Problem
+}
+
+func getTestGroup(db db.DBContext, c echo.Context) (*TestGroupCtx, error) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -29,7 +36,51 @@ func getTestGroup(db db.DBContext, c echo.Context) (*models.TestGroup, error) {
 	} else if err != nil {
 		return nil, err
 	}
-	return tg, nil
+	tests, err := models.GetTestGroupTests(db, tg.ID)
+	if err != nil {
+		return nil, err
+	}
+	problem, err := models.GetProblem(db, tg.ProblemID)
+	if err != nil {
+		return nil, err
+	}
+	contest, err := models.GetContest(db, problem.ContestID)
+	if err != nil {
+		return nil, err
+	}
+	return &TestGroupCtx{
+		TestGroupWithTests: &models.TestGroupWithTests{
+			TestGroup: tg,
+			Tests:     tests,
+		},
+		Problem: problem,
+		Contest: contest,
+	}, nil
+}
+
+// Render renders the context.
+func (ctx *TestGroupCtx) Render(c echo.Context) error {
+	return c.Render(http.StatusOK, "admin/test_group", ctx)
+}
+
+// ToForm converts the context into a nicer form format.
+func (ctx *TestGroupCtx) ToForm() TestGroupForm {
+	return TestGroupForm{
+		Name:        ctx.Name,
+		Score:       ctx.Score,
+		ScoringMode: ctx.ScoringMode,
+		MemoryLimit: OptionalInt64{ctx.MemoryLimit},
+		TimeLimit:   OptionalInt64{ctx.TimeLimit},
+	}
+}
+
+// TestGroupGet implements GET /admin/test_groups/:id
+func (g *Group) TestGroupGet(c echo.Context) error {
+	ctx, err := getTestGroup(g.db, c)
+	if err != nil {
+		return err
+	}
+	return ctx.Render(c)
 }
 
 // TestGroupUploadSingle implements POST /admin/test_groups/:id/upload_single.
@@ -70,7 +121,7 @@ func (g *Group) TestGroupUploadSingle(c echo.Context) error {
 	if err := tx.Commit(); err != nil {
 		return errors.WithStack(err)
 	}
-	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d", tg.ProblemID))
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/test_groups/%d", tg.ID))
 }
 
 // TestGroupUploadMultiple implements POST /admin/test_groups/:id/upload_multiple
@@ -104,7 +155,7 @@ func (g *Group) TestGroupUploadMultiple(c echo.Context) error {
 	if err := tx.Commit(); err != nil {
 		return err
 	}
-	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d", tg.ProblemID))
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/test_groups/%d", tg.ID))
 }
 
 // TestGroupEdit implements POST /admin/test_groups/:id
@@ -117,11 +168,11 @@ func (g *Group) TestGroupEdit(c echo.Context) error {
 	if err := c.Bind(&form); err != nil {
 		return httperr.BindFail(err)
 	}
-	form.Bind(tg)
+	form.Bind(tg.TestGroupWithTests.TestGroup)
 	if err := tg.Write(g.db); err != nil {
 		return httperr.BadRequestf("Cannot update test group: %v", err)
 	}
-	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d", tg.ProblemID))
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/test_groups/%d", tg.ID))
 }
 
 // TestGroupDelete implements POST /admin/test_groups/:id/delete
@@ -154,4 +205,37 @@ func readFromForm(name string, form *multipart.Form) ([]byte, error) {
 		return nil, errors.WithStack(err)
 	}
 	return content, nil
+}
+
+// TestGroupRejudgePost implements POST /admin/test_groups/:id/rejudge
+func (g *Group) TestGroupRejudgePost(c echo.Context) error {
+	tg, err := getTestGroup(g.db, c)
+	if err != nil {
+		return err
+	}
+	tx, err := g.db.Beginx()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	defer tx.Rollback()
+	subs, err := models.GetProblemSubmissions(tx, tg.ProblemID)
+	if err != nil {
+		return err
+	}
+	var id []int
+	for _, sub := range subs {
+		id = append(id, sub.ID)
+	}
+	// First we remove all the results related to a test group.
+	if err := tg.DeleteResults(tx); err != nil {
+		return err
+	}
+	// we still reset the score
+	if err := models.RejudgeScore(tx, id...); err != nil {
+		return err
+	}
+	if err := tx.Commit(); err != nil {
+		return errors.WithStack(err)
+	}
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d/submissions", tg.ProblemID))
 }

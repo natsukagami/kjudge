@@ -40,24 +40,36 @@
                 <input type="hidden" name="id" value="{{.Submission.ID}}">
                 <input type="hidden" name="stage" value="compile">
                 <input type="hidden" name="last" class="current-url">
-                <input type="submit" value="[recompile]" class="cursor-pointer hover:text-blue-900">
+                <input type="submit" value="[recompile]" class="text-btn hover:text-blue-900">
             </form>
             <form class="inline" method="POST" action="/admin/rejudge">
                 <input type="hidden" name="id" value="{{.Submission.ID}}">
                 <input type="hidden" name="stage" value="run">
                 <input type="hidden" name="last" class="current-url">
-                <input type="submit" value="[re-run all tests]" class="cursor-pointer hover:text-blue-600">
+                <input type="submit" value="[re-run all tests]" class="text-btn hover:text-blue-600">
             </form>
             <form class="inline" method="POST" action="/admin/rejudge">
                 <input type="hidden" name="id" value="{{.Submission.ID}}">
                 <input type="hidden" name="stage" value="score">
                 <input type="hidden" name="last" class="current-url">
-                <input type="submit" value="[recalculate score]" class="cursor-pointer hover:text-blue-300">
+                <input type="submit" value="[recalculate score]" class="text-btn hover:text-blue-300">
             </form>
             {{ if .Submission.CompiledSource }}
             {{ $link := printf "/admin/submissions/%d" .Submission.ID }}
-            <a href="{{$link}}/binary" class="hover:text-green-600">[download binary]</a>
+            <a href="{{$link}}/binary" class="text-btn hover:text-green-600">[download binary]</a>
             {{ end }}
+        </div>
+        <div>
+            All submissions from:
+            {{ $user_submissions := printf "/admin/users/%s#submissions" .Submission.UserID }}
+            <a href="{{$user_submissions}}" class="text-btn hover:text-blue-600"
+                title="{{.Submission.UserID}}">[Author]</a>
+            {{ $problem_submissions := printf "/admin/problems/%d/submissions" .Submission.ProblemID }}
+            <a href="{{$problem_submissions}}" class="text-btn hover:text-blue-600" title="{{.Problem.Name}}.
+                {{.Problem.DisplayName}}">[Problem]</a>
+            {{ $contest_submissions := printf "/admin/contests/%d/submissions" .Contest.ID }}
+            <a href="{{$contest_submissions}}" class="text-btn hover:text-blue-600"
+                title="{{.Contest.Name}}">[Contest]</a>
         </div>
     </div>
     <div class="text-right">
@@ -127,7 +139,7 @@
         <tbody>
             {{ range .Tests }}
             {{ $tr := index $testResults .ID }}
-            <tr>
+            <tr class="hover:bg-gray-300">
                 <td class="my-1 border-b text-center">{{.Name}}</td>
                 <td class="my-1 border-b text-center">{{$tr.RunningTime}}</td>
                 <td class="my-1 border-b text-center">{{$tr.MemoryUsed}}</td>
