@@ -1,0 +1,35 @@
+{{ define "title" }}{{.Contest.Name}} [scoreboard]{{ end }}
+
+{{ define "main" }}
+<div class="text-center">
+    <div class="text-4xl py-6 text-center"><b>{{.Contest.Name}}</b></div>
+
+    <div class="text-xl my-2 text-gray-800 timer" data-start="{{.Contest.StartTime | time}}"
+        data-end="{{.Contest.EndTime | time}}"><span class="font-semibold"></span></div>
+
+    <div class="text-xl my-2">
+        The contest starts at <span class="font-semibold display-time" data-time="{{.Contest.StartTime | time}}"></span>
+        and
+        ends at <span class="font-semibold display-time" data-time="{{.Contest.EndTime | time}}"></span>.
+    </div>
+</div>
+
+{{ with .Show }}
+<div class="text-center subheader">{{.Error}}
+</div>
+{{ else }}
+{{ template "scoreboard-body" . }}
+{{ end }}
+<hr class="mt-8">
+{{ template "footer" . }}
+{{ end }}
+
+{{ define "scoreboard-body" }}
+{{ $contest_link := printf "/contests/%d" .Contest.ID }}
+<div id="scoreboard"></div>
+<script>
+    document.initialScoreboard = JSON.parse("{{ json .JSON }}");
+    document.scoreboardJSONLink = '{{.JSONLink}}';
+</script>
+<script src="../../ts/scoreboard/index.tsx"></script>
+{{ end }}

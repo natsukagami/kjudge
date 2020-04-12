@@ -23,7 +23,7 @@
         {{ $ended := (isFuture .Contest.EndTime) }}
         {{ range .Problems }}
         {{ $link := printf "%s/problems/%s" $contest_link .Name }}
-        <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 px-4 flex flex-row justify-between">
+        <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 px-4 flex flex-row justify-end flex-wrap">
             <a class="flex-grow" href="{{$link}}">
                 {{.Name}}. {{.DisplayName}}
             </a>

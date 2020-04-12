@@ -1,7 +1,9 @@
 package admin
 
 import (
+	"bytes"
 	"database/sql"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -17,8 +19,21 @@ type ScoreboardCtx struct {
 	*models.Scoreboard
 }
 
+// Show decides whether the scoreboard can be shown. For compability with contests.ScoreboardCtx
+func (s *ScoreboardCtx) Show() error {
+	return nil
+}
+
+// JSONLink returns the link to the JSON scoreboard.
+func (s *ScoreboardCtx) JSONLink() string {
+	return fmt.Sprintf("/admin/contests/%d/scoreboard/json", s.Contest.ID)
+}
+
 // Render renders the scoreboard context
-func (s *ScoreboardCtx) Render(c echo.Context) error {
+func (s *ScoreboardCtx) Render(c echo.Context, wide bool) error {
+	if wide {
+		return c.Render(http.StatusOK, "contests/scoreboard_wide", s)
+	}
 	return c.Render(http.StatusOK, "admin/contest_scoreboard", s)
 }
 
@@ -64,7 +79,7 @@ func (g *Group) ScoreboardGet(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return ctx.Render(c)
+	return ctx.Render(c, c.QueryParam("wide") == "true")
 }
 
 // ScoreboardJSONGet implements GET /admin/contests/:id/scoreboard/json
@@ -74,4 +89,24 @@ func (g *Group) ScoreboardJSONGet(c echo.Context) error {
 		return err
 	}
 	return ctx.RenderJSON(c)
+}
+
+// ScoreboardCSVGet implements GET /admin/contests/:id/scoreboard/csv
+func (g *Group) ScoreboardCSVGet(c echo.Context) error {
+	ctx, err := getScoreboardCtx(g.db, c)
+	if err != nil {
+		return err
+	}
+	var buf bytes.Buffer
+	if c.QueryParam("scores_only") == "true" {
+		if err := ctx.CSVScoresOnly(&buf); err != nil {
+			return err
+		}
+	} else {
+		if err := ctx.CSV(&buf); err != nil {
+			return err
+		}
+	}
+	c.Response().Header().Add("Content-Disposition", `attachment; filename="scoreboard.csv"`)
+	return c.Blob(http.StatusOK, "text/csv", buf.Bytes())
 }

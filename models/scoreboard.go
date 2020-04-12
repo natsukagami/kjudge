@@ -1,11 +1,15 @@
 package models
 
 import (
+	"encoding/csv"
+	"fmt"
+	"io"
 	"sort"
 	"time"
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/server/httperr"
+	"github.com/pkg/errors"
 )
 
 // UserResult stores information about user's preformance in the contest
@@ -250,4 +254,62 @@ func GetScoreboard(db db.DBContext, contest *Contest, problems []*Problem) (*Sco
 		UserResults:            userResults,
 		ProblemBestSubmissions: problemBestSubmissions,
 	}, nil
+}
+
+// CSVScoresOnly returns the CSV version of the scoreboard, with only scores.
+func (s *Scoreboard) CSVScoresOnly(w io.Writer) error {
+	writer := csv.NewWriter(w)
+	// First row: Headers
+	headers := []string{"Username", "Total Score"}
+	for _, p := range s.Problems {
+		headers = append(headers, p.Name)
+	}
+	if err := writer.Write(headers); err != nil {
+		return errors.WithStack(err)
+	}
+	// One for each contestants
+	for _, u := range s.UserResults {
+		row := []string{u.User.ID, fmt.Sprintf("%.2f", u.TotalScore)}
+		for _, p := range s.Problems {
+			if score, ok := u.ProblemResults[p.ID]; ok {
+				row = append(row, fmt.Sprintf("%.2f", score.Score))
+			} else {
+				row = append(row, "-")
+			}
+		}
+		if err := writer.Write(row); err != nil {
+			return errors.Wrapf(err, "row %s", u.User.ID)
+		}
+	}
+	writer.Flush()
+	return errors.WithStack(writer.Error())
+}
+
+// CSV returns the CSV version of the scoreboard, with scores and penalties.
+func (s *Scoreboard) CSV(w io.Writer) error {
+	writer := csv.NewWriter(w)
+	// First row: Headers
+	headers := []string{"Username", "Total Score", "Total Penalty"}
+	for _, p := range s.Problems {
+		headers = append(headers, p.Name, p.Name+" (Penalty)")
+	}
+	if err := writer.Write(headers); err != nil {
+		return errors.WithStack(err)
+	}
+	// One for each contestants
+	for _, u := range s.UserResults {
+		row := []string{u.User.ID, fmt.Sprintf("%.2f", u.TotalScore), fmt.Sprint(u.TotalPenalty)}
+		for _, p := range s.Problems {
+			if score, ok := u.ProblemResults[p.ID]; ok {
+				row = append(row, fmt.Sprintf("%.2f", score.Score), fmt.Sprint(score.Penalty))
+			} else {
+				row = append(row, "-", "-")
+			}
+		}
+		if err := writer.Write(row); err != nil {
+			return errors.Wrapf(err, "row %s", u.User.ID)
+		}
+	}
+	writer.Flush()
+	return errors.WithStack(writer.Error())
 }
