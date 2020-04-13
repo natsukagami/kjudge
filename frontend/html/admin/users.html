@@ -6,7 +6,7 @@
         <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Users</div>
     </a>
     <a href="#registration">
-        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Registration</div>
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Registration and Customization</div>
     </a>
     <a href="#new">
         <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">New User</div>
@@ -22,12 +22,30 @@
     {{ template "user-table" .Users }}
 </div>
 
-<div id="registration" class="mt-4 mx-4 flex flex-row justify-around">
+<div id="registration" class="mt-4 mx-4 flex flex-row justify-between">
     <div class="text-2xl">Registration is
-        <span>{{ if .Config.EnableRegistration }}enabled{{ else }}disabled{{ end }}</span>.</div>
+        <span class="font-bold">{{ if .Config.EnableRegistration }}enabled{{ else }}disabled{{ end }}</span>.</div>
     <div>
-        <form class="inline" method="POST" action="/admin/config/toggle_enable_registration">
+        <form class="inline" method="POST" action="/admin/config/toggle">
+            <input type="hidden" name="key" value="enable_registration">
             <input class="text-lg p-2 bg-blue-200 hover:bg-blue-400 rounded" type="submit" value="Toggle Registration">
+        </form>
+    </div>
+</div>
+
+<div id="customization" class="mt-4 mx-4 flex flex-row justify-between">
+    <div class="text-2xl">Users
+        <span class="font-bold">{{ if .Config.EnableUserCustomization }}can{{ else }}cannot{{ end }}</span>
+        change their names and organizations.</div>
+    <div>
+        <form class="inline" method="POST" action="/admin/config/toggle">
+            <input type="hidden" name="key" value="enable_user_customization">
+            {{ if .Config.EnableRegistration }}
+            <input class="text-lg p-2 bg-blue-100 rounded" type="submit" disabled value="Toggle Customization"
+                title="Cannot disable customization while Registration is enabled.">
+            {{ else }}
+            <input class="text-lg p-2 bg-blue-200 hover:bg-blue-400 rounded" type="submit" value="Toggle Customization">
+            {{ end }}
         </form>
     </div>
 </div>

@@ -12,7 +12,8 @@
 {{ end }}
 
 {{ define "admin-content" }}
-<div class="py-4 text-4xl p-2">User <span class="font-semibold">{{.ID}}</span></div>
+<div class="py-4 text-4xl p-2">User <span class="font-semibold {{if .Hidden}}text-gray-600{{end}}">{{.ID}}
+        {{if .Hidden}}[hidden]{{end}}</span></div>
 
 <div class="subheader" id="submissions">Submissions</div>
 <div class="p-2">

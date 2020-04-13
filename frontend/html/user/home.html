@@ -1,7 +1,28 @@
 {{ define "title" }}Home{{ end }}
 
 {{ define "content" }}
-<div class="py-4 mx-auto text-4xl">User Control Panel [<b>{{.Me.ID}}</b>]</div>
+<div class="py-4 mx-auto text-4xl">User Control Panel [<b title="{{.Me.ID}}">{{.Me.DisplayName}}</b>]</div>
+
+{{ if .EnableUserCustomization }}
+<div class="subheader">Update Information</div>
+{{ template "form-error" .CustomizeError }}
+<form class="form-block" method="POST" action="/user/customize">
+    <label for="display-name" class="text-sm block">Display Name</label>
+    <input id="display-name" class="form-input" type="text" value="{{.Customize.DisplayName}}"
+        placeholder="Misaka Mikoto" name="display_name" maxlength="32" required>
+    <div class="text-sm text-gray-600">
+        This is the name that will be displayed on the scoreboard and such.
+    </div>
+    <label for="organization" class="text-sm block">Organization</label>
+    <input id="organization" class="form-input" type="text" value="{{.Customize.Organization}}"
+        placeholder="Your School / City / Country" name="organization" maxlength="64" required>
+
+    <div class="mt-2">
+        <input required type="submit" class="form-btn bg-green-200 hover:bg-green-300" value="Submit">
+        <input required type="reset" class="form-btn bg-red-200 hover:bg-red-300" value="Reset">
+    </div>
+</form>
+{{ end }}
 
 <div class="subheader">Change Password</div>
 {{ template "form-error" .ChangePasswordError }}
@@ -20,5 +41,6 @@
         <input required type="reset" class="form-btn bg-red-200 hover:bg-red-300" value="Reset">
     </div>
 </form>
+
 <script type="application/javascript" src="../../ts/user.ts"></script>
 {{ end }}

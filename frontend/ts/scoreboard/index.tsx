@@ -27,6 +27,8 @@ interface Problem {
 
 interface User {
     id: string;
+    display_name: string;
+    organization?: string;
     rank: number;
     total_penalty: number;
     solved_problems: number;
@@ -176,7 +178,12 @@ const Row = ({
                 {user.rank}
             </div>
             <div class="text-lg py-3 border-b pl-8 border-l flex-table-cell flex-grow">
-                {user.id}
+                <div title={user.id}>{user.display_name}</div>
+                {user.organization ? (
+                    <div class="italic text-sm text-gray-600">
+                        {user.organization}
+                    </div>
+                ) : null}
             </div>
             <div
                 class="text-lg py-3 border-b text-center font-semibold border-l flex-table-cell flex-shrink-0"

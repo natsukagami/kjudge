@@ -2,10 +2,12 @@ package user
 
 import (
 	"net/http"
+	"strings"
 
 	"git.nkagami.me/natsukagami/kjudge/db"
 	"git.nkagami.me/natsukagami/kjudge/models"
 	"git.nkagami.me/natsukagami/kjudge/server/auth"
+	"git.nkagami.me/natsukagami/kjudge/server/httperr"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
@@ -14,14 +16,38 @@ import (
 type HomeCtx struct {
 	*AuthCtx
 
+	EnableUserCustomization bool
+	CustomizeError          error
+	Customize               CustomizeForm
+
 	ChangePasswordError error
 	ChangePassword      ChangePasswordForm
+}
+
+// CustomizeForm is a form for an user to change their name or organization.
+type CustomizeForm struct {
+	DisplayName  string `form:"display_name"`
+	Organization string `form:"organization"`
+}
+
+// Load a default CustomizeForm from an user.
+func userCustomizeForm(u *models.User) CustomizeForm {
+	return CustomizeForm{
+		DisplayName:  u.DisplayName,
+		Organization: u.Organization,
+	}
+}
+
+// Bind binds the form to an user.
+func (c *CustomizeForm) Bind(u *models.User) {
+	u.DisplayName = strings.TrimSpace(c.DisplayName)
+	u.Organization = strings.TrimSpace(c.Organization)
 }
 
 // Render renders the context.
 func (h *HomeCtx) Render(c echo.Context) error {
 	status := http.StatusOK
-	if h.ChangePasswordError != nil {
+	if h.CustomizeError != nil || h.ChangePasswordError != nil {
 		status = http.StatusBadRequest
 	}
 	return c.Render(status, "user/home", h)
@@ -32,8 +58,15 @@ func getHomeCtx(db db.DBContext, c echo.Context) (*HomeCtx, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &HomeCtx{AuthCtx: me}, nil
-
+	config, err := models.GetConfig(db)
+	if err != nil {
+		return nil, err
+	}
+	return &HomeCtx{
+		AuthCtx:                 me,
+		EnableUserCustomization: config.EnableUserCustomization,
+		Customize:               userCustomizeForm(me.Me),
+	}, nil
 }
 
 // ChangePasswordForm is the form handling a password change request.
@@ -98,6 +131,35 @@ func (g *Group) ChangePassword(c echo.Context) error {
 	if err := handle(); err != nil {
 		ctx.ChangePasswordError = err
 		return ctx.Render(c)
+	}
+	return c.Redirect(http.StatusSeeOther, "/user")
+}
+
+// CustomizePost implements POST /user/customize.
+func (g *Group) CustomizePost(c echo.Context) error {
+	tx, err := g.db.Beginx()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	defer tx.Rollback()
+	ctx, err := getHomeCtx(tx, c)
+	if err != nil {
+		return err
+	}
+	if !ctx.EnableUserCustomization {
+		return httperr.BadRequestf("User customization has been disabled by the contest organizer.")
+	}
+	if err := c.Bind(&ctx.Customize); err != nil {
+		return httperr.BindFail(err)
+	}
+	u := *ctx.Me
+	ctx.Customize.Bind(&u)
+	if err := u.Write(tx); err != nil {
+		ctx.CustomizeError = err
+		return ctx.Render(c)
+	}
+	if err := tx.Commit(); err != nil {
+		return errors.WithStack(err)
 	}
 	return c.Redirect(http.StatusSeeOther, "/user")
 }

@@ -22,9 +22,11 @@ type UsersCtx struct {
 
 // UserForm is a form for adding or editing an user.
 type UserForm struct {
-	ID       string `form:"id"`
-	Password string `form:"password"`
-	Hidden   bool   `form:"hidden"`
+	ID           string `form:"id"`
+	DisplayName  string `form:"display_name"`
+	Organization string `form:"organization"`
+	Password     string `form:"password"`
+	Hidden       bool   `form:"hidden"`
 
 	IsUpdate bool
 }
@@ -32,6 +34,11 @@ type UserForm struct {
 // Bind binds the form's values to the model.
 func (f *UserForm) Bind(u *models.User) error {
 	u.ID = f.ID
+	u.DisplayName = f.DisplayName
+	if f.DisplayName == "" {
+		u.DisplayName = u.ID
+	}
+	u.Organization = f.Organization
 	if f.Password != "" {
 		p, err := auth.PasswordHash(f.Password)
 		if err != nil {
@@ -45,9 +52,11 @@ func (f *UserForm) Bind(u *models.User) error {
 
 func UserToForm(u *models.User) *UserForm {
 	return &UserForm{
-		ID:       u.ID,
-		Password: "",
-		Hidden:   u.Hidden,
+		ID:           u.ID,
+		DisplayName:  u.DisplayName,
+		Organization: u.Organization,
+		Password:     "",
+		Hidden:       u.Hidden,
 	}
 }
 

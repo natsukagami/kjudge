@@ -40,6 +40,8 @@ _order_by = "name ASC"
 id = "string"
 password = "string"
 hidden = "bool"
+display_name = "string"
+organization = "string"
 _order_by = "id ASC"
 
 [submissions]

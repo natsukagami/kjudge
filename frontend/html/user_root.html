@@ -2,9 +2,9 @@
 <div class="flex flex-rowi h-screen">
     <div class="w-1/4 mx-4 flex-shrink-0">
         <div class="text-lg py-4 pl-4">
-            Welcome
+            Welcome,
             {{ if (loggedIn .) }}
-            <b>{{.Me.ID}}</b>!
+            <span class="font-bold" title="{{.Me.ID}}">{{.Me.DisplayName}}</span>!
             {{ else }}
             to <b>kjudge</b>
             {{ end }}

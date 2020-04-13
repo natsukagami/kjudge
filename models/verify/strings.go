@@ -9,6 +9,16 @@ import (
 // StringVerify are string verifiers.
 type StringVerify func(string) error
 
+// StringEmptyOr passes the check if the string is empty, and complain otherwise.
+func StringEmptyOr(f StringVerify) StringVerify {
+	return func(s string) error {
+		if s == "" {
+			return nil
+		}
+		return f(s)
+	}
+}
+
 // Names specify that the names must be a non-empty string of maximum length 32.
 func Names(s string) error {
 	return String(s, StringNonEmpty, StringMaxLength(32))

@@ -68,7 +68,7 @@ func New(db *db.DB, unauthed *echo.Group) (*Group, error) {
 	g.GET("/users/:id", grp.UserGet)
 	g.POST("/users/:id", grp.UserEdit)
 	g.POST("/users/:id/delete", grp.UserDelete)
-	g.POST("/config/toggle_enable_registration", grp.ToggleEnableRegistration)
+	g.POST("/config/toggle", grp.ConfigTogglePost)
 	// Submissions
 	g.GET("/submissions", grp.SubmissionsGet)
 	g.GET("/submissions/:id", grp.SubmissionGet)

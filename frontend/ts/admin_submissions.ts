@@ -35,6 +35,14 @@
             "selected-count",
         )[0] as HTMLSpanElement;
 
+        // Disable "With Selected..." forms if selected-submissions are empty.
+        for (const input of selectedInputs) {
+            const form = input.parentElement as HTMLFormElement;
+            form.addEventListener("submit", (e) => {
+                if (input.value === "") e.preventDefault();
+            });
+        }
+
         function updateInputs() {
             const checked: string[] = [];
             for (const u of checkboxesArray) {

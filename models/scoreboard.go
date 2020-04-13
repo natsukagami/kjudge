@@ -36,6 +36,8 @@ type JSONScoreboard struct {
 // JSONUserResult represents a JSON encoded user in the scoreboard.
 type JSONUserResult struct {
 	ID             string                    `json:"id"`
+	DisplayName    string                    `json:"display_name"`
+	Organization   string                    `json:"organization,omitempty"`
 	Rank           int                       `json:"rank"`
 	TotalPenalty   int                       `json:"total_penalty"`
 	SolvedProblems int                       `json:"solved_problems"`
@@ -50,6 +52,8 @@ func jsonUserResult(u *UserResult, ps []JSONProblem) JSONUserResult {
 	}
 	return JSONUserResult{
 		ID:             u.User.ID,
+		DisplayName:    u.User.DisplayName,
+		Organization:   u.User.Organization,
 		Rank:           u.Rank,
 		TotalPenalty:   u.TotalPenalty,
 		SolvedProblems: u.SolvedProblems,
@@ -260,7 +264,7 @@ func GetScoreboard(db db.DBContext, contest *Contest, problems []*Problem) (*Sco
 func (s *Scoreboard) CSVScoresOnly(w io.Writer) error {
 	writer := csv.NewWriter(w)
 	// First row: Headers
-	headers := []string{"Username", "Total Score"}
+	headers := []string{"Username", "Name", "Organization", "Total Score"}
 	for _, p := range s.Problems {
 		headers = append(headers, p.Name)
 	}
@@ -269,7 +273,7 @@ func (s *Scoreboard) CSVScoresOnly(w io.Writer) error {
 	}
 	// One for each contestants
 	for _, u := range s.UserResults {
-		row := []string{u.User.ID, fmt.Sprintf("%.2f", u.TotalScore)}
+		row := []string{u.User.ID, u.User.DisplayName, u.User.Organization, fmt.Sprintf("%.2f", u.TotalScore)}
 		for _, p := range s.Problems {
 			if score, ok := u.ProblemResults[p.ID]; ok {
 				row = append(row, fmt.Sprintf("%.2f", score.Score))
@@ -289,7 +293,7 @@ func (s *Scoreboard) CSVScoresOnly(w io.Writer) error {
 func (s *Scoreboard) CSV(w io.Writer) error {
 	writer := csv.NewWriter(w)
 	// First row: Headers
-	headers := []string{"Username", "Total Score", "Total Penalty"}
+	headers := []string{"Username", "Name", "Organization", "Total Score", "Total Penalty"}
 	for _, p := range s.Problems {
 		headers = append(headers, p.Name, p.Name+" (Penalty)")
 	}
@@ -298,7 +302,7 @@ func (s *Scoreboard) CSV(w io.Writer) error {
 	}
 	// One for each contestants
 	for _, u := range s.UserResults {
-		row := []string{u.User.ID, fmt.Sprintf("%.2f", u.TotalScore), fmt.Sprint(u.TotalPenalty)}
+		row := []string{u.User.ID, u.User.DisplayName, u.User.Organization, fmt.Sprintf("%.2f", u.TotalScore), fmt.Sprint(u.TotalPenalty)}
 		for _, p := range s.Problems {
 			if score, ok := u.ProblemResults[p.ID]; ok {
 				row = append(row, fmt.Sprintf("%.2f", score.Score), fmt.Sprint(score.Penalty))
