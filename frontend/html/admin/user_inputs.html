@@ -87,3 +87,81 @@
     <input required type="reset" class="form-btn bg-red-200 hover:bg-red-300" value="Reset">
 </div>
 {{ end }}
+
+{{ define "batch-add-users" }}
+<div>
+    <div class="mb-2 text-lg">Already have the CSV file?</div>
+    <form id="batch-add-form" class="form-block" method="POST" action="/admin/batch_users"
+        enctype="multipart/form-data">
+        <label class="block text-sm" for="file">CSV file</label>
+        <input id="file" type="file" class="form-input" name="file" accept=".csv" required>
+        <div class="text-sm my-1 text-gray-600">
+            <p>The CSV file should list all users with predeclared columns. If you need an example, read on.</p>
+
+            <p>Columns are:
+                <ul class="list-disc list-inside">
+                    <li><span class="font-semibold">Username</span>: Required. The user's unique ID.</li>
+                    <li><span class="font-semibold">Display Name</span>: Optional. The user's name that will be
+                        displayed on
+                        the scoreboard.</li>
+                    <li><span class="font-semibold">Organization</span>: Optional. Usually the user's school, city or
+                        country of origin.</li>
+                    <li><span class="font-semibold">Password</span>: Optional. A random password will be generated and
+                        returned otherwise.</li>
+                    <li><span class="font-semibold">Hidden</span>: Optional. If the value is <span
+                            class="font-mono">true</span> or <span class="font-mono">1</span>, the user is hidden.</li>
+                </ul>
+            </p>
+
+            <p>The first row must contain all 5 headers (<span class="font-mono">Username,Display
+                    Name,Organization,Password,Hidden</span>).</p>
+            <p>Upon successful insert, you will get back the CSV file with all columns filled.</p>
+        </div>
+
+        <input type="checkbox" name="reset" value="true" id="batch-add-reset">
+        <label for="batch-add-reset">Remove all users before adding</label>
+
+        <div class="mt-2">
+            <input required type="submit" class="form-btn bg-green-200 hover:bg-green-300"
+                value="Submit and get Generated Users">
+            <input required type="reset" class="form-btn bg-red-200 hover:bg-red-300" value="Reset">
+        </div>
+    </form>
+
+    <div class="mt-4 mb-2 text-lg">Generate a CSV user list</div>
+    <form class="form-block" method="GET" action="/admin/batch_users/generate">
+        <label class="block text-sm" for="prefix">User prefix</label>
+        <input id="prefix" type="text" class="form-input font-mono" name="prefix" placeholder="user_" maxlength="29"
+            required>
+        <div class="text-sm text-gray-600">
+            All users generated in the CSV file will have this prefix. For example,
+            with the <span class="font-mono">user_</span> prefix, <span class="font-mono">user_001</span> and <span
+                class="font-mono">user_002</span> will be generated.
+        </div>
+        <label class="block text-sm" for="count">Count</label>
+        <input id="count" type="number" class="form-input" name="count" min="1" max="999" step="1" value="1" required>
+        <div class="text-sm text-gray-600">
+            The CSV file will be generated with this number of rows.
+        </div>
+        <label class="block text-sm" for="offset">Offset</label>
+        <input id="offset" type="number" class="form-input" name="offset" min="0" max="999" step="1" value="0" required>
+        <div class="text-sm text-gray-600">
+            IDs from <span class="text-mono">offset + 1</span> to <span class="text-mono">offset + count</span> will be
+            generated.
+        </div>
+
+        <div class="mt-2 flex flex-row justify-between">
+            <div>
+                <input required type="submit" class="form-btn bg-green-200 hover:bg-green-300"
+                    value="Get generated CSV">
+                <input required type="reset" class="form-btn bg-red-200 hover:bg-red-300" value="Reset">
+            </div>
+            <div>
+                <a href="/admin/batch_users/empty" class="form-btn bg-blue-200 hover:bg-blue-300">Want an empty
+                    file?</a>
+            </div>
+        </div>
+
+    </form>
+</div>
+{{ end }}

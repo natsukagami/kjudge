@@ -77,6 +77,10 @@ func New(db *db.DB, unauthed *echo.Group) (*Group, error) {
 	g.POST("/rejudge", grp.RejudgePost)
 	// Jobs
 	g.GET("/jobs", grp.JobsGet)
+	// Batch users
+	g.GET("/batch_users/empty", grp.BatchUsersEmptyGet)
+	g.GET("/batch_users/generate", grp.BatchUsersGenerateGet)
+	g.POST("/batch_users", grp.BatchUsersPost)
 
 	return grp, nil
 }

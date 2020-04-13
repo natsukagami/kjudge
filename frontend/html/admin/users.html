@@ -11,6 +11,9 @@
     <a href="#new">
         <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">New User</div>
     </a>
+    <a href="#batch-add">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Batch Add Users</div>
+    </a>
 </nav>
 {{ end }}
 
@@ -56,4 +59,11 @@
 <form action="/admin/users" class="form-block" method="POST">
     {{ template "user-inputs" .Form }}
 </form>
+
+<div id="batch-add" class="subheader">Batch Add Users</div>
+<div class="p-2">
+    {{ template "batch-add-users" . }}
+</div>
+
+<script src="../../ts/admin_users.ts"></script>
 {{ end }}
