@@ -13,6 +13,13 @@
 
 {{ define "admin-content" }}
 <div class="py-4 mx-auto text-4xl">Home</div>
+{{ with .NewVersionMessage }}
+<a href="https://git.nkagami.me/natsukagami/kjudge/wiki/Updating" target="_blank">
+    <div
+        class="p-4 border-orange-800 bg-orange-200 text-orange-600 hover:bg-orange-300 rounded mx-auto text-4xl text-center">
+        {{ . }}</div>
+</a>
+{{ end }}
 {{/* Contests overview */}}
 <div id="contests" class="p-2">
     <div class="text-2xl mx-2 my-4 font-bold">Active Contests</div>
