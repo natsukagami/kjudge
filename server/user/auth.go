@@ -36,13 +36,19 @@ type LoginCtx struct {
 	AllowRegistration bool
 
 	Error error
-	LoginForm
+	RegisterForm
 }
 
 type LoginForm struct {
 	ID       string `form:"id"`
 	Password string `form:"password"`
 	Remember bool   `form:"remember"`
+}
+
+type RegisterForm struct {
+	LoginForm
+	DisplayName  string `form:"display_name"`
+	Organization string `form:"organization"`
 }
 
 // Returns a login ctx, but with empty errors and fields.
@@ -143,7 +149,7 @@ func (g *Group) RegisterPost(c echo.Context) error {
 			return errors.New("Registration is disabled")
 		}
 
-		if err := c.Bind(&ctx.LoginForm); err != nil {
+		if err := c.Bind(&ctx.RegisterForm); err != nil {
 			return errors.WithStack(err)
 		}
 
@@ -160,7 +166,15 @@ func (g *Group) RegisterPost(c echo.Context) error {
 			return err
 		}
 
-		u := &models.User{ID: ctx.ID, Password: string(password)}
+		u := &models.User{
+			ID:           ctx.ID,
+			Password:     string(password),
+			DisplayName:  ctx.DisplayName,
+			Organization: ctx.Organization,
+		}
+		if u.DisplayName == "" {
+			u.DisplayName = u.ID
+		}
 		if err := u.Write(tx); err != nil {
 			return err
 		}

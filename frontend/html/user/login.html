@@ -11,6 +11,19 @@
         <label class="text-sm block" for="password">Password</label>
         <input class="form-input w-full" id="password" type="password" placeholder="Password" required name="password">
 
+        <div id="register-fields" class="hidden">
+            <label for="display-name" class="text-sm block">Display Name</label>
+            <input id="display-name" class="form-input w-full" type="text" value="{{.DisplayName}}"
+                placeholder="Misaka Mikoto" name="display_name" maxlength="32">
+            <div class="text-sm text-gray-600">
+                This is the name that will be displayed on the scoreboard and such.
+                If you don't specify one, then your ID will be used instead.
+            </div>
+            <label for="organization" class="text-sm block">Organization</label>
+            <input id="organization" class="form-input w-full" type="text" value="{{.Organization}}"
+                placeholder="Your School / City / Country" name="organization" maxlength="64">
+        </div>
+
         <div class="mt-4 flex flex-row justify-between">
             <div>
                 <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
