@@ -26,11 +26,11 @@ type UserResult struct {
 
 // JSONScoreboard represents a JSON encoded scoreboard.
 type JSONScoreboard struct {
-	ContestID              int              `json:"contest_id"`
-	ContestType            ContestType      `json:"contest_type"`
-	Problems               []JSONProblem    `json:"problems"`
-	Users                  []JSONUserResult `json:"users"`
-	ProblemBestSubmissions map[int]int64    `json:"problem_best_submissions"`
+	ContestID           int              `json:"contest_id"`
+	ContestType         ContestType      `json:"contest_type"`
+	Problems            []JSONProblem    `json:"problems"`
+	Users               []JSONUserResult `json:"users"`
+	ProblemFirstSolvers map[int]int64    `json:"problem_first_solvers"`
 }
 
 // JSONUserResult represents a JSON encoded user in the scoreboard.
@@ -108,18 +108,18 @@ func jsonProblem(p *Problem) JSONProblem {
 
 // Scoreboard is the struct used to render scoreboard
 type Scoreboard struct {
-	Contest                *Contest
-	Problems               []*Problem
-	UserResults            []*UserResult
-	ProblemBestSubmissions map[int]int64
+	Contest             *Contest
+	Problems            []*Problem
+	UserResults         []*UserResult
+	ProblemFirstSolvers map[int]int64
 }
 
 // JSON returns the JSON representation of the scoreboard.
 func (s *Scoreboard) JSON() JSONScoreboard {
 	sb := JSONScoreboard{
-		ContestID:              s.Contest.ID,
-		ContestType:            s.Contest.ContestType,
-		ProblemBestSubmissions: s.ProblemBestSubmissions,
+		ContestID:           s.Contest.ID,
+		ContestType:         s.Contest.ContestType,
+		ProblemFirstSolvers: s.ProblemFirstSolvers,
 	}
 	for _, p := range s.Problems {
 		sb.Problems = append(sb.Problems, jsonProblem(p))
@@ -152,17 +152,6 @@ func compareUserRanking(userResult []*UserResult, contestType ContestType, i, j 
 			return a.TotalPenalty < b.TotalPenalty, false
 		}
 		return a.User.ID < b.User.ID, true
-	}
-}
-
-// compare two users performance in a problem
-func compareProblemResult(r1, r2 *ProblemResult) bool {
-	if r1.Score != r2.Score {
-		return r1.Score > r2.Score
-	} else if r1.Penalty != r2.Penalty {
-		return r1.Penalty < r2.Penalty
-	} else {
-		return r1.UserID < r2.UserID
 	}
 }
 
@@ -215,8 +204,7 @@ func GetScoreboard(db db.DBContext, contest *Contest, problems []*Problem) (*Sco
 	}
 
 	// get bestSubmission ID for each problem
-	problemBestSubmissions := make(map[int]int64)
-	problemBestResults := make(map[int]*ProblemResult)
+	problemFirstSolvers := make(map[int]int64)
 
 	for _, userProblemResult := range userProblemResults {
 		// not consider users with no submissions and hidden users
@@ -227,11 +215,18 @@ func GetScoreboard(db db.DBContext, contest *Contest, problems []*Problem) (*Sco
 		problemResults := userProblemResult.ProblemResults
 		for _, problemResult := range problemResults {
 			problemID := problemResult.ProblemID
-			bestResult, ok := problemBestResults[problemID]
+			// skip the problemResult with verdict != Solved
+			if !problemResult.Solved {
+				continue
+			}
+			// skip if there is no submission
+			if !problemResult.BestSubmissionID.Valid {
+				continue
+			}
+			submissionID, ok := problemFirstSolvers[problemID]
 
-			if !ok || compareProblemResult(problemResult, bestResult) {
-				problemBestResults[problemID] = problemResult
-				problemBestSubmissions[problemID] = problemResult.BestSubmissionID.Int64
+			if !ok || submissionID > problemResult.BestSubmissionID.Int64 {
+				problemFirstSolvers[problemID] = problemResult.BestSubmissionID.Int64
 			}
 		}
 	}
@@ -253,10 +248,10 @@ func GetScoreboard(db db.DBContext, contest *Contest, problems []*Problem) (*Sco
 	}
 
 	return &Scoreboard{
-		Contest:                contest,
-		Problems:               problems,
-		UserResults:            userResults,
-		ProblemBestSubmissions: problemBestSubmissions,
+		Contest:             contest,
+		Problems:            problems,
+		UserResults:         userResults,
+		ProblemFirstSolvers: problemFirstSolvers,
 	}, nil
 }
 

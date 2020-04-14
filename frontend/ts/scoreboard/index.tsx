@@ -16,7 +16,7 @@ interface Scoreboard {
     contest_type: "weighted" | "unweighted";
     problems: Problem[];
     users: User[];
-    problem_best_submissions: { [key: number]: number };
+    problem_first_solvers: { [key: number]: number };
 }
 
 interface Problem {
@@ -48,7 +48,7 @@ interface ProblemResult {
  * Formats the score into a friendlier string.
  */
 function fmtScore(s: number): string {
-    return `${Math.round(s * 100) / 100}`;
+    return `${Math.round(s * 10) / 10}`;
 }
 
 /**
@@ -160,12 +160,12 @@ const Row = ({
     contest_type,
     problems,
     user,
-    problem_best_submissions,
+    problem_first_solvers,
 }: {
     contest_type: Scoreboard["contest_type"];
     problems: Scoreboard["problems"];
     user: User;
-    problem_best_submissions: Scoreboard["problem_best_submissions"];
+    problem_first_solvers: Scoreboard["problem_first_solvers"];
 }) => {
     const totalScore =
         contest_type === "unweighted" ? user.solved_problems : user.total_score;
@@ -201,7 +201,7 @@ const Row = ({
                     key={p.id}
                     contest_type={contest_type}
                     result={user.problem_results[p.id]}
-                    best_submission={problem_best_submissions[p.id]}
+                    first_solver_submission={problem_first_solvers[p.id]}
                 ></Cell>
             ))}
         </div>
@@ -214,11 +214,11 @@ const Row = ({
 const Cell = ({
     contest_type,
     result,
-    best_submission,
+    first_solver_submission,
 }: {
     contest_type: Scoreboard["contest_type"];
     result: ProblemResult;
-    best_submission: number | undefined;
+    first_solver_submission: number | undefined;
 }) => {
     let score: string = "";
     let color_class: string = "";
@@ -231,7 +231,7 @@ const Cell = ({
                 result.failed_attempts > 0 ? result.failed_attempts : ""
             }`;
             color_class = "text-green-700";
-            if (result.best_submission === best_submission) {
+            if (result.best_submission === first_solver_submission) {
                 bg_class = " bg-green-200 hover:bg-green-300";
                 title = "first to solve";
             }
@@ -246,7 +246,7 @@ const Cell = ({
         if (result.solved) {
             title = `${result.failed_attempts + 1} attempts`;
             color_class = "text-green-700";
-            if (result.best_submission === best_submission) {
+            if (result.best_submission === first_solver_submission) {
                 bg_class = " bg-green-200 hover:bg-green-300";
                 title = "first to solve, " + title;
             }
