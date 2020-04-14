@@ -186,6 +186,9 @@ func parseComparatorOutput(s *SandboxOutput, result *models.TestResult, useCompa
 	} else {
 		// Cute message from diff
 		result.Verdict = strings.TrimSpace(string(s.Stdout))
+		if result.Verdict == "" {
+			result.Verdict = "Diff failed"
+		}
 		if !s.Success {
 			result.Score = 0.0
 		}

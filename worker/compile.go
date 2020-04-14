@@ -44,18 +44,26 @@ func Compile(c *CompileContext) (bool, error) {
 		return false, err
 	}
 	hasFile := false
+	hasBatch := false
 	for _, file := range files {
+		hasBatch = hasBatch || isBatchFile(file.Filename)
 		if file.Filename == batchFile {
 			hasFile = true
 			break
 		}
 	}
-	if !hasFile {
+	if !hasBatch {
 		// No batch file, compiling as a single file.
 		action, err = CompileSingle(c.Sub.Language)
 		if err != nil {
 			return false, err
 		}
+	} else if !hasFile {
+		// Batch compile mode enabled, but this language is not supported.
+		c.Sub.CompiledSource = nil
+		c.Sub.Verdict = VerdictCompileError
+		c.Sub.CompilerOutput = []byte("Custom Compilers are not enabled for this language.")
+		return false, c.Sub.Write(c.DB)
 	}
 
 	log.Printf("[WORKER] Compiling submission %v\n", c.Sub.ID)
@@ -84,7 +92,7 @@ func Compile(c *CompileContext) (bool, error) {
 		c.Sub.CompiledSource = output
 	} else {
 		c.Sub.CompiledSource = nil
-		c.Sub.Verdict = "Compile Error"
+		c.Sub.Verdict = VerdictCompileError
 	}
 	log.Printf("[WORKER] Compiling submission %v succeeded (result = %v).", c.Sub.ID, result)
 
@@ -126,10 +134,24 @@ func (c *CompileAction) Perform(cwd string) (succeeded bool, messages []byte) {
 		allOutputs.Write(output)
 		allOutputs.WriteString("\n")
 		if err != nil {
+			log.Println(err)
 			return false, allOutputs.Bytes()
 		}
 	}
 	return true, allOutputs.Bytes()
+}
+
+var batchFilenames = []string{
+	"compile_cc.sh", "compile_go.sh", "compile_java.sh", "compile_rs.sh", "compile_pas.sh", "compile_py2.sh", "compile_py3.sh",
+}
+
+func isBatchFile(filename string) bool {
+	for _, f := range batchFilenames {
+		if f == filename {
+			return true
+		}
+	}
+	return false
 }
 
 // CompileBatch returns a compile action, along with the required batch filename
@@ -164,7 +186,7 @@ func CompileBatch(l models.Language) (*CompileAction, string, error) {
 
 	return &CompileAction{
 		Source:  source,
-		Command: []*exec.Cmd{exec.Command("./" + batch)},
+		Command: []*exec.Cmd{exec.Command("sh", batch)},
 		Output:  "code",
 	}, batch, nil
 }
