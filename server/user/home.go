@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"strings"
 
-	"git.nkagami.me/natsukagami/kjudge/db"
-	"git.nkagami.me/natsukagami/kjudge/models"
-	"git.nkagami.me/natsukagami/kjudge/server/auth"
-	"git.nkagami.me/natsukagami/kjudge/server/httperr"
+	"github.com/natsukagami/kjudge/db"
+	"github.com/natsukagami/kjudge/models"
+	"github.com/natsukagami/kjudge/server/auth"
+	"github.com/natsukagami/kjudge/server/httperr"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )

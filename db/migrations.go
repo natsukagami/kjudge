@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"sort"
 
-	"git.nkagami.me/natsukagami/kjudge/static"
+	"github.com/natsukagami/kjudge/static"
 	"github.com/pkg/errors"
 )
 

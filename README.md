@@ -2,8 +2,8 @@
 
 [![Build Status](https://ci.nkagami.me/api/badges/natsukagami/kjudge/status.svg)](https://ci.nkagami.me/natsukagami/kjudge)
 [![Docker Image Version (latest semver)](https://img.shields.io/docker/v/natsukagami/kjudge?logo=Docker)](https://hub.docker.com/r/natsukagami/kjudge)
-[![godoc](https://godoc.org/git.nkagami.me/natsukagami/kjudge?status.svg)](https://godoc.org/git.nkagami.me/natsukagami/kjudge)
-[![License is AGPLv3](https://img.shields.io/badge/license-AGPLv3-blue)](https://git.nkagami.me/natsukagami/kjudge/src/branch/master/LICENSE)
+[![godoc](https://godoc.org/github.com/natsukagami/kjudge?status.svg)](https://godoc.org/github.com/natsukagami/kjudge)
+[![License is AGPLv3](https://img.shields.io/badge/license-AGPLv3-blue)](https://github.com/natsukagami/kjudge/src/branch/master/LICENSE)
 
 - [kjudge](#kjudge)
   - [Project Goals](#project-goals)
@@ -33,11 +33,11 @@ It contains:
 - Compilers for C++, Pascal, Java, Go, Rust, Python 2 and 3
 - The [`isolate`](https://github.com/ioi/isolate) sandbox
 
-Please checkout the [wiki](https://git.nkagami.me/natsukagami/kjudge/wiki/Docker-Installation) for more information on how to get it up and running.
+Please checkout the [wiki](https://github.com/natsukagami/kjudge/wiki/Docker-Installation) for more information on how to get it up and running.
 
 ### Need more details?
 
-Check out the [wiki](https://git.nkagami.me/natsukagami/kjudge/wiki)!
+Check out the [wiki](https://github.com/natsukagami/kjudge/wiki)!
 
 ## Runtime dependencies
 

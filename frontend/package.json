@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Templates and others for kjudge.",
     "main": "index.js",
-    "repository": "https://git.nkagami.me/natsukagami/kjudge",
+    "repository": "https://github.com/natsukagami/kjudge",
     "author": "Natsu Kagami",
     "license": "AGPL-3.0",
     "private": true,

@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"git.nkagami.me/natsukagami/kjudge/worker"
+	"github.com/natsukagami/kjudge/worker"
 	"github.com/pkg/errors"
 )
 

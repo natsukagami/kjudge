@@ -10,13 +10,13 @@ import (
 	"path/filepath"
 	"time"
 
-	"git.nkagami.me/natsukagami/kjudge/db"
-	"git.nkagami.me/natsukagami/kjudge/models"
-	"git.nkagami.me/natsukagami/kjudge/models/verify"
-	"git.nkagami.me/natsukagami/kjudge/server/admin"
-	"git.nkagami.me/natsukagami/kjudge/server/contests"
-	"git.nkagami.me/natsukagami/kjudge/server/template"
-	"git.nkagami.me/natsukagami/kjudge/server/user"
+	"github.com/natsukagami/kjudge/db"
+	"github.com/natsukagami/kjudge/models"
+	"github.com/natsukagami/kjudge/models/verify"
+	"github.com/natsukagami/kjudge/server/admin"
+	"github.com/natsukagami/kjudge/server/contests"
+	"github.com/natsukagami/kjudge/server/template"
+	"github.com/natsukagami/kjudge/server/user"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
@@ -111,7 +111,7 @@ func (s *Server) HandleError(err error, c echo.Context) {
 			errStr += fmt.Sprintf("Cannot log the error down to file: %v", err)
 		} else {
 			errStr += fmt.Sprintf(`The error has been logged down to file '%s'.
-Please check out the open issues and help opening a new one if possible on https://git.nkagami.me/natsukagami/kjudge/issues/new`, path)
+Please check out the open issues and help opening a new one if possible on https://github.com/natsukagami/kjudge/issues/new`, path)
 		}
 		log.Println(errStr)
 		if s.echo.Debug {

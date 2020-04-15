@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"git.nkagami.me/natsukagami/kjudge"
+	"github.com/natsukagami/kjudge"
 	"github.com/pkg/errors"
 )
 
@@ -26,7 +26,7 @@ var currentVersion version
 // NewVersionMessageGet checks if there is a new version of kjudge
 func NewVersionMessageGet() (string, error) {
 	if currentVersion.TagName == "" || time.Now().After(currentVersion.LastUpdate.Add(time.Hour)) {
-		response, err := http.Get("https://git.nkagami.me/api/v1/repos/natsukagami/kjudge/releases?page=1&per_page=1")
+		response, err := http.Get("https://github.com/api/v1/repos/natsukagami/kjudge/releases?page=1&per_page=1")
 		if err != nil {
 			return "", errors.WithStack(err)
 		}

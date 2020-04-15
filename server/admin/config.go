@@ -3,8 +3,8 @@ package admin
 import (
 	"net/http"
 
-	"git.nkagami.me/natsukagami/kjudge/models"
-	"git.nkagami.me/natsukagami/kjudge/server/httperr"
+	"github.com/natsukagami/kjudge/models"
+	"github.com/natsukagami/kjudge/server/httperr"
 	"github.com/labstack/echo/v4"
 )
 

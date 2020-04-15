@@ -3,8 +3,8 @@ package contests
 import (
 	"net/http"
 
-	"git.nkagami.me/natsukagami/kjudge/db"
-	"git.nkagami.me/natsukagami/kjudge/models"
+	"github.com/natsukagami/kjudge/db"
+	"github.com/natsukagami/kjudge/models"
 	"github.com/labstack/echo/v4"
 )
 

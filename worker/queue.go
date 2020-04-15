@@ -4,8 +4,8 @@ import (
 	"log"
 	"time"
 
-	"git.nkagami.me/natsukagami/kjudge/db"
-	"git.nkagami.me/natsukagami/kjudge/models"
+	"github.com/natsukagami/kjudge/db"
+	"github.com/natsukagami/kjudge/models"
 	"github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 )

@@ -6,7 +6,7 @@ import (
 	"math"
 	"time"
 
-	"git.nkagami.me/natsukagami/kjudge/models"
+	"github.com/natsukagami/kjudge/models"
 	"github.com/jmoiron/sqlx"
 )
 

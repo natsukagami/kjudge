@@ -3,7 +3,7 @@ package models
 import (
 	"crypto/rand"
 
-	"git.nkagami.me/natsukagami/kjudge/db"
+	"github.com/natsukagami/kjudge/db"
 	"github.com/pkg/errors"
 )
 

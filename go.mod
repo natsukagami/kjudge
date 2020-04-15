@@ -1,4 +1,4 @@
-module git.nkagami.me/natsukagami/kjudge
+module github.com/natsukagami/kjudge
 
 go 1.13
 

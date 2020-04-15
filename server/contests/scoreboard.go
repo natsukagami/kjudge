@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	"git.nkagami.me/natsukagami/kjudge/db"
-	"git.nkagami.me/natsukagami/kjudge/models"
-	"git.nkagami.me/natsukagami/kjudge/server/user"
+	"github.com/natsukagami/kjudge/db"
+	"github.com/natsukagami/kjudge/models"
+	"github.com/natsukagami/kjudge/server/user"
 	"github.com/labstack/echo/v4"
 )
 

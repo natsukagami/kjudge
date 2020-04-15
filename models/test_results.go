@@ -1,6 +1,6 @@
 package models
 
-import "git.nkagami.me/natsukagami/kjudge/models/verify"
+import "github.com/natsukagami/kjudge/models/verify"
 
 // Verify verifies that the TestResult is a legit one.
 func (r *TestResult) Verify() error {

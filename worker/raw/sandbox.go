@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	"git.nkagami.me/natsukagami/kjudge/worker"
+	"github.com/natsukagami/kjudge/worker"
 )
 
 // Sandbox implements worker.Sandbox.

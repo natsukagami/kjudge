@@ -8,7 +8,7 @@ import (
 	"io"
 	"log"
 
-	"git.nkagami.me/natsukagami/kjudge"
+	"github.com/natsukagami/kjudge"
 	"github.com/pkg/errors"
 )
 

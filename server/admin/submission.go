@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"git.nkagami.me/natsukagami/kjudge/db"
-	"git.nkagami.me/natsukagami/kjudge/models"
-	"git.nkagami.me/natsukagami/kjudge/server/httperr"
-	"git.nkagami.me/natsukagami/kjudge/worker"
+	"github.com/natsukagami/kjudge/db"
+	"github.com/natsukagami/kjudge/models"
+	"github.com/natsukagami/kjudge/server/httperr"
+	"github.com/natsukagami/kjudge/worker"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )

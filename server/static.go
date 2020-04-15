@@ -6,7 +6,7 @@ import (
 	stdPath "path"
 	"strings"
 
-	"git.nkagami.me/natsukagami/kjudge/static"
+	"github.com/natsukagami/kjudge/static"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )

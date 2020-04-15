@@ -1,6 +1,6 @@
 package template
 
-import "git.nkagami.me/natsukagami/kjudge/models"
+import "github.com/natsukagami/kjudge/models"
 
 // Me should implement a context with a logged in user.
 type Me interface {

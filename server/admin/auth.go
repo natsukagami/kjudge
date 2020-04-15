@@ -3,7 +3,7 @@ package admin
 import (
 	"net/http"
 
-	"git.nkagami.me/natsukagami/kjudge/server/auth"
+	"github.com/natsukagami/kjudge/server/auth"
 	"github.com/labstack/echo/v4"
 )
 

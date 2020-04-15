@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"git.nkagami.me/natsukagami/kjudge/db"
+	"github.com/natsukagami/kjudge/db"
 	"github.com/pkg/errors"
 )
 

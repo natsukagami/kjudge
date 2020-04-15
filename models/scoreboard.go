@@ -7,8 +7,8 @@ import (
 	"sort"
 	"time"
 
-	"git.nkagami.me/natsukagami/kjudge/db"
-	"git.nkagami.me/natsukagami/kjudge/server/httperr"
+	"github.com/natsukagami/kjudge/db"
+	"github.com/natsukagami/kjudge/server/httperr"
 	"github.com/pkg/errors"
 )
 

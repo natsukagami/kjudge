@@ -19,7 +19,7 @@ import (
 	"strings"
 	"time"
 
-	"git.nkagami.me/natsukagami/kjudge/models"
+	"github.com/natsukagami/kjudge/models"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
