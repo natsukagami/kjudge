@@ -47,6 +47,7 @@ jobs:
             test -z "$(goimports -l . | tee /dev/stderr)"
             # vet
             go vet ./...
+            golangci-lint run --build-tags production
             # setup db
             scripts/setup_db.sh
             # test
