@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/labstack/echo/v4"
 	"github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/server/httperr"
-	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
 

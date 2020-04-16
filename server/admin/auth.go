@@ -3,8 +3,8 @@ package admin
 import (
 	"net/http"
 
-	"github.com/natsukagami/kjudge/server/auth"
 	"github.com/labstack/echo/v4"
+	"github.com/natsukagami/kjudge/server/auth"
 )
 
 // LoginCtx is the context for rendering the login page.

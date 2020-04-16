@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/labstack/echo/v4"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
-	"github.com/labstack/echo/v4"
 )
 
 // HomeCtx is a context for rendering Home page.

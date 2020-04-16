@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/natsukagami/kjudge/db"
 	"github.com/jmoiron/sqlx"
+	"github.com/natsukagami/kjudge/db"
 	"github.com/pkg/errors"
 )
 

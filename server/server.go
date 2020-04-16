@@ -10,6 +10,10 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo-contrib/session"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/models/verify"
@@ -17,10 +21,6 @@ import (
 	"github.com/natsukagami/kjudge/server/contests"
 	"github.com/natsukagami/kjudge/server/template"
 	"github.com/natsukagami/kjudge/server/user"
-	"github.com/gorilla/sessions"
-	"github.com/labstack/echo-contrib/session"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
 )
 

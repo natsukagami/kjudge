@@ -3,9 +3,9 @@ package admin
 import (
 	"net/http"
 
+	"github.com/labstack/echo/v4"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
-	"github.com/labstack/echo/v4"
 )
 
 // ContestWithProblems is a contest with embedded problems.

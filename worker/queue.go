@@ -4,9 +4,9 @@ import (
 	"log"
 	"time"
 
+	"github.com/mattn/go-sqlite3"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
-	"github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 )
 

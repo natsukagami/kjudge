@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models/verify"
-	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
 
