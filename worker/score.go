@@ -6,8 +6,8 @@ import (
 	"math"
 	"time"
 
-	"github.com/natsukagami/kjudge/models"
 	"github.com/jmoiron/sqlx"
+	"github.com/natsukagami/kjudge/models"
 )
 
 const (

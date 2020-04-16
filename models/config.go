@@ -38,16 +38,16 @@ func GetConfig(db db.DBContext) (*Config, error) {
 
 // Write writes to the database.
 // It needs a root DB because we need a transaction.
-func (c *Config) Write(db *db.DB) error {
+func (c *Config) Write(database *db.DB) error {
 	if err := c.Verify(); err != nil {
 		return err
 	}
 
-	tx, err := db.Beginx()
+	tx, err := database.Beginx()
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer tx.Rollback()
+	defer db.Rollback(tx)
 
 	res, err := tx.Exec("UPDATE config SET session_key = ?, enable_registration = ?, enable_user_customization = ?", c.SessionKey, c.EnableRegistration, c.EnableUserCustomization)
 	if err != nil {

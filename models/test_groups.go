@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models/verify"
-	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
 
@@ -31,6 +31,7 @@ func (t TestScoringMode) verify() error {
 // Verify verifies TestGroup's content.
 func (r *TestGroup) Verify() error {
 	return verify.All(map[string]error{
+		"ScoringMode": r.ScoringMode.verify(),
 		"TimeLimit":   verify.NullInt(r.TimeLimit, verify.IntPositive),
 		"MemoryLimit": verify.NullInt(r.MemoryLimit, verify.IntPositive),
 		"Name":        verify.Names(r.Name),

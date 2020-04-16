@@ -3,9 +3,9 @@ package admin
 import (
 	"net/http"
 
+	"github.com/labstack/echo/v4"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
-	"github.com/labstack/echo/v4"
 )
 
 // ContestWithProblems is a contest with embedded problems.
@@ -83,6 +83,9 @@ func SubmissionsBy(db db.DBContext, u *models.User, c *models.Contest, p *models
 		if p != nil {
 			s.Problem = p
 			s.Submissions, err = models.GetProblemSubmissions(db, p.ID)
+			if err != nil {
+				return nil, err
+			}
 		} else if c != nil {
 			if err := s.fillContest(db, c); err != nil {
 				return nil, err
@@ -92,6 +95,9 @@ func SubmissionsBy(db db.DBContext, u *models.User, c *models.Contest, p *models
 				ps = append(ps, p.ID)
 			}
 			s.Submissions, err = models.GetProblemsSubmissions(db, ps...)
+			if err != nil {
+				return nil, err
+			}
 		} else {
 			return SubmissionsAll(db)
 		}

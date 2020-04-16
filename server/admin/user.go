@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/labstack/echo/v4"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/server/httperr"
-	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
 
@@ -81,7 +81,7 @@ func (g *Group) UserEdit(c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer tx.Rollback()
+	defer db.Rollback(tx)
 	ctx, err := getUser(tx, c)
 	if err != nil {
 		return err

@@ -1,0 +1,57 @@
+name: Build and Test
+on: [push]
+
+jobs:
+    build:
+        name: Build kjudge
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v2
+        - uses: actions/setup-node@v1
+          with:
+              node-version: '13.x'
+        - name: Get yarn cache directory path
+          id: yarn-cache-dir-path
+          run: echo "::set-output name=dir::$(yarn cache dir)"
+        - uses: actions/cache@v1
+          id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+          with:
+            path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+            restore-keys: |
+              ${{ runner.os }}-yarn-
+        - uses: actions/setup-go@v2-beta
+          with:
+              go-version: '^1.14'
+        - uses: actions/cache@v1
+          with:
+            path: ~/go/pkg/mod
+            key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+            restore-keys: |
+              ${{ runner.os }}-go-
+        - name: Install front-end and run test/fmt checks
+          run: |
+            cd frontend
+            yarn
+            yarn fmt -c
+            yarn test
+        - name: Install go tools
+          run: |
+            scripts/install_tools.sh
+        - name: Run generation
+          run: |
+            scripts/generate.sh
+        - name: Run tests on go code
+          run: |
+            # Check formatting
+            test -z "$(goimports -l . | tee /dev/stderr)"
+            # vet
+            go vet ./...
+            golangci-lint run --build-tags production
+            # setup db
+            scripts/setup_db.sh
+            # test
+            go test ./...
+        - name: Try building in production mode
+          run: |
+            scripts/production_build.sh

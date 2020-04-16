@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/labstack/echo/v4"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/server/httperr"
-	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
 
@@ -180,7 +180,7 @@ func (g *Group) ContestRejudgePost(c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer tx.Rollback()
+	defer db.Rollback(tx)
 	var problemIDs []int
 	for _, p := range ctx.Problems {
 		problemIDs = append(problemIDs, p.ID)

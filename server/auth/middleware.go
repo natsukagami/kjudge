@@ -7,10 +7,10 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/natsukagami/kjudge/db"
-	"github.com/natsukagami/kjudge/models"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"github.com/natsukagami/kjudge/db"
+	"github.com/natsukagami/kjudge/models"
 	"github.com/pkg/errors"
 )
 

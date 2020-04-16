@@ -2,9 +2,9 @@
 package admin
 
 import (
+	"github.com/labstack/echo/v4"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/server/auth"
-	"github.com/labstack/echo/v4"
 )
 
 // Group represents a router Group with handling functions.

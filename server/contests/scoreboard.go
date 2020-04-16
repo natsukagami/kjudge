@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/labstack/echo/v4"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/server/user"
-	"github.com/labstack/echo/v4"
 )
 
 // ScoreboardCtx is the context required to display the scoreboard page

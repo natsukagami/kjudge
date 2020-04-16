@@ -2,9 +2,9 @@
 package user
 
 import (
+	"github.com/labstack/echo/v4"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/server/auth"
-	"github.com/labstack/echo/v4"
 )
 
 // Group is the /user handling group.

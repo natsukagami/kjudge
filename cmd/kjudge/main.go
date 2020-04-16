@@ -6,13 +6,13 @@ import (
 	"os"
 	"os/signal"
 
-	_ "git.nkagami.me/natsukagami/kjudge"
-	"git.nkagami.me/natsukagami/kjudge/db"
-	_ "git.nkagami.me/natsukagami/kjudge/models"
-	"git.nkagami.me/natsukagami/kjudge/server"
-	"git.nkagami.me/natsukagami/kjudge/worker"
-	"git.nkagami.me/natsukagami/kjudge/worker/isolate"
-	"git.nkagami.me/natsukagami/kjudge/worker/raw"
+	_ "github.com/natsukagami/kjudge"
+	"github.com/natsukagami/kjudge/db"
+	_ "github.com/natsukagami/kjudge/models"
+	"github.com/natsukagami/kjudge/server"
+	"github.com/natsukagami/kjudge/worker"
+	"github.com/natsukagami/kjudge/worker/isolate"
+	"github.com/natsukagami/kjudge/worker/raw"
 )
 
 var (
@@ -46,13 +46,17 @@ func main() {
 		log.Fatalf("%+v", err)
 	}
 
-	stop := make(chan os.Signal)
+	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
 
 	log.Println("Starting kjudge. Press Ctrl+C to stop")
 
 	go queue.Start()
-	go server.Start(*port)
+	go func() {
+		if err := server.Start(*port); err != nil {
+			panic(err)
+		}
+	}()
 
 	<-stop
 

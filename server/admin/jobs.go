@@ -3,9 +3,9 @@ package admin
 import (
 	"net/http"
 
+	"github.com/labstack/echo/v4"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
-	"github.com/labstack/echo/v4"
 )
 
 // JobsCtx is a context for rendering jobs.
@@ -47,6 +47,9 @@ func getJobsCtx(db db.DBContext) (*JobsCtx, error) {
 		problemIDs = append(problemIDs, tg.ProblemID)
 	}
 	problems, err := models.CollectProblemsByID(db, problemIDs...)
+	if err != nil {
+		return nil, err
+	}
 	return &JobsCtx{
 		Jobs: jobs,
 

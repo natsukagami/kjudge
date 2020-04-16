@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/labstack/echo/v4"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/server/auth"
 	"github.com/natsukagami/kjudge/server/user"
-	"github.com/labstack/echo/v4"
 )
 
 // ContestsCtx is a context for rendering a list of all contests

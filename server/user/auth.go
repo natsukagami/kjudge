@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/labstack/echo/v4"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/server/auth"
-	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
 
@@ -137,7 +137,7 @@ func (g *Group) RegisterPost(c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer tx.Rollback()
+	defer db.Rollback(tx)
 
 	ctx, err := getLoginCtx(tx, c)
 	if err != nil {

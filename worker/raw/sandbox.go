@@ -82,7 +82,7 @@ func (s *Sandbox) RunFrom(cwd string, input *worker.SandboxInput) (*worker.Sandb
 			ErrorMessage: "Command timed out",
 		}, nil
 	case commandErr := <-done:
-		runningTime := time.Now().Sub(startTime)
+		runningTime := time.Since(startTime)
 		return &worker.SandboxOutput{
 			Success:      commandErr == nil,
 			MemoryUsed:   0,

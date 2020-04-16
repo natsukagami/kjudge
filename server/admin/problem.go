@@ -7,9 +7,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/labstack/echo/v4"
+	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/server/httperr"
-	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
 
@@ -231,7 +232,7 @@ func (g *Group) ProblemRejudgePost(c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer tx.Rollback()
+	defer db.Rollback(tx)
 	subs, err := models.GetProblemSubmissions(tx, p.Problem.ID)
 	if err != nil {
 		return err

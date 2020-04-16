@@ -10,10 +10,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/labstack/echo/v4"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/server/httperr"
-	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
 
@@ -112,7 +112,7 @@ func (g *Group) SubmitPost(c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer tx.Rollback()
+	defer db.Rollback(tx)
 
 	ctx, err := getProblemCtx(tx, c)
 	if err != nil {
