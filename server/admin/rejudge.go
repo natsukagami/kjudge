@@ -28,7 +28,7 @@ func (g *Group) RejudgePost(c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer tx.Rollback()
+	defer db.Rollback(tx)
 
 	if err := DoRejudge(tx, id, stage); err != nil {
 		return err

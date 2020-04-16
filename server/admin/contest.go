@@ -180,7 +180,7 @@ func (g *Group) ContestRejudgePost(c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer tx.Rollback()
+	defer db.Rollback(tx)
 	var problemIDs []int
 	for _, p := range ctx.Problems {
 		problemIDs = append(problemIDs, p.ID)

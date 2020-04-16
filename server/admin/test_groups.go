@@ -89,7 +89,7 @@ func (g *Group) TestGroupUploadSingle(c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer tx.Rollback()
+	defer db.Rollback(tx)
 	tg, err := getTestGroup(tx, c)
 	if err != nil {
 		return err
@@ -130,7 +130,7 @@ func (g *Group) TestGroupUploadMultiple(c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer tx.Rollback()
+	defer db.Rollback(tx)
 	tg, err := getTestGroup(tx, c)
 	if err != nil {
 		return err
@@ -217,7 +217,7 @@ func (g *Group) TestGroupRejudgePost(c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer tx.Rollback()
+	defer db.Rollback(tx)
 	subs, err := models.GetProblemSubmissions(tx, tg.ProblemID)
 	if err != nil {
 		return err

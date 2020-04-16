@@ -49,7 +49,7 @@ func MustAdmin(h echo.HandlerFunc) echo.HandlerFunc {
 			return nil
 		}
 		if !res {
-			RemoveAdmin(c)
+			_ = RemoveAdmin(c)
 			return c.Redirect(http.StatusTemporaryRedirect, "/admin/login?last="+url.QueryEscape(c.Request().URL.String()))
 		}
 		return h(c)

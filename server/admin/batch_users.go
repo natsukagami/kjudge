@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/models/verify"
 	"github.com/natsukagami/kjudge/server/auth"
@@ -109,7 +110,7 @@ func (g *Group) BatchUsersPost(c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer tx.Rollback()
+	defer db.Rollback(tx)
 
 	if err := models.BatchAddUsers(tx, c.FormValue("reset") == "true", users...); err != nil {
 		return err

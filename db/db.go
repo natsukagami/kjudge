@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/mattn/go-sqlite3"
@@ -48,4 +49,12 @@ func New(filename string) (*DB, error) {
 	}
 
 	return db, nil
+}
+
+// Rollback performs a rollback on the transaction.
+// Logs the error down on error.
+func Rollback(tx *sqlx.Tx) {
+	if err := tx.Rollback(); err != nil {
+		log.Println("[DB] Rollback error: ", err)
+	}
 }

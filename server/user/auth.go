@@ -137,7 +137,7 @@ func (g *Group) RegisterPost(c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer tx.Rollback()
+	defer db.Rollback(tx)
 
 	ctx, err := getLoginCtx(tx, c)
 	if err != nil {

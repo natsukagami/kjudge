@@ -46,13 +46,17 @@ func main() {
 		log.Fatalf("%+v", err)
 	}
 
-	stop := make(chan os.Signal)
+	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
 
 	log.Println("Starting kjudge. Press Ctrl+C to stop")
 
 	go queue.Start()
-	go server.Start(*port)
+	go func() {
+		if err := server.Start(*port); err != nil {
+			panic(err)
+		}
+	}()
 
 	<-stop
 

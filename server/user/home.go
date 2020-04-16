@@ -105,7 +105,7 @@ func (g *Group) ChangePassword(c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer tx.Rollback()
+	defer db.Rollback(tx)
 
 	ctx, err := getHomeCtx(tx, c)
 	if err != nil {
@@ -141,7 +141,7 @@ func (g *Group) CustomizePost(c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer tx.Rollback()
+	defer db.Rollback(tx)
 	ctx, err := getHomeCtx(tx, c)
 	if err != nil {
 		return err

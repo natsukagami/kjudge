@@ -47,6 +47,9 @@ func getJobsCtx(db db.DBContext) (*JobsCtx, error) {
 		problemIDs = append(problemIDs, tg.ProblemID)
 	}
 	problems, err := models.CollectProblemsByID(db, problemIDs...)
+	if err != nil {
+		return nil, err
+	}
 	return &JobsCtx{
 		Jobs: jobs,
 

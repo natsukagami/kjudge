@@ -112,7 +112,7 @@ func (g *Group) SubmitPost(c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer tx.Rollback()
+	defer db.Rollback(tx)
 
 	ctx, err := getProblemCtx(tx, c)
 	if err != nil {

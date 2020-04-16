@@ -37,7 +37,7 @@ func (q *Queue) Start() {
 		if err := q.HandleJob(job); err != nil {
 			log.Printf("[WORKER] Handling job failed: %+v\n", err)
 		}
-		job.Delete(q.DB)
+		_ = job.Delete(q.DB)
 	}
 }
 
@@ -48,7 +48,7 @@ func (q *Queue) HandleJob(job *models.Job) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer tx.Rollback()
+	defer db.Rollback(tx)
 
 	sub, err := models.GetSubmission(tx, job.SubmissionID)
 	if err != nil {

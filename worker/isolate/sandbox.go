@@ -51,13 +51,13 @@ func mustHaveIsolate() {
 // Panics if isolate is not installed.
 func New() *Sandbox {
 	mustHaveIsolate()
-	return &Sandbox{}
+	return &Sandbox{private: struct{}{}}
 }
 
 // Run implements Sandbox.Run.
 func (s *Sandbox) Run(input *worker.SandboxInput) (*worker.SandboxOutput, error) {
 	// Init the sandbox
-	defer exec.Command(isolateCommand, "--cleanup", "--cg").Run()
+	defer s.cleanup()
 	dirBytes, err := exec.Command(isolateCommand, "--init", "--cg").Output()
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -145,4 +145,8 @@ func buildCmd(dir, metaFile string, input *worker.SandboxInput) *exec.Cmd {
 	cmd.Stdin = bytes.NewBuffer(input.Input)
 
 	return cmd
+}
+
+func (s *Sandbox) cleanup() {
+	_ = exec.Command(isolateCommand, "--cleanup", "--cg").Run()
 }

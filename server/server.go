@@ -100,10 +100,10 @@ func (s *Server) HandleError(err error, c echo.Context) {
 
 	if e, ok := err.(*echo.HTTPError); ok {
 		// Just handle it gracefully
-		c.Render(e.Code, "error", errCtx{Code: e.Code, Message: fmt.Sprint(e.Message), StatusText: http.StatusText(e.Code)})
+		_ = c.Render(e.Code, "error", errCtx{Code: e.Code, Message: fmt.Sprint(e.Message), StatusText: http.StatusText(e.Code)})
 	} else {
 		// internal error: dump it.
-		c.Render(http.StatusInternalServerError, "error", errCtx{Code: http.StatusInternalServerError})
+		_ = c.Render(http.StatusInternalServerError, "error", errCtx{Code: http.StatusInternalServerError})
 
 		errStr := fmt.Sprintf("An unexpected error has occured: %v\n", err)
 		path := filepath.Join(os.TempDir(), fmt.Sprintf("kjudge-%v.txt", time.Now().Format(time.RFC3339)))

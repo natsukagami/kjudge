@@ -87,7 +87,7 @@ func sortKeys(k map[string]string) []string {
 	for key := range k {
 		v = append(v, key)
 	}
-	sort.Sort(sort.StringSlice(v))
+	sort.Strings(v)
 	return v
 }
 
@@ -334,8 +334,8 @@ func main() {
 	if _, err := toml.DecodeFile("models/models.toml", &tables); err != nil {
 		log.Fatal(err)
 	}
-	if err := exec.Command("rm", "-v", "models/*_generated.go").Run(); err != nil {
-		// log.Fatal(err)
+	if err := exec.Command("rm", "-fv", "models/*_generated.go").Run(); err != nil {
+		log.Fatal(err)
 	}
 	files := []string{"-w"} // This is actually goimports's parameters.
 	for name, fields := range tables {
