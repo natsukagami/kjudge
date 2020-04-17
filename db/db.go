@@ -54,7 +54,7 @@ func New(filename string) (*DB, error) {
 // Rollback performs a rollback on the transaction.
 // Logs the error down on error.
 func Rollback(tx *sqlx.Tx) {
-	if err := tx.Rollback(); err != nil {
-		log.Println("[DB] Rollback error: ", err)
+	if err := tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {
+		log.Printf("[DB] Rollback error: %+v", errors.WithStack(err))
 	}
 }
