@@ -29,6 +29,10 @@ func CustomCompile(source *models.File, files []*models.File) (*models.File, err
 	action.Source.Content = source.Content
 	action.Files = files
 
+	if err := action.Prepare(dir); err != nil {
+		return nil, err
+	}
+
 	result, message := action.Perform(dir)
 	if result {
 		output, err := ioutil.ReadFile(filepath.Join(dir, action.Output))
