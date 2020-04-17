@@ -26,20 +26,17 @@ var currentVersion version
 // NewVersionMessageGet checks if there is a new version of kjudge
 func NewVersionMessageGet() (string, error) {
 	if currentVersion.TagName == "" || time.Now().After(currentVersion.LastUpdate.Add(time.Hour)) {
-		response, err := http.Get("https://github.com/api/v1/repos/natsukagami/kjudge/releases?page=1&per_page=1")
+		response, err := http.Get("https://api.github.com/repos/natsukagami/kjudge/releases/latest")
 		if err != nil {
 			return "", errors.WithStack(err)
 		}
 		defer response.Body.Close()
-		var x []jsonRelease
+		var x jsonRelease
 		decode := json.NewDecoder(response.Body)
 		if err := decode.Decode(&x); err != nil {
 			return "", errors.WithStack(err)
 		}
-		if len(x) == 0 {
-			return "", errors.New("Found no relase")
-		}
-		currentVersion.TagName = x[0].TagName[1:]
+		currentVersion.TagName = x.TagName[1:]
 		currentVersion.LastUpdate = time.Now()
 	}
 	if kjudge.Version != currentVersion.TagName {
