@@ -62,6 +62,7 @@ func New(db *db.DB, unauthed *echo.Group) (*Group, error) {
 	// File
 	g.GET("/files/:id", grp.FileGet)
 	g.POST("/files/:id/delete", grp.FileDelete)
+	g.POST("/files/:id/compile", grp.FileCompile)
 	// Users
 	g.GET("/users", grp.UsersGet)
 	g.POST("/users", grp.UsersAdd)

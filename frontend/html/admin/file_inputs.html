@@ -17,6 +17,11 @@
                 <a title="Save file" class="text-btn hover:text-blue-600" href="{{$link}}">
                     [s]
                 </a>
+                {{ if .Compilable }}
+                <form class="inline" method="POST" action="{{$link}}/compile">
+                    <input type="submit" class="hover:text-green-600 text-btn" value="[x]" title="Compile file">
+                </form>
+                {{ end }}
                 <form class="inline require-confirm" method="POST" action="{{$link}}/delete">
                     <input type="submit" class="hover:text-red-600 text-btn" value="[d]" title="Delete file">
                 </form>

@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/natsukagami/kjudge/db"
@@ -33,6 +34,12 @@ func (f *File) Verify() error {
 		"Filename": verify.Names(f.Filename),
 		"Content":  verify.NotNull(f.Content),
 	})
+}
+
+// Compilable returns whether a file can be compiled.
+func (f *File) Compilable() bool {
+	_, err := LanguageByExt(filepath.Ext(f.Filename))
+	return err == nil
 }
 
 // WriteFiles writes the given files as brand new, overwritting the old ones.
