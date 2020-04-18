@@ -8,6 +8,9 @@ import (
 
 // Verify verifies Announcement's content.
 func (a *Announcement) Verify() error {
+	if len(a.Content) > 2048 {
+		return verify.Errorf("Content must be at most 2048 characters")
+	}
 	return verify.All(map[string]error{
 		"content": verify.NotNull(a.Content),
 	})

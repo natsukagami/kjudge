@@ -11,6 +11,12 @@ func (c *Clarification) Verify() error {
 	if c.Response != nil && len(c.Response) == 0 {
 		return verify.Errorf("field Response: cannot be empty")
 	}
+	if len(c.Content) > 2048 {
+		return verify.Errorf("Content must be at most 2048 characters")
+	}
+	if len(c.Response) > 2048 {
+		return verify.Errorf("Response must be at most 2048 characters")
+	}
 	return verify.All(map[string]error{
 		"content": verify.NotNull(c.Content),
 	})
