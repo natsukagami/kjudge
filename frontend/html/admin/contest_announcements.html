@@ -1,0 +1,79 @@
+{{ define "admin-title" }}Announcements - {{.Contest.Name}}{{ end }}
+
+{{ define "admin-nav" }}
+<nav>
+    <a href="#new">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-2 pl-4">New Announcement</div>
+    </a>
+    <a href="#list">
+        <div class="bg-gray-200 rounded-sm hover:bg-gray-400 m-2 py-1 ml-4 pl-4">Past Announcements</div>
+    </a>
+</nav>
+{{ end }}
+
+{{ define "admin-content" }}
+{{ $contest_link := printf "/admin/contests/%d" .Contest.ID }}
+<div class="py-4 mx-auto">
+    <a class="text-3xl text-gray-600 hover:text-blue-600 cursor-pointer" href="{{$contest_link}}">
+        {{.Contest.Name}}
+    </a>
+    <span>>></span>
+    <span class="text-4xl">Announcements</span>
+</div>
+
+<div class="subheader" id="new">New Announcement</div>
+{{ template "form-error" .Error }}
+<form method="POST" action="{{$contest_link}}/announcements" class="form-block">
+    <label for="problem" class="text-sm block">For problem</label>
+    <select class="form-input" id="problem" name="problem">
+        {{ if eq .Form.Problem 0 }}
+        <option selected value="0">General Annonuncement</option>
+        {{ else }}
+        <option value="0">General Annonuncement</option>
+        {{ end }}
+        {{ range .Problems }}
+        {{ if eq $.Form.Problem .ID }}
+        <option selected value="{{.ID}}">{{.Name}}. {{.DisplayName}}</option>
+        {{ else }}
+        <option value="{{.ID}}">{{.Name}}. {{.DisplayName}}</option>
+        {{ end }}
+        {{ end }}
+    </select>
+
+    <label for="content" class="text-sm block">Content</label>
+    <textarea id="content" class="form-input text-lg overflow-y-auto whitespace-pre-wrap leading-relaxed h-40"
+        name="content" maxlength="2048" required>{{.Form.Content}}</textarea>
+
+    <div class="mt-2">
+        <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
+        <input required type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
+    </div>
+</form>
+
+<div class="subheader" id="list">Past Announcements</div>
+<div class="p-2">
+    {{ range .Announcements }}
+    <div class="p-2 border rounded-sm bg-gray-200 hover:bg-blue-200 my-2">
+        <div class="flex flex-row justify-between">
+            <div class="text-lg">
+                {{ if .ProblemID.Valid }}
+                {{ with (index $.Problems .ProblemID.Int64) }}
+                Problem
+                <span class="font-semibold">{{.Name}}. {{.DisplayName}}</span>
+                {{ end }}
+                {{ else }}
+                <span class="font-semibold">General Announcement</span>
+                {{ end }}
+            </div>
+            <div class="text-sm italic display-time" data-time="{{.CreatedAt | time}}"></div>
+        </div>
+        <div class="mt-2 overflow-y-auto whitespace-normal">
+            {{ printf "%s" .Content }}
+        </div>
+    </div>
+    {{ else }}
+    <div class="text-center">No announcements</div>
+    {{ end }}
+</div>
+
+{{ end }}

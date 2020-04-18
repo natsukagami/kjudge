@@ -77,6 +77,8 @@
             <td class="py-2 text-center display-time" data-time="{{.StartTime | time}}">{{.StartTime}}</td>
             <td class="py-2 text-center display-time" data-time="{{.EndTime | time}}">{{.EndTime}}</td>
             <td class="py-2 text-center">
+                <a href="{{$link}}/announcements" title="Announcements of the contest"
+                    class="text-btn hover:text-green-600">[a]</a>
                 <a href="{{$link}}/submissions" title="See submissions for contest"
                     class="text-btn hover:text-green-600">[s]</a>
                 <a href="{{$link}}/scoreboard" title="View contest's scoreboard"
