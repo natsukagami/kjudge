@@ -40,6 +40,9 @@ func New(db *db.DB, unauthed *echo.Group) (*Group, error) {
 	g.POST("/contests/:id/delete", grp.ContestDelete)
 	g.POST("/contests/:id/add_problem", grp.ContestAddProblem)
 	g.POST("/contests/:id/rejudge", grp.ContestRejudgePost)
+	// Contest Announcements
+	g.GET("/contests/:id/announcements", grp.AnnouncementsGet)
+	g.POST("/contests/:id/announcements", grp.AnnouncementAddPost)
 	// Problem Management
 	g.GET("/problems/:id", grp.ProblemGet)
 	g.GET("/problems/:id/submissions", grp.ProblemSubmissionsGet)
