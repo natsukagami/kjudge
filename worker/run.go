@@ -113,6 +113,58 @@ func (r *RunContext) CompareInput(submissionOutput []byte) (input *SandboxInput,
 	}, true, nil
 }
 
+func RunSingleCommand(sandbox Sandbox, r *RunContext, source []byte) (output *SandboxOutput, err error) {
+	// First, use the sandbox to run the submission itself.
+	input, err := r.RunInput(source)
+	if err != nil {
+		return nil, err
+	}
+	output, err = sandbox.Run(input)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return output, nil
+}
+
+func RunMutipleCommands(sandbox Sandbox, r *RunContext, source []byte, stages []string) (output *SandboxOutput, err error) {
+	command, args, err := RunCommand(r.Sub.Language)
+	if err != nil {
+		return nil, err
+	}
+
+	input := r.Test.Input
+	for i, stage := range stages {
+		// somehow Go includes EOF when splitting a string file line by line
+		if stage == "" && i == len(stages)-1 {
+			continue
+		}
+		stageArgs := strings.Split(stage, " ")
+
+		sandboxInput := &SandboxInput{
+			Command:     command,
+			Args:        append(stageArgs, args...),
+			Files:       nil,
+			TimeLimit:   r.TimeLimit(),
+			MemoryLimit: r.MemoryLimit(),
+
+			CompiledSource: source,
+			Input:          input,
+		}
+
+		output, err = sandbox.Run(sandboxInput)
+		if err != nil {
+			return nil, err
+		}
+		// stop if the current run fails
+		if !output.Success {
+			break
+		}
+		// Next input in the chain will be the standard output of the previous command run
+		input = output.Stdout
+	}
+	return output, nil
+}
+
 // Run runs a RunContext.
 func Run(sandbox Sandbox, r *RunContext) error {
 	compiled, source := r.CompiledSource()
@@ -128,17 +180,26 @@ func Run(sandbox Sandbox, r *RunContext) error {
 
 	log.Printf("[WORKER] Running submission %v on [test `%v`, group `%v`]\n", r.Sub.ID, r.Test.Name, r.TestGroup.Name)
 
-	// First, use the sandbox to run the submission itself.
-	input, err := r.RunInput(source)
-	if err != nil {
+	var output *SandboxOutput
+	file, err := models.GetFileWithName(r.DB, r.Problem.ID, ".stages")
+	if errors.Is(err, sql.ErrNoRows) {
+		// Problem type is not Chained Type, run a single command
+		output, err = RunSingleCommand(sandbox, r, source)
+		if err != nil {
+			return err
+		}
+	} else if err != nil {
 		return err
+	} else {
+		// Problem Type is Chained Type, we need to run mutiple commands with arguments from .stages (file)
+		stages := strings.Split(string(file.Content), "\n")
+		output, err = RunMutipleCommands(sandbox, r, source, stages)
+		if err != nil {
+			return err
+		}
 	}
-	output, err := sandbox.Run(input)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	result := parseSandboxOutput(output, r)
 
+	result := parseSandboxOutput(output, r)
 	if !output.Success {
 		result.Verdict = "Runtime Error"
 		if output.ErrorMessage != "" {
