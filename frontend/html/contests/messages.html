@@ -6,8 +6,10 @@
 <div class="text-xl my-2 text-gray-800 timer" data-start="{{.Contest.StartTime | time}}"
     data-end="{{.Contest.EndTime | time}}"><span class="font-semibold"></span></div>
 
+{{ if isFuture .Contest.EndTime }}
 <a class="text-lg inline-block rounded p-2 bg-green-200 hover:bg-green-300" href="#send-clarification">Request a
     Clarification</a>
+{{ end }}
 
 <div class="subheader">Messages</div>
 <div class="p-2">
@@ -23,9 +25,11 @@
     {{ end }}
 </div>
 
+{{ if isFuture .Contest.EndTime }}
 <div class="subheader" id="send-clarification">Request a Clarification</div>
 {{ template "form-error" .FormError }}
 {{ template "send-clarification" . }}
+{{ end }}
 
 {{ end }}
 

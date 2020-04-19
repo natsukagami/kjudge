@@ -100,6 +100,9 @@ func (g *Group) SendClarificationPost(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	if ctx.Contest.EndTime.Before(time.Now()) {
+		return httperr.BadRequestf("Cannot send a clarification after the contest ends")
+	}
 	if err := c.Bind(&ctx.Form); err != nil {
 		return httperr.BindFail(err)
 	}
