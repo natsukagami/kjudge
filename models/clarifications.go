@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models/verify"
 	"github.com/pkg/errors"
@@ -20,6 +22,11 @@ func (c *Clarification) Verify() error {
 	return verify.All(map[string]error{
 		"content": verify.NotNull(c.Content),
 	})
+}
+
+// AdminLink returns the link to the Clarification in the Admin Panel.
+func (c *Clarification) AdminLink() string {
+	return fmt.Sprintf("/admin/clarifications/%d", c.ID)
 }
 
 // GetUnreadClarifications returns unread clarifications later than the given ID.
