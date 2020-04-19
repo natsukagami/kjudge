@@ -128,17 +128,63 @@ func Run(sandbox Sandbox, r *RunContext) error {
 
 	log.Printf("[WORKER] Running submission %v on [test `%v`, group `%v`]\n", r.Sub.ID, r.Test.Name, r.TestGroup.Name)
 
-	// First, use the sandbox to run the submission itself.
-	input, err := r.RunInput(source)
-	if err != nil {
-		return err
-	}
-	output, err := sandbox.Run(input)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	result := parseSandboxOutput(output, r)
+	var output *SandboxOutput
+	file, err := models.GetFileWithName(r.DB, r.Problem.ID, ".stages")
+	if errors.Is(err, sql.ErrNoRows) {
+		// Problem type is not Chained Type, run a single command
 
+		// First, use the sandbox to run the submission itself.
+		input, err := r.RunInput(source)
+		if err != nil {
+			return err
+		}
+		output, err = sandbox.Run(input)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+	} else if err != nil {
+		return err
+	} else {
+		// Problem Type is Chained Type, we need to run mutiple commands with arguments from .stages (file)
+		stages := strings.Split(string(file.Content), "\n")
+		command, args, err := RunCommand(r.Sub.Language)
+		if err != nil {
+			return err
+		}
+
+		input := r.Test.Input
+		for i, stage := range stages {
+			// somehow Go includes EOF when splitting a string file line by line
+			if stage == "" && i == len(stages)-1 {
+				continue
+			}
+			stageArgs := strings.Split(stage, " ")
+
+			sandboxInput := &SandboxInput{
+				Command:     command,
+				Args:        append(stageArgs, args...),
+				Files:       nil,
+				TimeLimit:   r.TimeLimit(),
+				MemoryLimit: r.MemoryLimit(),
+
+				CompiledSource: source,
+				Input:          input,
+			}
+
+			output, err = sandbox.Run(sandboxInput)
+			if err != nil {
+				return err
+			}
+			// stop if the current run fails
+			if !output.Success {
+				break
+			}
+			// Next input in the chain will be the standard output of the previous command run
+			input = output.Stdout
+		}
+	}
+
+	result := parseSandboxOutput(output, r)
 	if !output.Success {
 		result.Verdict = "Runtime Error"
 		if output.ErrorMessage != "" {
