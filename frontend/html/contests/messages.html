@@ -6,6 +6,10 @@
 <div class="text-xl my-2 text-gray-800 timer" data-start="{{.Contest.StartTime | time}}"
     data-end="{{.Contest.EndTime | time}}"><span class="font-semibold"></span></div>
 
+<a class="text-lg inline-block rounded p-2 bg-green-200 hover:bg-green-300" href="#send-clarification">Request a
+    Clarification</a>
+
+<div class="subheader">Messages</div>
 <div class="p-2">
     {{ range .Messages }}
     {{ with .Announcement }}
@@ -18,15 +22,51 @@
     <div class="text-center">No messages</div>
     {{ end }}
 </div>
+
+<div class="subheader" id="send-clarification">Request a Clarification</div>
+{{ template "form-error" .FormError }}
+{{ template "send-clarification" . }}
+
+{{ end }}
+
+{{ define "send-clarification" }}
+{{ $form_link := printf "/contests/%d/messages" .Contest.ID }}
+<form class="form-block" method="POST" action="{{$form_link}}">
+    <label for="problem" class="text-sm block">For problem</label>
+    <select class="form-input" id="problem" name="problem">
+        {{ if eq .Form.Problem 0 }}
+        <option selected value="0">General Question</option>
+        {{ else }}
+        <option value="0">General Question</option>
+        {{ end }}
+        {{ range .Problems }}
+        {{ if eq $.Form.Problem .ID }}
+        <option selected value="{{.ID}}">{{.Name}}. {{.DisplayName}}</option>
+        {{ else }}
+        <option value="{{.ID}}">{{.Name}}. {{.DisplayName}}</option>
+        {{ end }}
+        {{ end }}
+    </select>
+
+    <label for="content" class="text-sm block">Content</label>
+    <textarea id="content" class="form-input text-lg overflow-y-auto whitespace-pre-wrap leading-relaxed h-40"
+        name="content" maxlength="2048" required>{{.Form.Content}}</textarea>
+
+    <div class="mt-2">
+        <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
+        <input required type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
+    </div>
+</form>
 {{ end }}
 
 {{ define "clarification" }}
-<div class="p-2 bg-gray-200 rounded border hover:bg-blue-200 clarification" data-id="{{.ID}}">
+<div class="p-2 bg-gray-200 rounded border hover:bg-blue-200 clarification" data-id="{{.ID}}"
+    data-responded="{{.Responded}}">
     <div class="flex flex-row justify-between">
         <div>
             <div class="text-lg">
                 {{ if .ProblemID.Valid }}
-                {{ with (index $.Problems .ProblemID.Int64) }}
+                {{ with (index $.ProblemsMap .ProblemID.Int64) }}
                 {{ $problemLink := .AdminLink }}
                 re:
                 <a href="{{$problemLink}}" class="font-semibold hover:text-blue-600">
@@ -59,7 +99,7 @@
     <div class="flex flex-row justify-between">
         <div class="text-lg">
             {{ if .ProblemID.Valid }}
-            {{ with (index $.Problems .ProblemID.Int64) }}
+            {{ with (index $.ProblemsMap .ProblemID.Int64) }}
             Problem
             <span class="font-semibold">{{.Name}}. {{.DisplayName}}</span>
             {{ end }}

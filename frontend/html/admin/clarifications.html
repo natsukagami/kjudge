@@ -10,7 +10,7 @@
         <input id="show-unread" type="checkbox">
         <label for="show-unread">Show only unanswered clarifications.</label>
     </div>
-    <div class="p-2 bg-gray-200 rounded border hover:bg-blue-200 clarification" data-answered="{{ne .Response nil}}">
+    <div class="p-2 bg-gray-200 rounded border hover:bg-blue-200 clarification" data-answered="{{.Responded}}">
         <div class="flex flex-row justify-between">
             <div>
                 <div class="text-sm">
@@ -37,7 +37,7 @@
             <div class="text-right">
                 <div class="text-sm italic display-time" data-time="{{.UpdatedAt | time}}"></div>
                 <div>By:
-                    {{ $user_link := "/admin/users/%s" .UserID }}
+                    {{ $user_link := printf "/admin/users/%s" .UserID }}
                     <a href="{{$user_link}}" class="font-semibold hover:text-blue-600">{{.UserID}}</a>
                 </div>
             </div>
@@ -50,9 +50,9 @@
         </div>
         {{ else }}
         <form class="form-block" method="POST" action="{{.AdminLink}}">
-            <label for="response" class="text-sm block">Content</label>
-            <textarea class="form-input text-lg overflow-y-auto whitespace-pre-wrap leading-relaxed h-40"
-                name="response" maxlength="2048" required>{{.Form.Content}}</textarea>
+            <label for="response" class="text-sm block">Response</label>
+            <textarea class="form-input text-lg overflow-y-auto whitespace-pre-wrap leading-relaxed h-20"
+                name="response" maxlength="2048" required></textarea>
 
             <label for="premade" class="text-sm block">Template Answers</label>
             <select class="form-input premade">

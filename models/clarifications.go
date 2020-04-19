@@ -24,6 +24,9 @@ func (c *Clarification) Verify() error {
 	})
 }
 
+// Responded returns whether the Clarification has been responded.
+func (c *Clarification) Responded() bool { return c.Response != nil }
+
 // AdminLink returns the link to the Clarification in the Admin Panel.
 func (c *Clarification) AdminLink() string {
 	return fmt.Sprintf("/admin/clarifications/%d", c.ID)

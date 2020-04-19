@@ -57,6 +57,7 @@ func New(db *db.DB, g *echo.Group) (*Group, error) {
 	authed := g.Group("/", auth.MustAuth(db))
 	authed.GET(":id", grp.OverviewGet)
 	authed.GET(":id/messages", grp.MessagesGet)
+	authed.POST(":id/messages", grp.SendClarificationPost)
 	authed.GET(":id/problems/:problem", grp.ProblemGet)
 	authed.GET(":id/problems/:problem/files/:file", grp.FileGet)
 	authed.POST(":id/problems/:problem/submit", grp.SubmitPost)
