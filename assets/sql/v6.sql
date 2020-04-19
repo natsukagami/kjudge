@@ -16,7 +16,7 @@ CREATE INDEX announcements_by_contest ON announcements(contest_id ASC, id DESC);
 -- Clarifications table.
 CREATE TABLE clarifications (
     id INTEGER NOT NULL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    user_id VARCHAR NOT NULL,
     contest_id INTEGER NOT NULL,
     problem_id INTEGER, 
 

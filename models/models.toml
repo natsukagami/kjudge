@@ -101,7 +101,7 @@ _order_by = "id DESC"
 
 [clarifications]
 id = "int"
-user_id = "int"
+user_id = "string"
 contest_id = "int"
 problem_id = "sql.NullInt64"
 content = "[]byte"
