@@ -87,6 +87,7 @@ func New(db *db.DB, unauthed *echo.Group) (*Group, error) {
 	g.POST("/batch_users", grp.BatchUsersPost)
 	// Clarifications
 	g.GET("/clarifications", grp.ClarificationsGet)
+	g.POST("/clarifications/:id", grp.ClarificationReplyPost)
 
 	return grp, nil
 }

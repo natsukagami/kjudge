@@ -111,6 +111,7 @@ func parseRootTemplate() (*template.Template, error) {
 		"version":  version,
 		"loggedIn": loggedIn,
 		"json":     func(item interface{}) (string, error) { b, err := json.Marshal(item); return string(b), err },
+		"zip":      func(items ...interface{}) []interface{} { return items },
 	})
 	tRoot, err = tRoot.Parse(string(root))
 	if err != nil {

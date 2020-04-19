@@ -5,12 +5,12 @@
 <div class="py-4 mx-auto text-4xl">Clarifications</div>
 
 <div class="p-2">
-    {{ range .Clarifications }}
     <div class="my-2">
-        <input id="show-unread" type="checkbox">
-        <label for="show-unread">Show only unanswered clarifications.</label>
+        <input id="show-unanswered" type="checkbox">
+        <label for="show-unanswered">Show only unanswered clarifications.</label>
     </div>
-    <div class="p-2 bg-gray-200 rounded border hover:bg-blue-200 clarification" data-answered="{{.Responded}}">
+    {{ range .Clarifications }}
+    <div class="mt-2 p-2 bg-gray-200 rounded border hover:bg-blue-200 clarification" data-answered="{{.Responded}}">
         <div class="flex flex-row justify-between">
             <div>
                 <div class="text-sm">
@@ -42,11 +42,11 @@
                 </div>
             </div>
         </div>
-        <pre class="whitespace-pre-wrap my-2">{{- printf "%s" .Content -}}</pre>
+        <pre class="whitespace-pre-wrap m-2">{{- printf "%s" .Content -}}</pre>
         {{ if .Response }}
         <div>
             <div class="text-lg">Response:</div>
-            <pre class="whitespace-pre-wrap mt-1">{{- printf "%s" .Content -}}</pre>
+            <pre class="whitespace-pre-wrap mt-1 mx-2">{{- printf "%s" .Response -}}</pre>
         </div>
         {{ else }}
         <form class="form-block" method="POST" action="{{.AdminLink}}">
@@ -70,10 +70,11 @@
         </form>
         {{ end }}
     </div>
-
+    <div id="no-unanswered" class="hidden text-center text-lg">No unanswered Clarifications, great!</div>
     {{ else }}
     <div class="text-center text-lg">No Clarifications</div>
     {{ end }}
+    <script src="../../ts/admin_clarifications.ts"></script>
 </div>
 
 {{ end }}
