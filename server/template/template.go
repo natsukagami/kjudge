@@ -41,7 +41,7 @@ var templateList = map[string][]string{
 	"contests/home":            []string{"user_root"},
 	"contests/root":            []string{"user_root"},
 	"contests/overview":        []string{"contests/root"},
-	"contests/announcements":   {"contests/root"},
+	"contests/messages":        {"contests/root"},
 	"contests/problem":         []string{"contests/root"},
 	"contests/submission":      []string{"contests/root"},
 	"contests/scoreboard":      []string{"contests/root"},
