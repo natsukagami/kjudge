@@ -58,8 +58,9 @@
             <div class="text-lg">
                 {{ if .ProblemID.Valid }}
                 {{ with (index $.Problems .ProblemID.Int64) }}
+                {{ $problem_link := printf "/admin/problems/%d" .ID }}
                 Problem
-                <span class="font-semibold">{{.Name}}. {{.DisplayName}}</span>
+                <a href="{{$problem_link}}" class="font-semibold hover:text-blue-600">{{.Name}}. {{.DisplayName}}</a>
                 {{ end }}
                 {{ else }}
                 <span class="font-semibold">General Announcement</span>
@@ -67,9 +68,9 @@
             </div>
             <div class="text-sm italic display-time" data-time="{{.CreatedAt | time}}"></div>
         </div>
-        <div class="mt-2 overflow-y-auto whitespace-normal">
-            {{ printf "%s" .Content }}
-        </div>
+        <pre class="mt-2 overflow-y-auto whitespace-pre-wrap">
+            {{- printf "%s" .Content -}}
+        </pre>
     </div>
     {{ else }}
     <div class="text-center">No announcements</div>
