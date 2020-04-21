@@ -58,6 +58,9 @@ func (g *Group) ClarificationsGet(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	if c.QueryParam("unanswered") == "true" {
+		return c.JSON(http.StatusOK, ctx.getUnansweredClarificationsCount())
+	}
 	return ctx.Render(c)
 }
 
@@ -103,4 +106,14 @@ func (g *Group) ClarificationReplyPost(c echo.Context) error {
 	}
 
 	return c.Redirect(http.StatusSeeOther, "/admin/clarifications")
+}
+
+func (ctx *ClarificationsCtx) getUnansweredClarificationsCount() int {
+	count := 0
+	for _, c := range ctx.Clarifications {
+		if !c.Responded() {
+			count++
+		}
+	}
+	return count
 }
