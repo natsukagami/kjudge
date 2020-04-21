@@ -10,6 +10,7 @@ const notificationSound = new Audio(require("../sounds/notification.ogg"));
 
 // Stores the last announcement and clarification read.
 interface Store {
+    contestId: number;
     lastAnnouncement: number;
     lastClarification: number;
 }
@@ -22,8 +23,10 @@ window.announcements = (() => {
     const set = (x: Store) =>
         localStorage.setItem(announcementKey, JSON.stringify(x));
     // Set a default value
-    localStorage.getItem(announcementKey) === null
+    localStorage.getItem(announcementKey) === null ||
+    get().contestId !== window.contestId
         ? set({
+              contestId: window.contestId,
               lastAnnouncement: 0,
               lastClarification: 0,
           })
@@ -65,7 +68,7 @@ window.announcements = (() => {
 
     return {
         setLast: () => {
-            firstLoad.then(() => {
+            firstLoad.finally(() => {
                 const clars = [
                     ...document.getElementsByClassName("clarification"),
                 ]
@@ -78,8 +81,9 @@ window.announcements = (() => {
                     ...document.getElementsByClassName("announcement"),
                 ].map((item) => Number(item.getAttribute("data-id")));
                 set({
-                    lastAnnouncement: Math.max(...announcements),
-                    lastClarification: Math.max(...clars),
+                    contestId: window.contestId,
+                    lastAnnouncement: Math.max(...announcements, 0),
+                    lastClarification: Math.max(...clars, 0),
                 });
                 setAnnouncementCount(0);
             });
