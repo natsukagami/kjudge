@@ -21,7 +21,7 @@
 {{ $contest_link := printf "/admin/contests/%d" .Contest.ID }}
 <div id="overview" class="py-4 mx-auto text-4xl">{{.Name}}
     <span class="text-2xl">(
-        <a href="{{$contest_link}}/announcements" title="View contest's scoreboard"
+        <a href="{{$contest_link}}/announcements" title="View contest's announcements"
             class="hover:text-blue-600 cursor-pointer">Announcements</a> |
         <a href="{{$contest_link}}/scoreboard" title="View contest's scoreboard"
             class="hover:text-blue-600 cursor-pointer">Scoreboard</a> |
