@@ -20,7 +20,7 @@
                     <a href="{{$contestLink}}" class="font-semibold hover:text-blue-600">{{.Name}}</a>
                     {{ end }}
                 </div>
-                <div class="text-lg">
+                <div class="text-2xl">
                     {{ if .ProblemID.Valid }}
                     {{ with (index $.Problems .ProblemID.Int64) }}
                     {{ $problemLink := .AdminLink }}

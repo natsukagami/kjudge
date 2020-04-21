@@ -55,7 +55,7 @@
     {{ range .Announcements }}
     <div class="p-2 border rounded-sm bg-gray-200 hover:bg-blue-200 my-2">
         <div class="flex flex-row justify-between">
-            <div class="text-lg">
+            <div class="text-2xl">
                 {{ if .ProblemID.Valid }}
                 {{ with (index $.Problems .ProblemID.Int64) }}
                 {{ $problem_link := printf "/admin/problems/%d" .ID }}
