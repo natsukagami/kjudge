@@ -34,8 +34,7 @@
         )[0] as HTMLTextAreaElement;
         const select = elem as HTMLSelectElement;
         select.addEventListener("change", () => {
-            textarea.innerHTML =
-                select.selectedOptions[0].value || textarea.innerHTML;
+            textarea.value = select.selectedOptions[0].value || textarea.value;
         });
     }
 })();

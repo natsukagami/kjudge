@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
+	"sort"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -46,6 +47,14 @@ type Message struct {
 	*models.Clarification
 }
 
+// UpdatedAt returns the last updated time of the Message.
+func (m Message) UpdatedAt() time.Time {
+	if m.Announcement != nil {
+		return m.Announcement.CreatedAt
+	}
+	return m.Clarification.UpdatedAt
+}
+
 func (a *MessagesCtx) Render(c echo.Context) error {
 	status := http.StatusOK
 	if a.FormError != nil {
@@ -78,6 +87,7 @@ func getMessagesCtx(db db.DBContext, c echo.Context) (*MessagesCtx, error) {
 	for _, a := range clars {
 		messages = append(messages, Message{Clarification: a})
 	}
+	sort.Slice(messages, func(i, j int) bool { return messages[i].UpdatedAt().After(messages[j].UpdatedAt()) })
 	return &MessagesCtx{
 		ContestCtx:  contest,
 		ProblemsMap: problems,
@@ -122,4 +132,29 @@ func (g *Group) SendClarificationPost(c echo.Context) error {
 		return ctx.Render(c)
 	}
 	return c.Redirect(http.StatusSeeOther, ctx.Contest.Link()+"/messages")
+}
+
+// MessagesUnreadGet returns the number of unread messages.
+// Implements GET /contests/:id/messages/unread
+func (g *Group) MessagesUnreadGet(c echo.Context) error {
+	ctx, err := getContestCtx(g.db, c)
+	if err != nil {
+		return err
+	}
+	var last struct {
+		LastAnnouncement  int `query:"last_announcement"`
+		LastClarification int `query:"last_clarification"`
+	}
+	if err := c.Bind(&last); err != nil {
+		return httperr.BindFail(err)
+	}
+	anns, err := models.GetUnreadAnnouncements(g.db, ctx.Contest.ID, last.LastAnnouncement)
+	if err != nil {
+		return err
+	}
+	clars, err := models.GetUnreadClarifications(g.db, ctx.Contest.ID, ctx.Me.ID, last.LastClarification)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, len(anns)+len(clars))
 }

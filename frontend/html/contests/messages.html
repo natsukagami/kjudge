@@ -33,7 +33,7 @@
 
 <script>
     window.announcements.markUnread();
-    window.announcements.setLast("{{(index .Announcements 0).ID}}");
+    window.announcements.setLast();
 </script>
 
 {{ end }}
@@ -70,8 +70,8 @@
 
 {{ define "clarification" }}
 {{ with (index . 0) }}
-<div class="mt-2 p-2 bg-gray-200 rounded border hover:bg-blue-200 clarification" data-id="{{.ID}}"
-    data-responded="{{.Responded}}">
+<div class="mt-2 p-2 {{if .Responded}}bg-gray-200{{else}}bg-red-200{{end}} rounded border hover:bg-blue-200 clarification"
+    data-id="{{.ID}}" data-responded="{{.Responded}}">
     <div class="flex flex-row justify-between">
         <div>
             <div class="text-lg">
