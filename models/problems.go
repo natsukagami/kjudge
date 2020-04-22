@@ -63,6 +63,16 @@ func (r *Problem) Verify() error {
 	})
 }
 
+// AdminLink is the link to the problem in the admin panel.
+func (r *Problem) AdminLink() string {
+	return fmt.Sprintf("/admin/problems/%d", r.ID)
+}
+
+// Link is the link to the problem.
+func (r *Problem) Link() string {
+	return fmt.Sprintf("/contests/%d/problems/%s", r.ContestID, r.Name)
+}
+
 // ProblemWithTestGroups is a problem with attached test groups,
 // that will provide score-related statistics.
 type ProblemWithTestGroups struct {

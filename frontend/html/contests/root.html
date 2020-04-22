@@ -15,6 +15,13 @@
         <a href="{{$contest_link}}">
             <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 pl-4">Overview</div>
         </a>
+        <a href="{{$contest_link}}/messages">
+            <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 px-4 flex flex-row justify-between">
+                <div>Messages</div>
+                <div class="rounded-full bg-red-600 text-white font-bold px-2 hidden" id="messages-counter"></div>
+            </div>
+        </a>
+        <script src="../../ts/announcements.ts"></script>
         <a href="{{$contest_link}}/scoreboard">
             <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 pl-4">Scoreboard</div>
         </a>

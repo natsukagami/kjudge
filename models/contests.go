@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models/verify"
 	"github.com/pkg/errors"
@@ -43,6 +45,16 @@ func (c *Contest) Verify() error {
 		return errors.New("contest type: invalid value")
 	}
 	return nil
+}
+
+// Link returns the HTTP link to the contest.
+func (c *Contest) Link() string {
+	return fmt.Sprintf("/contests/%d", c.ID)
+}
+
+// AdminLink returns the link to the contest in the Admin Panel.
+func (c *Contest) AdminLink() string {
+	return fmt.Sprintf("/admin/contests/%d", c.ID)
 }
 
 // GetContestsUnfinished gets a list of contests that are unfinished (upcoming or pending).

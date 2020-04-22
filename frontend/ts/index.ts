@@ -5,6 +5,13 @@ import "typeface-ibm-plex-mono";
 // Moment.js
 import hd from "humanize-duration";
 
+// Set localStorage version.
+(() => {
+    const versionKey = "kjudge-localstorage-version";
+    const version = "1";
+    localStorage.setItem(versionKey, version);
+})();
+
 // Set timezone
 (function () {
     setInterval(() => {

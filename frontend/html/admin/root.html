@@ -12,6 +12,12 @@
             <a href="/admin/contests">
                 <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 pl-4">Contests</div>
             </a>
+            <a href="/admin/clarifications">
+                <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 px-4 flex flex-row justify-between">
+                    <div>Clarifications</div>
+                    <div class="rounded-full bg-red-600 text-white font-bold px-2 hidden" id="unanswered-counter"></div>
+                </div>
+            </a>
             <a href="/admin/users">
                 <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 pl-4">Users</div>
             </a>
@@ -33,5 +39,6 @@
     <div class="flex-grow overflow-auto border-l px-4 mb-2">
         {{ block "admin-content" . }}{{ end }}
     </div>
+    <script src="../../ts/admin.ts"></script>
 </div>
 {{ end }}

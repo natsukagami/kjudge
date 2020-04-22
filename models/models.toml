@@ -90,3 +90,21 @@ problem_id = "int"
 filename = "string"
 content = "[]byte"
 public = "bool"
+
+[announcements]
+id = "int"
+contest_id = "int"
+problem_id = "sql.NullInt64"
+content = "[]byte"
+created_at = "time.Time"
+_order_by = "id DESC"
+
+[clarifications]
+id = "int"
+user_id = "string"
+contest_id = "int"
+problem_id = "sql.NullInt64"
+content = "[]byte"
+updated_at = "time.Time"
+response = "[]byte"
+_order_by = "user_id ASC, id DESC"

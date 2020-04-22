@@ -1,0 +1,80 @@
+{{ define "admin-title" }}Clarifications{{ end }}
+
+{{ define "admin-content" }}
+
+<div class="py-4 mx-auto text-4xl">Clarifications</div>
+
+<div class="p-2">
+    <div class="my-2">
+        <input id="show-unanswered" type="checkbox">
+        <label for="show-unanswered">Show only unanswered clarifications.</label>
+    </div>
+    {{ range .Clarifications }}
+    <div class="mt-2 p-2 bg-gray-200 rounded border hover:bg-blue-200 clarification" data-answered="{{.Responded}}">
+        <div class="flex flex-row justify-between">
+            <div>
+                <div class="text-sm">
+                    {{ with (index $.Contests .ContestID) }}
+                    {{ $contestLink := .AdminLink }}
+                    Contest:
+                    <a href="{{$contestLink}}" class="font-semibold hover:text-blue-600">{{.Name}}</a>
+                    {{ end }}
+                </div>
+                <div class="text-2xl">
+                    {{ if .ProblemID.Valid }}
+                    {{ with (index $.Problems .ProblemID.Int64) }}
+                    {{ $problemLink := .AdminLink }}
+                    re:
+                    <a href="{{$problemLink}}" class="font-semibold hover:text-blue-600">
+                        {{.Name}}. {{.DisplayName}}
+                    </a>
+                    {{ end }}
+                    {{ else }}
+                    General Question
+                    {{ end }}
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-sm italic display-time" data-time="{{.UpdatedAt | time}}"></div>
+                <div>By:
+                    {{ $user_link := printf "/admin/users/%s" .UserID }}
+                    <a href="{{$user_link}}" class="font-semibold hover:text-blue-600">{{.UserID}}</a>
+                </div>
+            </div>
+        </div>
+        <pre class="whitespace-pre-wrap m-2">{{- printf "%s" .Content -}}</pre>
+        {{ if .Response }}
+        <div>
+            <div class="text-lg">Response:</div>
+            <pre class="whitespace-pre-wrap mt-1 mx-2">{{- printf "%s" .Response -}}</pre>
+        </div>
+        {{ else }}
+        <form class="form-block" method="POST" action="{{.AdminLink}}">
+            <label for="response" class="text-sm block">Response</label>
+            <textarea class="form-input text-lg overflow-y-auto whitespace-pre-wrap leading-relaxed h-20"
+                name="response" maxlength="2048" required></textarea>
+
+            <label for="premade" class="text-sm block">Template Answers</label>
+            <select class="form-input premade">
+                <option value="" selected>None</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+                <option value="Read problem description">Read problem description</option>
+                <option value="No Answer">No Answer</option>
+            </select>
+
+            <div class="mt-2">
+                <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
+                <input required type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
+            </div>
+        </form>
+        {{ end }}
+    </div>
+    <div id="no-unanswered" class="hidden text-center text-lg">No unanswered Clarifications, great!</div>
+    {{ else }}
+    <div class="text-center text-lg">No Clarifications</div>
+    {{ end }}
+    <script src="../../ts/admin_clarifications.ts"></script>
+</div>
+
+{{ end }}

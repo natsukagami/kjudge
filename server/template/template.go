@@ -18,20 +18,22 @@ import (
 //
 // The root template "root" is always prepended at the beginning.
 var templateList = map[string][]string{
-	"admin/home":                []string{"admin/root", "admin/contest_inputs"},
-	"admin/contests":            []string{"admin/root", "admin/contest_inputs"},
-	"admin/contest":             []string{"admin/root", "admin/contest_inputs", "admin/problem_inputs"},
-	"admin/contest_submissions": []string{"admin/root", "admin/submission_inputs"},
-	"admin/problem":             []string{"admin/root", "admin/problem_inputs", "admin/test_inputs", "admin/test_group_inputs", "admin/file_inputs"},
-	"admin/test_group":          []string{"admin/root", "admin/test_inputs", "admin/test_group_inputs"},
-	"admin/problem_submissions": []string{"admin/root", "admin/submission_inputs"},
-	"admin/users":               []string{"admin/root", "admin/user_inputs"},
-	"admin/user":                []string{"admin/root", "admin/user_inputs", "admin/submission_inputs"},
-	"admin/submissions":         []string{"admin/root", "admin/submission_inputs"},
-	"admin/submission":          []string{"admin/root"},
-	"admin/jobs":                []string{"admin/root"},
-	"admin/contest_scoreboard":  []string{"admin/root"},
-	"admin/login":               []string{},
+	"admin/home":                  []string{"admin/root", "admin/contest_inputs"},
+	"admin/contests":              []string{"admin/root", "admin/contest_inputs"},
+	"admin/contest":               []string{"admin/root", "admin/contest_inputs", "admin/problem_inputs"},
+	"admin/contest_submissions":   []string{"admin/root", "admin/submission_inputs"},
+	"admin/contest_announcements": {"admin/root"},
+	"admin/problem":               []string{"admin/root", "admin/problem_inputs", "admin/test_inputs", "admin/test_group_inputs", "admin/file_inputs"},
+	"admin/test_group":            []string{"admin/root", "admin/test_inputs", "admin/test_group_inputs"},
+	"admin/problem_submissions":   []string{"admin/root", "admin/submission_inputs"},
+	"admin/users":                 []string{"admin/root", "admin/user_inputs"},
+	"admin/user":                  []string{"admin/root", "admin/user_inputs", "admin/submission_inputs"},
+	"admin/submissions":           []string{"admin/root", "admin/submission_inputs"},
+	"admin/submission":            []string{"admin/root"},
+	"admin/jobs":                  []string{"admin/root"},
+	"admin/contest_scoreboard":    []string{"admin/root"},
+	"admin/clarifications":        []string{"admin/root"},
+	"admin/login":                 []string{},
 
 	"user/login": []string{"user_root"},
 	"user/home":  []string{"user_root"},
@@ -39,6 +41,7 @@ var templateList = map[string][]string{
 	"contests/home":            []string{"user_root"},
 	"contests/root":            []string{"user_root"},
 	"contests/overview":        []string{"contests/root"},
+	"contests/messages":        {"contests/root"},
 	"contests/problem":         []string{"contests/root"},
 	"contests/submission":      []string{"contests/root"},
 	"contests/scoreboard":      []string{"contests/root"},
@@ -108,6 +111,7 @@ func parseRootTemplate() (*template.Template, error) {
 		"version":  version,
 		"loggedIn": loggedIn,
 		"json":     func(item interface{}) (string, error) { b, err := json.Marshal(item); return string(b), err },
+		"zip":      func(items ...interface{}) []interface{} { return items },
 	})
 	tRoot, err = tRoot.Parse(string(root))
 	if err != nil {

@@ -15,7 +15,7 @@ import (
 // It filters away files that don't end with ".css", ".js" or ".map"
 func StaticFiles(c echo.Context) error {
 	path := c.Request().URL.Path
-	for _, suffix := range []string{".woff2", ".woff", ".css", ".js", ".map", ".png"} {
+	for _, suffix := range []string{".woff2", ".woff", ".css", ".js", ".map", ".png", ".ogg"} {
 		if strings.HasSuffix(path, suffix) {
 			return serveFile(stdPath.Join("templates", path), c)
 		}
