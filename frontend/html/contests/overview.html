@@ -42,7 +42,7 @@
             </td>
             <td class="text-lg py-3 border-b text-center">
                 {{ with (index $scores .ID) }}
-                <span class="font-semibold">{{ .Score }}</span>
+                <span class="font-semibold">{{ .Score | printf "%.2f" }}</span>
                 {{ if .Penalty }}
                 <span>(+{{ .Penalty}})</span>
                 {{ end }}
