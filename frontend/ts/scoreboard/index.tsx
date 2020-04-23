@@ -48,7 +48,7 @@ interface ProblemResult {
  * Formats the score into a friendlier string.
  */
 function fmtScore(s: number): string {
-    return `${Math.round(s * 10) / 10}`;
+    return `${Math.round(s * 100) / 100}`;
 }
 
 /**
