@@ -28,7 +28,7 @@
     </a>
     <span>>></span>
     <span class="text-4xl">{{.Problem.Name}}. {{.Problem.DisplayName}}</span>
-    <span class="text-2xl">
+    <span class="text-2xl inline-block">
         (
         {{ $problem_link := printf "/admin/problems/%d" .Problem.ID }}
         <a href="{{$problem_link}}/submissions" class="hover:text-green-600"

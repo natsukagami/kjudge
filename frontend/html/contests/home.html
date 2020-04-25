@@ -16,7 +16,9 @@
         {{ $link := printf "/contests/%d" (.ID) }}
         <tr class="border-b">
             <td class="py-2 text-center">{{.ID}}</td>
-            <td class="py-2 pl-4">{{.Name}}</td>
+            <td class="py-2 pl-4">
+                <a href="{{$link}}" class="hover:text-blue-600">{{.Name}}</a>
+            </td>
             <td class="py-2 text-center display-time" data-time="{{.StartTime | time}}">{{.StartTime}}</td>
             <td class="py-2 text-center display-time" data-time="{{.EndTime | time}}">{{.EndTime}}</td>
             <td class="py-2 text-center">
