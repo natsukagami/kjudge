@@ -114,6 +114,8 @@ func (g *Group) SubmitPost(c echo.Context) error {
 	}
 	defer db.Rollback(tx)
 
+	now := time.Now()
+
 	ctx, err := getProblemCtx(tx, c)
 	if err != nil {
 		return err
@@ -121,6 +123,17 @@ func (g *Group) SubmitPost(c echo.Context) error {
 
 	if ctx.Contest.EndTime.Before(time.Now()) {
 		return httperr.BadRequestf("Contest has already ended")
+	}
+
+	// Check limits
+	if ctx.Problem.MaxSubmissionsCount > 0 && len(ctx.Submissions) >= ctx.Problem.MaxSubmissionsCount {
+		return httperr.Newf(http.StatusTooManyRequests, "You can only submit %d submissions for this problem", ctx.Problem.MaxSubmissionsCount)
+	}
+	if len(ctx.Submissions) > 0 {
+		lastSub := ctx.Submissions[0]
+		if now.Sub(lastSub.SubmittedAt) < time.Duration(ctx.Problem.SecondsBetweenSubmissions)*time.Second {
+			return httperr.Newf(http.StatusTooManyRequests, "Please wait %d seconds between submissions for this problem", ctx.Problem.SecondsBetweenSubmissions)
+		}
 	}
 
 	form, err := c.MultipartForm()
@@ -150,7 +163,7 @@ func (g *Group) SubmitPost(c echo.Context) error {
 		UserID:      ctx.Me.ID,
 		Source:      source,
 		Language:    lang,
-		SubmittedAt: time.Now(),
+		SubmittedAt: now,
 		Verdict:     "...",
 	}
 

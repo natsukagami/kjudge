@@ -84,12 +84,27 @@
 
 {{ define "problem-submit" }}
 {{ $submit_link := printf "/contests/%d/problems/%s/submit" .Problem.ContestID .Problem.Name }}
-<form class="form-block" method="POST" action="{{ $submit_link }}" enctype="multipart/form-data">
+{{ if and .Problem.MaxSubmissionsCount (ge (len .Submissions) .Problem.MaxSubmissionsCount) }}
+<div class="text-lg text-center">
+    You have reached the submission count limit (<span class="font-bold">{{.Problem.MaxSubmissionsCount}}</span>)
+    for this problem.
+</div>
+{{ else }}
+{{ if .Problem.MaxSubmissionsCount }}
+<div class="py-2 text-lg">You have made <span class="font-bold">{{len .Submissions}}</span>
+    out of <span class="font-bold">{{.Problem.MaxSubmissionsCount}}</span> allowed submissions.</div>
+{{ end }}
+<form class="form-block" id="submit-form" method="POST" action="{{ $submit_link }}" enctype="multipart/form-data">
+    {{ if (len .Submissions) }}
+    <div class="data hidden" data-last-submission-time="{{(index .Submissions 0).SubmittedAt | time}}"
+        data-seconds-between-submissions="{{.Problem.SecondsBetweenSubmissions}}"></div>
+    {{end}}
     <label for="file" class="block text-sm">File</label>
     <input class="form-input" type="file" id="file" name="file" required>
 
-    <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
+    <input required type="submit" class="form-btn submit bg-green-200 hover:bg-green-300" value="Submit">
 </form>
+{{ end }}
 {{ end }}
 
 {{ define "problem-submissions" }}

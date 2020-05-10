@@ -16,6 +16,8 @@ time_limit = "int"
 memory_limit = "int"
 scoring_mode = "ScoringMode"
 penalty_policy = "PenaltyPolicy"
+max_submissions_count = "int"
+seconds_between_submissions = "int"
 _order_by = "contest_id ASC, name ASC"
 
 [test_groups]

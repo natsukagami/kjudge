@@ -1,3 +1,5 @@
+import hd from "humanize-duration";
+
 // Tab handling
 (() => {
     let currentTab = new URL(document.URL).hash.substr(1);
@@ -47,4 +49,56 @@
     window.addEventListener("hashchange", (_) =>
         render(window.location.hash.substr(1)),
     );
+})();
+
+// Submit form seconds-between-submissions
+(() => {
+    const submitForm = document.getElementById(
+        "submit-form",
+    ) as HTMLFormElement;
+    const dataDiv = submitForm.getElementsByClassName("data")[0] as
+        | HTMLDivElement
+        | undefined;
+    // Only continue if we have a data-div
+    if (!dataDiv) return;
+
+    const lastSubmissionTime = new Date(
+        dataDiv.getAttribute("data-last-submission-time") ?? "",
+    );
+    const secondsBetweenSubmissions = Number(
+        dataDiv.getAttribute("data-seconds-between-submissions"),
+    );
+    const nextSubmitTime = new Date(
+        lastSubmissionTime.getTime() + secondsBetweenSubmissions * 1000,
+    );
+
+    // Set a submit handler
+    submitForm.addEventListener("submit", (e) => {
+        const now = new Date();
+        if (now.getTime() < nextSubmitTime.getTime()) e.preventDefault();
+    });
+
+    // Set a "disable submit handler"
+    const submit = submitForm.getElementsByClassName(
+        "submit",
+    )[0] as HTMLInputElement;
+    const checkSubmit = () => {
+        const now = new Date();
+        if (now.getTime() < nextSubmitTime.getTime()) {
+            submit.value = `Please wait ${hd(
+                nextSubmitTime.getTime() - now.getTime(),
+                { largest: 1, units: ["m", "s"], round: true },
+            )}`;
+            submit.classList.add("cursor-not-allowed");
+            submit.disabled = true;
+            submit.classList.remove("hover:bg-green-300");
+        } else {
+            submit.value = "Submit";
+            submit.classList.remove("cursor-not-allowed");
+            submit.disabled = false;
+            submit.classList.add("hover:bg-green-300");
+        }
+    };
+    setInterval(checkSubmit, 1000);
+    checkSubmit();
 })();

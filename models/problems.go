@@ -54,12 +54,14 @@ func (p PenaltyPolicy) verify() error {
 // Verify verifies a Problem's content.
 func (r *Problem) Verify() error {
 	return verify.All(map[string]error{
-		"DisplayName":   verify.Names(r.DisplayName),
-		"Name":          verify.Names(r.Name),
-		"ScoringMode":   r.ScoringMode.verify(),
-		"PenaltyPolicy": r.PenaltyPolicy.verify(),
-		"TimeLimit":     verify.IntPositive(r.TimeLimit),
-		"MemoryLimit":   verify.IntPositive(r.MemoryLimit),
+		"DisplayName":               verify.Names(r.DisplayName),
+		"Name":                      verify.Names(r.Name),
+		"ScoringMode":               r.ScoringMode.verify(),
+		"PenaltyPolicy":             r.PenaltyPolicy.verify(),
+		"TimeLimit":                 verify.IntPositive(r.TimeLimit),
+		"MemoryLimit":               verify.IntPositive(r.MemoryLimit),
+		"MaxSubmissionsCount":       verify.IntMin(0)(r.MaxSubmissionsCount),
+		"SecondsBetweenSubmissions": verify.IntMin(0)(r.SecondsBetweenSubmissions),
 	})
 }
 
