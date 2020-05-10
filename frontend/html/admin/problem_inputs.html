@@ -86,6 +86,15 @@
         <li>ICPC-style: Submission time + 20 * number of failed submissions</li>
     </ul>
 </div>
+<label for="max_submissions_count" class="text-sm block">Maximum Submissions Allowed</label>
+<input required class="form-input" name="max_submissions_count" type="number" min="0" placeholder="20"
+    value="{{ .MaxSubmissionsCount }}">
+<div class="p-1 text-sm text-gray-600">Put 0 for no limits. Note that this does not affect already existing submissions.
+</div>
+<label for="seconds_between_submissions" class="text-sm block">Time between submissions (seconds)</label>
+<input required class="form-input" name="seconds_between_submissions" type="number" min="0" placeholder="60"
+    value="{{ .SecondsBetweenSubmissions }}">
+<div class="p-1 text-sm text-gray-600">Put 0 for no limits.</div>
 <div class="mt-2">
     <input required type="submit" class="form-btn  bg-green-200 hover:bg-green-300" value="Submit">
     <input required type="reset" class="form-btn  bg-red-200 hover:bg-red-300" value="Reset">
@@ -102,6 +111,7 @@
             <th class="py-2 text-center">Memory Limit (KBs)</th>
             <th class="py-2 text-center">Scoring Mode</th>
             <th class="py-2 text-center">Penalty Policy</th>
+            <th class="py-2 text-center" title="Maximum Submissions Allowed / Time between submissions">Limits</th>
             <th class="py-2 text-center">Actions</th>
         </tr>
     </thead>
@@ -116,6 +126,16 @@
             <td class="text-center border-b py-2">{{.ScoringMode}}</td>
             <td class="text-center border-b py-2">{{.PenaltyPolicy}}</td>
             <td class="text-center border-b py-2">
+                <span title="Maximum Submissions Allowed">
+                    {{ if .MaxSubmissionsCount }}
+                    {{.MaxSubmissionsCount}}
+                    {{ else }}
+                    -
+                    {{ end }}
+                </span> /
+                <span title="Time between submissions, in seconds">{{.SecondsBetweenSubmissions}}</span>
+            </td>
+            <td class="text-center border-b py-2">
                 <a href="{{$link}}/submissions" title="See submissions for problem"
                     class="text-btn hover:text-green-600">[s]</a>
                 <a class="hover:text-blue-600 text-btn" href="{{$link}}" title="Edit problem">[e]</a>
@@ -127,7 +147,7 @@
         </tr>
         {{ else }}
         <tr>
-            <td colspan="7" class="py-2 border-b text-center">No problems</td>
+            <td colspan="8" class="py-2 border-b text-center">No problems</td>
         </tr>
         {{ end }}
     </tbody>

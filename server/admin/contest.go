@@ -15,12 +15,14 @@ import (
 
 // ProblemForm is a form for creating/updating a problem.
 type ProblemForm struct {
-	DisplayName   string               `form:"display_name"`
-	MemoryLimit   int                  `form:"memory_limit"`
-	Name          string               `form:"name"`
-	PenaltyPolicy models.PenaltyPolicy `form:"penalty_policy"`
-	ScoringMode   models.ScoringMode   `form:"scoring_mode"`
-	TimeLimit     int                  `form:"time_limit"`
+	DisplayName               string               `form:"display_name"`
+	MemoryLimit               int                  `form:"memory_limit"`
+	Name                      string               `form:"name"`
+	PenaltyPolicy             models.PenaltyPolicy `form:"penalty_policy"`
+	ScoringMode               models.ScoringMode   `form:"scoring_mode"`
+	TimeLimit                 int                  `form:"time_limit"`
+	MaxSubmissionsCount       int                  `form:"max_submissions_count"`
+	SecondsBetweenSubmissions int                  `form:"seconds_between_submissions"`
 }
 
 // Bind binds the form's content into the Problem.
@@ -31,6 +33,8 @@ func (f *ProblemForm) Bind(p *models.Problem) {
 	p.PenaltyPolicy = f.PenaltyPolicy
 	p.ScoringMode = f.ScoringMode
 	p.TimeLimit = f.TimeLimit
+	p.MaxSubmissionsCount = f.MaxSubmissionsCount
+	p.SecondsBetweenSubmissions = f.SecondsBetweenSubmissions
 }
 
 // ProblemForm produces an edit form from the problem.
@@ -42,6 +46,8 @@ func ProblemToForm(p *models.Problem) ProblemForm {
 	f.PenaltyPolicy = p.PenaltyPolicy
 	f.ScoringMode = p.ScoringMode
 	f.TimeLimit = p.TimeLimit
+	f.MaxSubmissionsCount = p.MaxSubmissionsCount
+	f.SecondsBetweenSubmissions = p.SecondsBetweenSubmissions
 	return f
 }
 
