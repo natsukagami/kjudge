@@ -126,7 +126,7 @@ func (g *Group) SubmitPost(c echo.Context) error {
 	}
 
 	// Check limits
-	if len(ctx.Submissions) >= ctx.Problem.MaxSubmissionsCount {
+	if ctx.Problem.MaxSubmissionsCount > 0 && len(ctx.Submissions) >= ctx.Problem.MaxSubmissionsCount {
 		return httperr.Newf(http.StatusTooManyRequests, "You can only submit %d submissions for this problem", ctx.Problem.MaxSubmissionsCount)
 	}
 	if len(ctx.Submissions) > 0 {
