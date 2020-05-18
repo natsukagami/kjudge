@@ -91,6 +91,8 @@ scripts/production_build.sh
 
 ### Development build
 
+**First time contributors**: Please check out the [Code of Conduct](./CODE_OF_CONDUCT.md) and [Contributor Guidelines](./CONTRIBUTING.md)!
+
 First, start the template generator and updater with
 
 ```bash
