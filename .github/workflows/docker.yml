@@ -1,0 +1,15 @@
+name: Docker
+on: push
+jobs:
+  build:
+    name: Publish to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+      - name: Publish
+        uses: whoan/docker-build-with-cache-action@v3.1.1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          image_name: natsukagami/kjudge
