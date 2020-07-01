@@ -1,7 +1,5 @@
 name: Publish to Docker Hub (stable)
-on:
-  release:
-    types: [created]
+on: release
 jobs:
   latest:
     name: Full
@@ -27,6 +25,13 @@ jobs:
         uses: actions/checkout@v1
       - name: Prepare version tags
         run: echo ${{ github.ref }} | echo ::set-env name=VERS_GCC::$(awk -F "." '{ print $1 "," $1 "." $2 "," $1 "." $2 "." $3 }' | sed -E 's/(,|$)/-gcc\1/g')
+      - name: Test
+        run: echo ${{ github.ref }} | echo ::set-env name=VERS_GCC::$(awk -F "." '{ print $1 "," $1 "." $2 "," $1 "." $2 "." $3 }' | sed -E 's/(,|$)/-gcc\1/g') > test.txt
+      - name: Publish test
+        uses: actions/upload-artifact@v1
+        with:
+          name: test
+          path: test.txt
       - name: Publish
         uses: docker/build-push-action@v1
         with:
