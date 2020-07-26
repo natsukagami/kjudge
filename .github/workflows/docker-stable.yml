@@ -1,5 +1,7 @@
 name: Publish to Docker Hub (stable)
-on: release
+on:
+  release:
+    types: [published]
 jobs:
   latest:
     name: Full
