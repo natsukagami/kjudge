@@ -1,7 +1,8 @@
 # kjudge
 
-![Build and Test](https://github.com/natsukagami/kjudge/workflows/Build%20and%20Test/badge.svg)
-[![Docker Image Version (latest semver)](https://img.shields.io/docker/v/natsukagami/kjudge?logo=Docker)](https://hub.docker.com/r/natsukagami/kjudge)
+[![Build and Test](https://github.com/natsukagami/kjudge/workflows/Build%20and%20Test/badge.svg)](https://github.com/natsukagami/kjudge/actions?query=workflow%3A%22Build+and+Test%22+branch%3Amaster)
+[![Docker Image Version (latest semver)](https://img.shields.io/docker/v/natsukagami/kjudge?logo=docker&sort=semver)](https://hub.docker.com/r/natsukagami/kjudge)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/natsukagami/kjudge?logo=github&sort=semver)](https://github.com/natsukagami/kjudge/releases)
 [![godoc](https://godoc.org/github.com/natsukagami/kjudge?status.svg)](https://godoc.org/github.com/natsukagami/kjudge)
 [![License is AGPLv3](https://img.shields.io/badge/license-AGPLv3-blue)](https://github.com/natsukagami/kjudge/src/branch/master/LICENSE)
 
@@ -19,7 +20,7 @@
 
 ## Project Goals
 
-- As lightweightedly deployable as possible (single binary, minimal dependencies)
+- As lightweightedly deployable as possible (single binary, minimal dependencies, Docker-compatible)
 - User friendly
 - Doesn't get in the way (take minimal resources)
 
