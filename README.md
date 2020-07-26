@@ -56,10 +56,12 @@ Required binaries:
 ## Command line switches
 
 ```sh
-> ./kjudge --help
+> ./kjudge -h
 Usage of ./kjudge:
   -file string
     	Path to the database file (default "kjudge.db")
+  -port int
+    	The port for the server to listen on (default 8088)
   -sandbox string
     	The sandbox implementation to be used (isolate, raw). If anything other than 'raw' is given, isolate is used. (default "isolate")
 ```
@@ -71,7 +73,7 @@ External Dependencies:
 ```yaml
 cc:      anything that compiles SQLite 3
 go:      >= 1.13
-node.js: >= 9
+node.js: >= 12
 yarn:    >= 1
 ```
 
@@ -126,6 +128,7 @@ assets:   # Static assets that gets compiled into the binary
     - sql # SQL migration schemas
 cmd:          # Main commands
     - kjudge  # Main compile target
+    - migrate # Database migration tool, useful for development
 db # Database interaction library
 docker    # Dockerfile and other docker-related packaging handlers
 scripts   # Scripts that helps automating builds
@@ -147,6 +150,8 @@ server:        # Root of server logic
     - user     # /user page handling and contexts
     - admin    # /admin (Admin Panel) page handling and contexts
     - contests # /contests (main contest UI) page handling and contexts
+test  # Sample data for testing purposes
+tests # Test-handling logic
 ```
 
 ## License
