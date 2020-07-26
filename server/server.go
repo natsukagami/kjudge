@@ -125,6 +125,11 @@ func (s *Server) Start(port int) error {
 	return s.echo.Start(fmt.Sprintf(":%d", port))
 }
 
+// StartWithSSL starts the server with a given private key and certificate file paths.
+func (s *Server) StartWithSSL(port int, privateKey, cert string) error {
+	return s.echo.StartTLS(fmt.Sprintf(":%d", port), cert, privateKey)
+}
+
 // StartWithTLS starts the server, also tries to get a cert from LetsEncrypt.
 func (s *Server) StartWithTLS(address string) error {
 	return s.echo.StartAutoTLS(address)

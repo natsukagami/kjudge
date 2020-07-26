@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 
 	_ "github.com/natsukagami/kjudge"
 	"github.com/natsukagami/kjudge/db"
@@ -18,7 +19,9 @@ import (
 var (
 	dbfile      = flag.String("file", "kjudge.db", "Path to the database file")
 	sandboxImpl = flag.String("sandbox", "isolate", "The sandbox implementation to be used (isolate, raw). If anything other than 'raw' is given, isolate is used.")
-	port        = flag.Int("port", 8088, "The port for the server to listen on")
+	port        = flag.Int("port", 8088, "The port for the server to listen on.")
+
+	httpsDir = flag.String("https", "", "Path to the directory where the HTTPS private key (kjudge.key) and certificate (kjudge.crt) is located. If omitted or empty, HTTPS is disabled.")
 )
 
 func main() {
@@ -53,7 +56,13 @@ func main() {
 
 	go queue.Start()
 	go func() {
-		if err := server.Start(*port); err != nil {
+		var err error
+		if *httpsDir == "" {
+			err = server.Start(*port)
+		} else {
+			err = server.StartWithSSL(*port, filepath.Join(*httpsDir, "kjudge.key"), filepath.Join(*httpsDir, "kjudge.crt"))
+		}
+		if err != nil {
 			panic(err)
 		}
 	}()
