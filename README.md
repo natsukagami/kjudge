@@ -1,7 +1,8 @@
 # kjudge
 
-![Build and Test](https://github.com/natsukagami/kjudge/workflows/Build%20and%20Test/badge.svg)
-[![Docker Image Version (latest semver)](https://img.shields.io/docker/v/natsukagami/kjudge?logo=Docker)](https://hub.docker.com/r/natsukagami/kjudge)
+[![Build and Test](https://github.com/natsukagami/kjudge/workflows/Build%20and%20Test/badge.svg)](https://github.com/natsukagami/kjudge/actions?query=workflow%3A%22Build+and+Test%22+branch%3Amaster)
+[![Docker Image Version (latest semver)](https://img.shields.io/docker/v/natsukagami/kjudge?logo=docker&sort=semver)](https://hub.docker.com/r/natsukagami/kjudge)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/natsukagami/kjudge?logo=github&sort=semver)](https://github.com/natsukagami/kjudge/releases)
 [![godoc](https://godoc.org/github.com/natsukagami/kjudge?status.svg)](https://godoc.org/github.com/natsukagami/kjudge)
 [![License is AGPLv3](https://img.shields.io/badge/license-AGPLv3-blue)](https://github.com/natsukagami/kjudge/src/branch/master/LICENSE)
 
@@ -19,7 +20,7 @@
 
 ## Project Goals
 
-- As lightweightedly deployable as possible (single binary, minimal dependencies)
+- As lightweightedly deployable as possible (single binary, minimal dependencies, Docker-compatible)
 - User friendly
 - Doesn't get in the way (take minimal resources)
 
@@ -55,10 +56,12 @@ Required binaries:
 ## Command line switches
 
 ```sh
-> ./kjudge --help
+> ./kjudge -h
 Usage of ./kjudge:
   -file string
     	Path to the database file (default "kjudge.db")
+  -port int
+    	The port for the server to listen on (default 8088)
   -sandbox string
     	The sandbox implementation to be used (isolate, raw). If anything other than 'raw' is given, isolate is used. (default "isolate")
 ```
@@ -70,7 +73,7 @@ External Dependencies:
 ```yaml
 cc:      anything that compiles SQLite 3
 go:      >= 1.13
-node.js: >= 9
+node.js: >= 12
 yarn:    >= 1
 ```
 
@@ -125,6 +128,7 @@ assets:   # Static assets that gets compiled into the binary
     - sql # SQL migration schemas
 cmd:          # Main commands
     - kjudge  # Main compile target
+    - migrate # Database migration tool, useful for development
 db # Database interaction library
 docker    # Dockerfile and other docker-related packaging handlers
 scripts   # Scripts that helps automating builds
@@ -146,6 +150,8 @@ server:        # Root of server logic
     - user     # /user page handling and contexts
     - admin    # /admin (Admin Panel) page handling and contexts
     - contests # /contests (main contest UI) page handling and contexts
+test  # Sample data for testing purposes
+tests # Test-handling logic
 ```
 
 ## License
