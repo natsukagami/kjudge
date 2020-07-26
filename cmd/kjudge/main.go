@@ -60,6 +60,13 @@ func main() {
 		if *httpsDir == "" {
 			err = server.Start(*port)
 		} else {
+			if rootCAPort, ok := os.LookupEnv("ROOT_CA_PORT"); ok {
+				go func() {
+					if err := server.ServeHTTPRootCA(":"+rootCAPort, filepath.Join(*httpsDir, "root.pem")); err != nil {
+						panic(err)
+					}
+				}()
+			}
 			err = server.StartWithSSL(*port, filepath.Join(*httpsDir, "kjudge.key"), filepath.Join(*httpsDir, "kjudge.crt"))
 		}
 		if err != nil {

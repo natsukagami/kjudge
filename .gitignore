@@ -7,6 +7,6 @@ kjudge.db
 kjudge.db.bak
 kjudge.db-*
 
-kjudge
-templates
-keys
+/kjudge
+/templates
+/keys
