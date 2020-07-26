@@ -36,28 +36,38 @@ echo "- Email address = $CERT_EMAIL"
 echo "- Alt hosts = $CERT_ALTNAMES"
 echo
 
-echo "Generating root private key to $ROOT_KEY"
-openssl genrsa -out $ROOT_KEY $RSA_BITS 
+generateKey() {
+    if [ -f "$ROOT_DIR/.certs_generated" ]; then
+        echo "Certificate has already been generated."
+        return 0
+    fi
+    echo "Generating root private key to $ROOT_KEY"
+    openssl genrsa -out $ROOT_KEY $RSA_BITS
 
-echo "Generating a root certificate authority to $ROOT_CERT"
-openssl req -x509 -new -key $ROOT_KEY -days 1285 -out $ROOT_CERT \
-    -subj "$CERT_SUBJ"
+    echo "Generating a root certificate authority to $ROOT_CERT"
+    openssl req -x509 -new -key $ROOT_KEY -days 1285 -out $ROOT_CERT \
+        -subj "$CERT_SUBJ"
 
-echo "Generating a sub-key for kjudge to $KJUDGE_KEY"
-openssl genrsa -out $KJUDGE_KEY $RSA_BITS 
+    echo "Generating a sub-key for kjudge to $KJUDGE_KEY"
+    openssl genrsa -out $KJUDGE_KEY $RSA_BITS
 
-echo "Generating a certificate signing request to $KJUDGE_CSR"
-openssl req -new -key $KJUDGE_KEY -out $KJUDGE_CSR \
-    -subj "$CERT_SUBJ" \
-    -addext "$CERT_EXT" 
+    echo "Generating a certificate signing request to $KJUDGE_CSR"
+    openssl req -new -key $KJUDGE_KEY -out $KJUDGE_CSR \
+        -subj "$CERT_SUBJ" \
+        -addext "$CERT_EXT"
 
-echo "Generating a certificate signature to $KJUDGE_CERT"
-echo "[v3_ca]\n$CERT_EXT" | openssl x509 -req -days 730 \
-    -in $KJUDGE_CSR \
-    -CA $ROOT_CERT -CAkey $ROOT_KEY -CAcreateserial \
-    -extensions v3_ca -extfile - \
-    -out $KJUDGE_CERT 
+    echo "Generating a certificate signature to $KJUDGE_CERT"
+    printf "[v3_ca]\n$CERT_EXT\n" | openssl x509 -req -days 730 \
+        -in $KJUDGE_CSR \
+        -CA $ROOT_CERT -CAkey $ROOT_KEY -CAcreateserial \
+        -extensions v3_ca -extfile - \
+        -out $KJUDGE_CERT
 
-echo "Certificate generation complete."
+    echo "Certificate generation complete."
+    touch $ROOT_DIR/.certs_generated
+}
+
+generateKey
+echo "To re-generate the keys, delete $ROOT_DIR/.certs_generated"
 echo "Please keep $ROOT_KEY and $KJUDGE_KEY secret, while distributing"\
     "$ROOT_CERT as the certificate authority."
