@@ -35,7 +35,8 @@ RUN go generate && go build -tags production -o kjudge cmd/kjudge/main.go
 # Stage 4: Create awesome output image
 FROM ubuntu:focal
 
-RUN apt-get update && apt-get install -y build-essential openjdk-8-jdk-headless fp-compiler python3.6 cgroup-lite python2.7 rustc golang libcap-dev
+RUN apt-get update && \
+    DEBIAN_FRONTEND="noninteractive" TZ="Asia/Ho_Chi_Minh" apt-get install -y build-essential openjdk-8-jdk-headless fp-compiler python3 cgroup-lite python2.7 rustc golang libcap-dev
 
 COPY --from=isolate /isolate/ /isolate
 
@@ -44,7 +45,7 @@ RUN make install
 
 COPY --from=backend /kjudge/kjudge /usr/local/bin
 
-RUN ln -s /usr/bin/python3.6 /usr/bin/python3 && ln -s /usr/bin/python2.7 /usr/bin/python2
+RUN ln -s /usr/bin/python2.7 /usr/bin/python2
 
 VOLUME ["/data"]
 
