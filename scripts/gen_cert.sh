@@ -2,6 +2,20 @@
 
 set -e
 
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    echo "gen_certs.sh [target-dir=.] [-h|--help]
+    cert generation environment variables:
+        - RSA_BITS      [4096]                         Strength of the RSA key.
+        - CERT_C        [JP]                           Certificate country code
+        - CERT_ST       [Moonland]                     Certificate State
+        - CERT_L        [Kagamitown]                   Certificate Locality
+        - CERT_O        [nki inc.]                     Certificate Organization Name
+        - CERT_CN       [kjudge]                       Certificate Common name
+        - CERT_EMAIL    [not@nkagami.me]               Certificate Email address
+        - CERT_ALTNAMES [IP:127.0.0.1,DNS:localhost]   A list of hosts that kjudge will be listening on, either by IP (as 'IP:1.2.3.4') or DNS (as 'DNS:google.com'), separated by ','"
+    exit 0
+fi
+
 CERT_C=${CERT_C:-JP} # Country code
 CERT_ST=${CERT_ST:-Moonland} # State
 CERT_L=${CERT_L:-Kagamitown} # Locality
