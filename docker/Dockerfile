@@ -35,8 +35,9 @@ RUN go generate && go build -tags production -o kjudge cmd/kjudge/main.go
 # Stage 4: Create awesome output image
 FROM ubuntu:focal
 
-RUN apt-get update && \
-    DEBIAN_FRONTEND="noninteractive" TZ="Asia/Ho_Chi_Minh" apt-get install -y build-essential openjdk-8-jdk-headless fp-compiler python3 cgroup-lite python2.7 rustc golang libcap-dev
+RUN apt-get update && DEBIAN_FRONTEND="noninteractive" TZ="Asia/Ho_Chi_Minh" apt-get install -y \
+    build-essential openjdk-8-jdk-headless fp-compiler python3.6 cgroup-lite python2.7 rustc golang libcap-dev # Compilers  \
+    openssl # For HTTPS support
 
 COPY --from=isolate /isolate/ /isolate
 
@@ -44,11 +45,14 @@ WORKDIR /isolate
 RUN make install
 
 COPY --from=backend /kjudge/kjudge /usr/local/bin
+COPY --from=backend /kjudge/scripts /scripts
 
 RUN ln -s /usr/bin/python2.7 /usr/bin/python2
 
-VOLUME ["/data"]
+VOLUME ["/data", "/certs"]
 
-EXPOSE 80
+EXPOSE 80 443
 
-CMD ["kjudge", "-port", "80", "-file", "/data/kjudge.db"]
+WORKDIR /
+ENTRYPOINT ["scripts/start_container.sh"]
+

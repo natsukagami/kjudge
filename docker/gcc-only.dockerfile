@@ -37,7 +37,7 @@ RUN go generate && go build -tags production -o kjudge cmd/kjudge/main.go
 # Stage 4: Create awesome output image
 FROM alpine:3
 
-RUN apk add --no-cache libcap make g++
+RUN apk add --no-cache libcap make g++ openssl bash
 
 COPY --from=isolate /isolate/ /isolate
 
@@ -45,9 +45,11 @@ WORKDIR /isolate
 RUN make install
 
 COPY --from=backend /kjudge/kjudge /usr/local/bin
+COPY --from=backend /kjudge/scripts /scripts
 
-VOLUME ["/data"]
+VOLUME ["/data", "/certs"]
 
-EXPOSE 80
+EXPOSE 80 443
 
-CMD ["kjudge", "-port", "80", "-file", "/data/kjudge.db"]
+WORKDIR /
+ENTRYPOINT ["scripts/start_container.sh"]
