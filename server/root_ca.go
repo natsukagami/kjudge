@@ -17,16 +17,6 @@ func (s *Server) ServeHTTPRootCA(address, rootCA string) error {
 	} else if stat.IsDir() {
 		return errors.Errorf("cannot use rootCA: %s is a directory", rootCA)
 	}
-	// server := http.Server{
-	// 	Addr: address,
-	// 	Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	// 		if r.Method != "GET" || r.URL.EscapedPath() != "/ca" {
-	// 			w.WriteHeader(404)
-	// 			return
-	// 		}
-	// 		http.ServeFile(w, r, rootCA)
-	// 	}),
-	// }
 	server := echo.New()
 	server.GET("/ca", func(c echo.Context) error {
 		return c.Attachment(rootCA, "root.pem")
@@ -34,6 +24,6 @@ func (s *Server) ServeHTTPRootCA(address, rootCA string) error {
 	server.HideBanner = true
 	server.HidePort = true
 	defer func() { _ = server.Shutdown(context.Background()) }()
-	log.Printf("Root certificate is being served on '%s'", address)
+	log.Printf("Root certificate is being served on '%s', obtain the Root CA on /ca", address)
 	return errors.WithStack(server.Start(address))
 }
