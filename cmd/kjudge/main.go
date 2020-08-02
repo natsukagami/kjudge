@@ -65,10 +65,10 @@ func main() {
 func startServer(server *server.Server) {
 	var err error
 	if *httpsDir == "" {
-    	// No HTTPS
+		// No HTTPS
 		err = server.Start(*port)
 	} else {
-    	// Start a HTTP server to host the root CA.
+		// Start a HTTP server to host the root CA.
 		if rootCAPort, ok := os.LookupEnv("ROOT_CA_PORT"); ok {
 			go func() {
 				if err := server.ServeHTTPRootCA(":"+rootCAPort, filepath.Join(*httpsDir, "root.pem")); err != nil {
