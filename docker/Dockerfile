@@ -19,7 +19,7 @@ WORKDIR /kjudge/frontend
 RUN yarn && yarn --prod --frozen-lockfile build 
 
 # Stage 3: Build back-end
-FROM golang:1.13-stretch AS backend
+FROM golang:1.14-buster AS backend
 
 WORKDIR /kjudge
 
