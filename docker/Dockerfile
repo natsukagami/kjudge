@@ -1,5 +1,5 @@
 # Stage 0: Compile isolate
-FROM ubuntu:bionic AS isolate
+FROM ubuntu:focal AS isolate
 
 RUN apt-get update && apt-get install -y libcap-dev gcc git make
 
@@ -33,7 +33,7 @@ RUN sed -i 's/^debug/# debug/' fileb0x.yaml
 RUN go generate && go build -tags production -o kjudge cmd/kjudge/main.go
 
 # Stage 4: Create awesome output image
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 RUN apt-get update && apt-get install -y build-essential openjdk-8-jdk-headless fp-compiler python3.6 cgroup-lite python2.7 rustc golang libcap-dev
 
