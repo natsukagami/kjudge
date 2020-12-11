@@ -10,13 +10,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v1
       - name: Prepare version tags
-        run: echo ${{ github.ref }} | xargs basename | echo ::set-env name=VERS::$(awk -F "." '{ print $1 "," $1 "." $2 "," $1 "." $2 "." $3 }')
-      - name: Publish
-        uses: docker/build-push-action@v1
+        run: echo ${{ github.ref }} | xargs basename | echo name=VERS::$(awk -F "." '{ print $1 "," $1 "." $2 "," $1 "." $2 "." $3 }') >> $GITHUB_ENV
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: natsukagami/kjudge
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+      - name: Publish
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
           tags: ${{ env.VERS }},latest
           dockerfile: ./docker/Dockerfile
   latest-gcc:
@@ -26,12 +40,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v1
       - name: Prepare version tags
-        run: echo ${{ github.ref }} | xargs basename | echo ::set-env name=VERS_GCC::$(awk -F "." '{ print $1 "," $1 "." $2 "," $1 "." $2 "." $3 }' | sed -E 's/(,|$)/-gcc\1/g')
-      - name: Publish
-        uses: docker/build-push-action@v1
+        run: echo ${{ github.ref }} | xargs basename | echo name=VERS_GCC::$(awk -F "." '{ print $1 "," $1 "." $2 "," $1 "." $2 "." $3 }' | sed -E 's/(,|$)/-gcc\1/g') >> $GITHUB_ENV
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: natsukagami/kjudge
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+      - name: Publish
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
           tags: ${{ env.VERS_GCC }},latest-gcc
           dockerfile: ./docker/gcc-only.dockerfile
