@@ -9,6 +9,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1
+      - name: Prepare version tags
+        run: |
+            echo "tags<<EOF" >> $GITHUB_ENV
+            scripts/format_docker_tags.py "unstable" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -29,16 +34,19 @@ jobs:
         with:
           context: .
           push: true
-          tags: |
-            natsukagami/kjudge:unstable
-            ghcr.io/natsukagami/kjudge:unstable
-          file: ./docker/Dockerfile
+          tags: ${{ env.tags }}
+          file: ./docker/gcc-only.dockerfile
   unstable-gcc:
     name: GCC-only
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1
+      - name: Prepare version tags
+        run: |
+            echo "tags<<EOF" >> $GITHUB_ENV
+            scripts/format_docker_tags.py "unstable" "-gcc" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -59,7 +67,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: |
-            natsukagami/kjudge:unstable-gcc
-            ghcr.io/natsukagami/kjudge:unstable-gcc
+          tags: ${{ env.tags }}
           file: ./docker/gcc-only.dockerfile

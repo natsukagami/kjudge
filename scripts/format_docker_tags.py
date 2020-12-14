@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+#
+# Outputs a list of Docker tags appropriate for the docker file.
+# ./format_docker_tags.py <"unstable" | a SemVer version string> [suffix]
 import sys
 
 version = sys.argv[1]
@@ -6,7 +9,8 @@ version_numbers = version.split(".")
 version_tags = [ ".".join(version_numbers[:i+1]) for i in range(0, len(version_numbers)) ]
 
 # Latest is also a version_tag
-version_tags.append("latest")
+if version != "unstable":
+    version_tags.append("latest")
 
 suffix = ""
 if len(sys.argv) == 3:
