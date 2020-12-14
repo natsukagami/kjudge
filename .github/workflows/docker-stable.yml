@@ -10,7 +10,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v1
       - name: Prepare version tags
-        run: echo ${{ github.ref }} | xargs basename | echo name=VERS::$(awk -F "." '{ print $1 "," $1 "." $2 "," $1 "." $2 "." $3 }') >> $GITHUB_ENV
+        run: |
+            echo "tags<<EOF" >> $GITHUB_ENV
+            scripts/format_docker_tags.py $(basename ${{ github.ref }}) >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -31,7 +34,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.VERS }},latest
+          tags: ${{ env.tags }}
           file: ./docker/Dockerfile
   latest-gcc:
     name: GCC-only
@@ -40,7 +43,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v1
       - name: Prepare version tags
-        run: echo ${{ github.ref }} | xargs basename | echo name=VERS_GCC::$(awk -F "." '{ print $1 "," $1 "." $2 "," $1 "." $2 "." $3 }' | sed -E 's/(,|$)/-gcc\1/g') >> $GITHUB_ENV
+        run: |
+            echo "tags<<EOF" >> $GITHUB_ENV
+            scripts/format_docker_tags.py $(basename ${{ github.ref }}) "-gcc" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -61,5 +67,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.VERS_GCC }},latest-gcc
+          tags: ${{ env.tags }}
           file: ./docker/gcc-only.dockerfile
