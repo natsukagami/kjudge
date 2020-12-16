@@ -1,4 +1,4 @@
-const hs = require("highlight.js/lib/highlight.js");
+const hs = require("highlight.js/lib/core.js");
 import "regenerator-runtime/runtime";
 
 hs.registerLanguage("cpp", require("highlight.js/lib/languages/cpp"));

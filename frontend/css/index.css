@@ -16,7 +16,7 @@
     @apply shadow my-1 p-1 w-2/3 rounded-sm;
 }
 .form-input:focus {
-    @apply shadow-outline;
+    @apply ring;
 }
 
 .form-btn {

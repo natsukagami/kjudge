@@ -30,7 +30,7 @@ type DB struct {
 
 // New creates a new DB object from the given filename.
 func New(filename string) (*DB, error) {
-	dsn := fmt.Sprintf("%s?_fk=1&mode=rw&cache=shared&_journal=WAL", filename)
+	dsn := fmt.Sprintf("%s?_fk=1&mode=rw&cache=shared&_journal=WAL&_busy_timeout=10000&_sync=NORMAL", filename)
 	sqlxdb, err := sqlx.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -43,7 +43,6 @@ func New(filename string) (*DB, error) {
 		DB:             sqlxdb,
 		PersistentConn: conn.(*sqlite3.SQLiteConn),
 	}
-	db.SetMaxOpenConns(1)
 	// Perform migrations, if needed.
 	if err := db.migrate(); err != nil {
 		return nil, err
