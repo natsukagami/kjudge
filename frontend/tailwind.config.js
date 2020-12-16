@@ -1,4 +1,5 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
+const colors = require("tailwindcss/colors");
 
 module.exports = {
     purge: false,
@@ -8,6 +9,11 @@ module.exports = {
             ...defaultTheme.fontFamily,
             mono: ['"IBM Plex Mono"', ...defaultTheme.fontFamily.mono],
         },
+        colors: {
+            ...defaultTheme.colors,
+            teal: colors.teal,
+            orange: colors.orange,
+        }
     },
     variants: {},
     plugins: [],
