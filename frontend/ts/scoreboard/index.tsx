@@ -1,8 +1,7 @@
-import { h, render } from "preact";
-import { useState } from "preact/hooks";
+import { render } from "preact";
+import { useState, useEffect } from "preact/hooks";
 import FlipMove from "react-flip-move";
 import "regenerator-runtime/runtime";
-import { useEffect } from "react";
 
 declare global {
     interface Document {
