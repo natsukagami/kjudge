@@ -13,7 +13,7 @@ module.exports = {
             ...defaultTheme.colors,
             teal: colors.teal,
             orange: colors.orange,
-        }
+        },
     },
     variants: {},
     plugins: [],
