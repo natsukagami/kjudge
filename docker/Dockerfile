@@ -10,7 +10,7 @@ RUN git clone --branch v1.8.1 --single-branch https://github.com/ioi/isolate.git
 RUN make isolate
 
 # Stage 1: Generate front-end
-FROM node:13 AS frontend
+FROM node:14 AS frontend
 
 COPY ./ /kjudge
 
