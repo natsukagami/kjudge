@@ -10,7 +10,10 @@ RUN git clone --branch v1.8.1 --single-branch https://github.com/ioi/isolate.git
 RUN make isolate
 
 # Stage 1: Generate front-end
-FROM node:14 AS frontend
+FROM node:14-buster AS frontend
+
+# Install node-gyp requirements
+RUN apt-get install python3 make g++
 
 COPY ./ /kjudge
 

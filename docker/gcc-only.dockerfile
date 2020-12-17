@@ -12,6 +12,9 @@ RUN make isolate
 # Stage 1: Generate front-end
 FROM node:14-alpine AS frontend
 
+# Install node-gyp requirements
+RUN apk add --no-cache python3 make g++
+
 COPY ./ /kjudge
 
 WORKDIR /kjudge/frontend
