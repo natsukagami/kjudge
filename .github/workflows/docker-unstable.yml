@@ -1,4 +1,4 @@
-name: Build image and (optionally) push to Docker Hub / ghcr.io (unstable)
+name: Build image and maybe push [unstable]
 on:
   push:
     branches: [master]
