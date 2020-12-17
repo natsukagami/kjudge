@@ -13,7 +13,7 @@ RUN make isolate
 FROM node:14-buster AS frontend
 
 # Install python because somehow we need it now
-RUN apt-get install python3
+RUN apt-get install python3 make gcc
 
 COPY ./ /kjudge
 
