@@ -12,8 +12,8 @@ RUN make isolate
 # Stage 1: Generate front-end
 FROM node:14-alpine AS frontend
 
-# Install python because somehow we need it now
-RUN apk add --no-cache python3 make gcc
+# Install node-gyp requirements
+RUN apk add --no-cache python3 make g++
 
 COPY ./ /kjudge
 

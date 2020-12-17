@@ -12,8 +12,8 @@ RUN make isolate
 # Stage 1: Generate front-end
 FROM node:14-buster AS frontend
 
-# Install python because somehow we need it now
-RUN apt-get install python3 make gcc
+# Install node-gyp requirements
+RUN apt-get install python3 make g++
 
 COPY ./ /kjudge
 
