@@ -12,6 +12,8 @@ import (
 	"text/template"
 
 	"github.com/BurntSushi/toml"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // TomlTable is a map from column name to relevant type
@@ -32,7 +34,7 @@ func SnakeToGocase(s string, export bool) string {
 			// Special case: id => ID
 			part = "ID"
 		} else {
-			part = strings.Title(part)
+			part = cases.Title(language.English).String(part)
 		}
 		result.WriteString(part)
 	}
