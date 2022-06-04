@@ -4,7 +4,7 @@
     "description": "Templates and others for kjudge.",
     "repository": "https://github.com/natsukagami/kjudge",
     "author": "Natsu Kagami",
-    "license": "AGPL-3.0",
+    "license": "AGPL-3.0-Only",
     "private": true,
     "browserslist": "> 0.25%, not dead",
     "targets": {
