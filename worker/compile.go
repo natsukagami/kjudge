@@ -11,7 +11,6 @@ package worker
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -69,7 +68,7 @@ func Compile(c *CompileContext) (bool, error) {
 	log.Printf("[WORKER] Compiling submission %v\n", c.Sub.ID)
 
 	// Now, create a temporary directory.
-	dir, err := ioutil.TempDir("", "*")
+	dir, err := os.MkdirTemp("", "*")
 	if err != nil {
 		return false, errors.WithStack(err)
 	}
@@ -88,7 +87,7 @@ func Compile(c *CompileContext) (bool, error) {
 
 	if result {
 		// Success!
-		output, err := ioutil.ReadFile(filepath.Join(dir, action.Output))
+		output, err := os.ReadFile(filepath.Join(dir, action.Output))
 		if err != nil {
 			return false, errors.WithStack(err)
 		}
@@ -114,11 +113,11 @@ type CompileAction struct {
 // Prepare prepares a temporary folder and copies all the content there.
 func (c *CompileAction) Prepare(dir string) error {
 	// Copy over all files and the source code.
-	if err := ioutil.WriteFile(filepath.Join(dir, c.Source.Filename), c.Source.Content, 0666); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, c.Source.Filename), c.Source.Content, 0666); err != nil {
 		return errors.WithStack(err)
 	}
 	for _, file := range c.Files {
-		if err := ioutil.WriteFile(filepath.Join(dir, file.Filename), file.Content, 0666); err != nil {
+		if err := os.WriteFile(filepath.Join(dir, file.Filename), file.Content, 0666); err != nil {
 			return errors.Wrapf(err, "copying file %s", file.Filename)
 		}
 	}

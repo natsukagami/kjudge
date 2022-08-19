@@ -1,7 +1,7 @@
 package worker
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/natsukagami/kjudge/models"
@@ -21,7 +21,7 @@ func CustomCompile(source *models.File, files []*models.File) (*models.File, err
 		return nil, err
 	}
 	// Perform compilation
-	dir, err := ioutil.TempDir("", "*")
+	dir, err := os.MkdirTemp("", "*")
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -35,7 +35,7 @@ func CustomCompile(source *models.File, files []*models.File) (*models.File, err
 
 	result, message := action.Perform(dir)
 	if result {
-		output, err := ioutil.ReadFile(filepath.Join(dir, action.Output))
+		output, err := os.ReadFile(filepath.Join(dir, action.Output))
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
