@@ -1,9 +1,6 @@
 package models
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models/verify"
