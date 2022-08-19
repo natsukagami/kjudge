@@ -3,7 +3,7 @@ package admin
 import (
 	"database/sql"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -189,7 +189,7 @@ func (g *Group) ProblemAddFile(c echo.Context) error {
 			return errors.Wrapf(err, "file %s", file.Filename)
 		}
 		defer r.Close()
-		content, err := ioutil.ReadAll(r)
+		content, err := io.ReadAll(r)
 		if err != nil {
 			return errors.Wrapf(err, "file %s", file.Filename)
 		}

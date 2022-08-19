@@ -1,7 +1,7 @@
 package worker
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -46,13 +46,13 @@ type SandboxOutput struct {
 func (input *SandboxInput) CopyTo(cwd string) error {
 	// Copy all the files into "cwd"
 	for name, file := range input.Files {
-		if err := ioutil.WriteFile(filepath.Join(cwd, name), file, 0666); err != nil {
+		if err := os.WriteFile(filepath.Join(cwd, name), file, 0666); err != nil {
 			return errors.Wrapf(err, "writing file %s", name)
 		}
 	}
 	// Copy and set chmod the "code" file
 	if input.CompiledSource != nil {
-		if err := ioutil.WriteFile(filepath.Join(cwd, "code"), input.CompiledSource, 0777); err != nil {
+		if err := os.WriteFile(filepath.Join(cwd, "code"), input.CompiledSource, 0777); err != nil {
 			return errors.WithStack(err)
 		}
 	}

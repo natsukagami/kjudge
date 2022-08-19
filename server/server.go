@@ -3,7 +3,6 @@ package server
 import (
 	"database/sql"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -107,7 +106,7 @@ func (s *Server) HandleError(err error, c echo.Context) {
 
 		errStr := fmt.Sprintf("An unexpected error has occured: %v\n", err)
 		path := filepath.Join(os.TempDir(), fmt.Sprintf("kjudge-%v.txt", time.Now().Format(time.RFC3339)))
-		if err := ioutil.WriteFile(path, []byte(fmt.Sprintf("%+v", errors.WithStack(err))), 0644); err != nil {
+		if err := os.WriteFile(path, []byte(fmt.Sprintf("%+v", errors.WithStack(err))), 0644); err != nil {
 			errStr += fmt.Sprintf("Cannot log the error down to file: %v", err)
 		} else {
 			errStr += fmt.Sprintf(`The error has been logged down to file '%s'.

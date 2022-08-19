@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -154,7 +154,7 @@ func (g *Group) SubmitPost(c echo.Context) error {
 		return errors.WithStack(err)
 	}
 	defer fileContent.Close()
-	source, err := ioutil.ReadAll(fileContent)
+	source, err := io.ReadAll(fileContent)
 	if err != nil {
 		return errors.WithStack(err)
 	}

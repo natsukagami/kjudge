@@ -4,15 +4,22 @@ package tests
 import (
 	"archive/zip"
 	"io"
-	"io/ioutil"
 	"strings"
 
 	"github.com/natsukagami/kjudge/models"
 	"github.com/pkg/errors"
 )
 
+// LazyTest is a `models.Test` but input and outputs are `zip.File`s.
+type LazyTest struct {
+	models.Test
+	Input, Output *zip.File
+}
+
+type textMap = map[string]*zip.File
+
 // Unpack try to unpack a zip file and extract tests from the given pattern.
-func Unpack(zipFile io.ReaderAt, size int64, input, output string) ([]*models.Test, error) {
+func Unpack(zipFile io.ReaderAt, size int64, input, output string) ([]*LazyTest, error) {
 	file, err := zip.NewReader(zipFile, size)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -25,8 +32,8 @@ func Unpack(zipFile io.ReaderAt, size int64, input, output string) ([]*models.Te
 	if err != nil {
 		return nil, errors.Wrap(err, "output pattern")
 	}
-	inputs := make(map[string][]byte)
-	outputs := make(map[string][]byte)
+	inputs := make(textMap)
+	outputs := make(textMap)
 	for _, f := range file.File {
 		if name, ok := inP.Match(f.Name); ok {
 			if err := readToMap(f, name, inputs); err != nil {
@@ -42,15 +49,15 @@ func Unpack(zipFile io.ReaderAt, size int64, input, output string) ([]*models.Te
 	return matchTests(inputs, outputs), nil
 }
 
-func matchTests(in, out map[string][]byte) []*models.Test {
-	var res []*models.Test
+func matchTests(in, out textMap) []*LazyTest {
+	var res []*LazyTest
 	for name, input := range in {
 		output, ok := out[name]
 		if !ok {
 			continue
 		}
-		res = append(res, &models.Test{
-			Name:   name,
+		res = append(res, &LazyTest{
+			Test:   models.Test{Name: name},
 			Input:  input,
 			Output: output,
 		})
@@ -58,20 +65,11 @@ func matchTests(in, out map[string][]byte) []*models.Test {
 	return res
 }
 
-func readToMap(f *zip.File, name string, target map[string][]byte) error {
+func readToMap(f *zip.File, name string, target textMap) error {
 	if _, ok := target[name]; ok {
 		return errors.Errorf("duplicate key %s", name)
 	}
-	reader, err := f.Open()
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	defer reader.Close()
-	res, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	target[name] = res
+	target[name] = f
 	return nil
 }
 

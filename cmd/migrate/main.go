@@ -3,7 +3,7 @@ package main
 
 import (
 	"flag"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 
@@ -30,7 +30,7 @@ func main() {
 	}
 
 	log.Println("Now reading SQL commands from the standard input.")
-	sql, err := ioutil.ReadAll(os.Stdin)
+	sql, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		log.Fatalf("%+v", errors.WithStack(err))
 	}
