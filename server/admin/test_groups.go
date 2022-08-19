@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"strconv"
@@ -202,7 +202,7 @@ func readFromForm(name string, form *multipart.Form) ([]byte, error) {
 		return nil, errors.WithStack(err)
 	}
 	defer f.Close()
-	content, err := ioutil.ReadAll(f)
+	content, err := io.ReadAll(f)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -292,7 +292,7 @@ func readZip(f *zip.File) ([]byte, error) {
 		return nil, errors.WithStack(err)
 	}
 	defer reader.Close()
-	res, err := ioutil.ReadAll(reader)
+	res, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
