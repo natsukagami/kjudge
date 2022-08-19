@@ -38,42 +38,6 @@ func (r *TestGroup) Verify() error {
 	})
 }
 
-// WriteTests writes the given set of tests into the Database.
-// If override is set, all tests in the test group gets deleted first.
-func (r *TestGroup) WriteTests(db db.DBContext, tests []*Test, override bool) error {
-	for _, test := range tests {
-		test.TestGroupID = r.ID
-		if err := test.Verify(); err != nil {
-			return errors.Wrapf(err, "test `%s`", test.Name)
-		}
-	}
-	if override {
-		if _, err := db.Exec("DELETE FROM tests WHERE test_group_id = ?", r.ID); err != nil {
-			return errors.WithStack(err)
-		}
-	}
-	var (
-		terms []string
-		vars  []interface{}
-	)
-	for _, test := range tests {
-		terms = append(terms, "(?, ?, ?, ?)")
-		vars = append(vars, test.Name, test.TestGroupID, test.Input, test.Output)
-	}
-	res, err := db.Exec(fmt.Sprintf("INSERT INTO tests(name, test_group_id, input, output) VALUES %s", strings.Join(terms, ", ")), vars...)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	id, err := res.LastInsertId()
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	for i, test := range tests {
-		test.ID = int(id) - len(tests) + i + 1
-	}
-	return nil
-}
-
 // DeleteResults deletes all test results of a given test group.
 func (t *TestGroup) DeleteResults(db db.DBContext) error {
 	tests, err := GetTestGroupTests(db, t.ID)

@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"archive/zip"
 	"bytes"
 	"database/sql"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/natsukagami/kjudge/db"
@@ -238,4 +240,61 @@ func (g *Group) TestGroupRejudgePost(c echo.Context) error {
 		return errors.WithStack(err)
 	}
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d/submissions", tg.ProblemID))
+}
+
+// WriteTests writes the given set of tests into the Database.
+// If override is set, all tests in the test group gets deleted first.
+func (r *TestGroupCtx) WriteTests(db db.DBContext, tests []*tests.LazyTest, override bool) error {
+	for _, test := range tests {
+		test.TestGroupID = r.ID
+		if err := test.Verify(); err != nil {
+			return errors.Wrapf(err, "test `%s`", test.Name)
+		}
+	}
+	if override {
+		if _, err := db.Exec("DELETE FROM tests WHERE test_group_id = ?", r.ID); err != nil {
+			return errors.WithStack(err)
+		}
+	}
+	var (
+		terms []string
+		vars  []interface{}
+	)
+	for _, test := range tests {
+		terms = append(terms, "(?, ?, ?, ?)")
+		input, err := readZip(test.Input)
+		if err != nil {
+			return errors.Wrapf(err, "test %v input", test.Name)
+		}
+		output, err := readZip(test.Output)
+		if err != nil {
+			return errors.Wrapf(err, "test %v output", test.Name)
+		}
+		vars = append(vars, test.Name, test.TestGroupID, input, output)
+	}
+	res, err := db.Exec(fmt.Sprintf("INSERT INTO tests(name, test_group_id, input, output) VALUES %s", strings.Join(terms, ", ")), vars...)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	for i, test := range tests {
+		test.ID = int(id) - len(tests) + i + 1
+	}
+	return nil
+}
+
+func readZip(f *zip.File) ([]byte, error) {
+	reader, err := f.Open()
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	defer reader.Close()
+	res, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return res, nil
 }
