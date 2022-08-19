@@ -32,7 +32,7 @@ func Score(s *ScoreContext) error {
 	if err != nil {
 		return err
 	}
-	tests, err := models.GetProblemTests(s.DB, s.Problem.ID)
+	tests, err := models.GetProblemTestsMeta(s.DB, s.Problem.ID)
 	if err != nil {
 		return err
 	}
