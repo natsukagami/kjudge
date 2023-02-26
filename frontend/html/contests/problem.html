@@ -42,7 +42,7 @@
     <div style="display: none;" class="tab" data-tab="submissions">{{ template "problem-submissions" . }}</div>
 </div>
 
-<script src="../../ts/problem.ts"></script>
+<script type="module" src="../../ts/problem.ts"></script>
 {{ end }}
 
 {{ define "problem-statements" }}
@@ -141,7 +141,7 @@
         {{ end }}
     </tbody>
 </table>
-<script src="../../ts/submission.ts"></script>
+<script type="module" src="../../ts/submission.ts"></script>
 {{ end }}
 
 {{ define "submission-verdict" }}

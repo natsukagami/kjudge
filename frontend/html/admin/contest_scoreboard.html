@@ -32,5 +32,5 @@
     document.initialScoreboard = JSON.parse("{{ json .JSON }}");
     document.scoreboardJSONLink = '/admin/contests/{{.Contest.ID}}/scoreboard/json';
 </script>
-<script src="../../ts/scoreboard/index.tsx"></script>
+<script type="module" src="../../ts/scoreboard/index.tsx"></script>
 {{ end }}
