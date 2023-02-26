@@ -70,6 +70,7 @@ func New(db *db.DB) (*Server, error) {
 		return nil, err
 	}
 	s.echo.GET("", contests.ConestsGetNearestOngoingContest)
+	s.echo.Group("/static").GET("*", StaticFiles)
 	s.echo.GET("*", StaticFiles)
 	s.echo.POST("*", NotFoundHandler)
 

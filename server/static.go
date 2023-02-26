@@ -14,7 +14,7 @@ import (
 // StaticFiles serves files from the source fileb0x.
 // It filters away files that don't end with ".css", ".js" or ".map"
 func StaticFiles(c echo.Context) error {
-	path := c.Request().URL.Path
+	path := strings.TrimPrefix(c.Request().URL.Path, "/static")
 	for _, suffix := range []string{".woff2", ".woff", ".css", ".js", ".map", ".png", ".ogg"} {
 		if strings.HasSuffix(path, suffix) {
 			return serveFile(stdPath.Join("templates", path), c)
