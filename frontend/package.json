@@ -27,8 +27,8 @@
     "scripts": {
         "test": "echo No tests... yet",
         "fmt": "prettier \"css/**/*\" \"ts/**/*\" \"*.json\" \"*.js\"",
-        "dev": "parcel watch --dist-dir ../templates \"html/**/*.html\"",
-        "build": "mkdir -p ../templates && rm -rf ../templates/* && parcel build --no-source-maps --dist-dir ../templates \"html/**/*.html\""
+        "dev": "parcel watch \"html/**/*.html\"",
+        "build": "mkdir -p ../templates && rm -rf ../templates/* && parcel build --no-source-maps \"html/**/*.html\""
     },
     "alias": {
         "react": "preact/compat",
