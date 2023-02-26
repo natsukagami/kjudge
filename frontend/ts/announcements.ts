@@ -6,7 +6,9 @@ declare interface Window {
     };
 }
 
-const notificationSound = new Audio(new URL("../sounds/notification.ogg", import.meta.url));
+const notificationSound = new Audio(
+    new URL("../sounds/notification.ogg", import.meta.url),
+);
 
 // Stores the last announcement and clarification read.
 interface Store {
