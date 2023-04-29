@@ -5,12 +5,12 @@ RUN apk add --no-cache libcap gcc make git g++ libcap-dev
 
 WORKDIR /isolate
 
-RUN git clone --branch v1.8.1 --single-branch https://github.com/ioi/isolate.git .
+RUN git clone --branch v1.10.1 --single-branch https://github.com/ioi/isolate.git .
 
 RUN make isolate
 
 # Stage 1: Generate front-end
-FROM node:14-alpine AS frontend
+FROM node:18-alpine AS frontend
 
 # Install node-gyp requirements
 RUN apk add --no-cache python3 make g++
