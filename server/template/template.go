@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/natsukagami/kjudge/static"
+	"github.com/natsukagami/kjudge/embed"
 	"github.com/pkg/errors"
 )
 
@@ -84,7 +84,7 @@ func parseTemplateTree(root *template.Template, name string) (*template.Template
 		return nil, errors.WithStack(err)
 	}
 	for _, name := range names {
-		content, err := static.ReadFile(templateFilename(name))
+		content, err := embed.Content.ReadFile(templateFilename(name))
 		if err != nil {
 			return nil, errors.Wrapf(err, "file %s", name)
 		}
@@ -96,7 +96,7 @@ func parseTemplateTree(root *template.Template, name string) (*template.Template
 }
 
 func parseRootTemplate() (*template.Template, error) {
-	root, err := static.ReadFile("templates/root.html")
+	root, err := embed.Content.ReadFile("templates/root.html")
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

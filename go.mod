@@ -4,7 +4,6 @@ go 1.13
 
 require (
 	github.com/BurntSushi/toml v1.1.0
-	github.com/UnnoTed/fileb0x v1.1.4
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/go-sql-driver/mysql v1.4.1 // indirect
 	github.com/gorilla/sessions v1.2.0
