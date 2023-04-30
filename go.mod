@@ -1,6 +1,6 @@
 module github.com/natsukagami/kjudge
 
-go 1.13
+go 1.16
 
 require (
 	github.com/BurntSushi/toml v1.1.0
