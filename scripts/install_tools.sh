@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 set -ex
 
-for i in $(grep -Pioh "(?<=_ \")(.+)(?=\")" tools.go) # Fetch all required tools from the tools.go file.
+grep -Pioh "(?<=_ \")(.+)(?=\")" < tools.go | while IFS= read -r line # Fetch all required tools from the tools.go file.
 do
-    go install -v $i
+    go install -v "${line}"
 done
 
 # Install golangci-lint
-curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.52.2
+curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)"/bin v1.52.2

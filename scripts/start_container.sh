@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 set -e
 
@@ -27,7 +27,7 @@ if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
     exit 0
 fi
 
-case $HTTPS in
+case ${HTTPS} in
     preconfigured)
     if [ ! -d "/certs" ]; then
         >&2 echo "Please mount the directory containing certs to /certs"
@@ -43,7 +43,7 @@ case $HTTPS in
     ;;
 esac
 
-if [ "$useHTTPS" = true ]; then
+if [ "${useHTTPS}" = true ]; then
     kjudge -port 443 -file /data/kjudge.db -https /certs
 else
     kjudge -port 80 -file /data/kjudge.db

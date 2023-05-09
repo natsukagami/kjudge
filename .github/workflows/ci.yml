@@ -33,6 +33,10 @@ jobs:
             key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
             restore-keys: |
               ${{ runner.os }}-go-
+        - name: Run ShellCheck
+          uses: ludeeus/action-shellcheck@master
+          with:
+            scandir: './scripts'
         - name: Install front-end and run test/fmt checks
           run: |
             cd frontend
