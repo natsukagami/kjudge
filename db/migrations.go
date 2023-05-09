@@ -2,8 +2,8 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
+	"path"
 	"regexp"
 	"sort"
 
@@ -11,7 +11,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-var versionRegexp = regexp.MustCompile(`embed\/assets\/sql\/(.+)\.sql`)
+var versionRegexp = regexp.MustCompile(`(.+)\.sql`)
+
+const (
+	assetsSql = "assets/sql"
+)
 
 // Attempt to migrate to a newer version of the schema, if any.
 func (db *DB) migrate() error {
@@ -39,15 +43,15 @@ func (db *DB) migrate() error {
 
 	// Do migrations one by one
 	for _, name := range versions {
-		path := fmt.Sprintf("embed/assets/sql/%s.sql", name)
-		file, err := embed.Content.ReadFile(path)
+		sqlFile := path.Join(assetsSql, name+".sql")
+		file, err := embed.Content.ReadFile(sqlFile)
 		if err != nil {
-			return errors.Wrapf(err, "File %s", path)
+			return errors.Wrapf(err, "File %s", sqlFile)
 		}
 		if _, err := db.Exec(string(file)); err != nil {
-			return errors.Wrapf(err, "File %s", path)
+			return errors.Wrapf(err, "File %s", sqlFile)
 		}
-		log.Printf("DB migrated to schema: %s", path)
+		log.Printf("DB migrated to schema: %s", sqlFile)
 		version = name
 	}
 
@@ -73,7 +77,7 @@ func (db *DB) getSchemaVersion() (string, error) {
 
 // Collect the schema files from the static.
 func getSchemaFiles() ([]string, error) {
-	files, err := embed.Content.ReadDir("embed/assets/sql")
+	files, err := embed.Content.ReadDir(assetsSql)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
