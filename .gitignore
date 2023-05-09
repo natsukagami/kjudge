@@ -10,3 +10,4 @@ kjudge.db-*
 /kjudge
 /templates
 /keys
+/embed/templates
