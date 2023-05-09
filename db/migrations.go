@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"io/fs"
 	"log"
 	"path"
 	"regexp"
@@ -44,7 +45,7 @@ func (db *DB) migrate() error {
 	// Do migrations one by one
 	for _, name := range versions {
 		sqlFile := path.Join(assetsSql, name+".sql")
-		file, err := embed.Content.ReadFile(sqlFile)
+		file, err := fs.ReadFile(embed.Content, sqlFile)
 		if err != nil {
 			return errors.Wrapf(err, "File %s", sqlFile)
 		}
@@ -77,7 +78,7 @@ func (db *DB) getSchemaVersion() (string, error) {
 
 // Collect the schema files from the static.
 func getSchemaFiles() ([]string, error) {
-	files, err := embed.Content.ReadDir(assetsSql)
+	files, err := fs.ReadDir(embed.Content, assetsSql)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

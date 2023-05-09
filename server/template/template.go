@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"html/template"
 	"io"
+	"io/fs"
 	"log"
 	"strings"
 	"time"
@@ -84,7 +85,7 @@ func parseTemplateTree(root *template.Template, name string) (*template.Template
 		return nil, errors.WithStack(err)
 	}
 	for _, name := range names {
-		content, err := embed.Content.ReadFile(templateFilename(name))
+		content, err := fs.ReadFile(embed.Content, templateFilename(name))
 		if err != nil {
 			return nil, errors.Wrapf(err, "file %s", name)
 		}
@@ -96,7 +97,7 @@ func parseTemplateTree(root *template.Template, name string) (*template.Template
 }
 
 func parseRootTemplate() (*template.Template, error) {
-	root, err := embed.Content.ReadFile("templates/root.html")
+	root, err := fs.ReadFile(embed.Content, "templates/root.html")
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
