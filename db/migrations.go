@@ -2,16 +2,21 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
+	"io/fs"
 	"log"
+	"path"
 	"regexp"
 	"sort"
 
-	"github.com/natsukagami/kjudge/static"
+	"github.com/natsukagami/kjudge/embed"
 	"github.com/pkg/errors"
 )
 
-var versionRegexp = regexp.MustCompile(`assets\/sql\/(.+)\.sql`)
+var versionRegexp = regexp.MustCompile(`(.+)\.sql`)
+
+const (
+	assetsSql = "assets/sql"
+)
 
 // Attempt to migrate to a newer version of the schema, if any.
 func (db *DB) migrate() error {
@@ -39,15 +44,15 @@ func (db *DB) migrate() error {
 
 	// Do migrations one by one
 	for _, name := range versions {
-		path := fmt.Sprintf("assets/sql/%s.sql", name)
-		file, err := static.ReadFile(path)
+		sqlFile := path.Join(assetsSql, name+".sql")
+		file, err := fs.ReadFile(embed.Content, sqlFile)
 		if err != nil {
-			return errors.Wrapf(err, "File %s", path)
+			return errors.Wrapf(err, "File %s", sqlFile)
 		}
 		if _, err := db.Exec(string(file)); err != nil {
-			return errors.Wrapf(err, "File %s", path)
+			return errors.Wrapf(err, "File %s", sqlFile)
 		}
-		log.Printf("DB migrated to schema: %s", path)
+		log.Printf("DB migrated to schema: %s", sqlFile)
 		version = name
 	}
 
@@ -73,13 +78,13 @@ func (db *DB) getSchemaVersion() (string, error) {
 
 // Collect the schema files from the static.
 func getSchemaFiles() ([]string, error) {
-	files, err := static.WalkDirs("assets/sql", false)
+	files, err := fs.ReadDir(embed.Content, assetsSql)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 	var names []string
 	for _, file := range files {
-		matches := versionRegexp.FindAllStringSubmatch(file, 1)
+		matches := versionRegexp.FindAllStringSubmatch(file.Name(), 1)
 		if len(matches) == 1 {
 			names = append(names, matches[0][1])
 		}

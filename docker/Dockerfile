@@ -33,8 +33,7 @@ RUN go mod download
 
 COPY --from=frontend /kjudge/. /kjudge
 
-RUN scripts/install_tools.sh 
-RUN sed -i 's/^debug/# debug/' fileb0x.yaml
+RUN scripts/install_tools.sh
 RUN go generate && go build -tags production -o kjudge cmd/kjudge/main.go
 
 # Stage 3: Create awesome output image

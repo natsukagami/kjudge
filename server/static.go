@@ -1,13 +1,14 @@
 package server
 
 import (
+	"io"
 	"net/http"
 	"os"
 	stdPath "path"
 	"strings"
 
 	"github.com/labstack/echo/v4"
-	"github.com/natsukagami/kjudge/static"
+	"github.com/natsukagami/kjudge/embed"
 	"github.com/pkg/errors"
 )
 
@@ -24,7 +25,7 @@ func StaticFiles(c echo.Context) error {
 }
 
 func serveFile(file string, c echo.Context) error {
-	f, err := static.FS.OpenFile(c.Request().Context(), file, os.O_RDONLY, 0644)
+	f, err := embed.Content.Open(file)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return echo.NewHTTPError(http.StatusNotFound)
@@ -35,6 +36,6 @@ func serveFile(file string, c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	http.ServeContent(c.Response(), c.Request(), stat.Name(), stat.ModTime(), f)
+	http.ServeContent(c.Response(), c.Request(), stat.Name(), stat.ModTime(), f.(io.ReadSeeker)) // returned file always comes from embed or os.DirFS
 	return nil
 }

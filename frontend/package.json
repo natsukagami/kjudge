@@ -24,8 +24,8 @@
     "scripts": {
         "test": "echo No tests... yet",
         "fmt": "prettier \"css/**/*\" \"ts/**/*\" \"*.json\" \"*.js\"",
-        "dev": "parcel watch -d ../templates \"html/**/*.html\"",
-        "build": "mkdir -p ../templates && rm -rf ../templates/* && parcel build --no-source-maps -d ../templates \"html/**/*.html\""
+        "dev": "parcel watch -d ../embed/templates \"html/**/*.html\"",
+        "build": "mkdir -p ../embed/templates && rm -rf ../embed/templates/* && parcel build --no-source-maps -d ../embed/templates \"html/**/*.html\""
     },
     "alias": {
         "react": "preact/compat",
