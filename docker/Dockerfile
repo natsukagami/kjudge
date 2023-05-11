@@ -10,18 +10,20 @@ RUN git clone --branch v1.10.1 --single-branch https://github.com/ioi/isolate.gi
 RUN make isolate
 
 # Stage 1: Generate front-end
-FROM node:18-bullseye AS frontend
+FROM node:18-alpine AS frontend
 
 # Install node-gyp requirements
-RUN apt-get install python3 make g++
-
-COPY ./ /kjudge
+RUN apk add --no-cache python3 make g++
 
 WORKDIR /kjudge/frontend
 
-RUN yarn && yarn --prod --frozen-lockfile build 
+COPY ./frontend/package.json ./frontend/yarn.lock .
+RUN yarn install --frozen-lockfile
 
-# Stage 3: Build back-end
+COPY ./ /kjudge
+RUN yarn --prod --frozen-lockfile build 
+
+# Stage 2: Build back-end
 FROM golang:1.18-bullseye AS backend
 
 WORKDIR /kjudge
@@ -35,7 +37,7 @@ RUN scripts/install_tools.sh
 RUN sed -i 's/^debug/# debug/' fileb0x.yaml
 RUN go generate && go build -tags production -o kjudge cmd/kjudge/main.go
 
-# Stage 4: Create awesome output image
+# Stage 3: Create awesome output image
 FROM ubuntu:jammy
 
 RUN apt-get update && DEBIAN_FRONTEND="noninteractive" TZ="Asia/Ho_Chi_Minh" apt-get install -y \

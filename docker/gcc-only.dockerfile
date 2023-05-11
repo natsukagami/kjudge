@@ -15,13 +15,15 @@ FROM node:18-alpine AS frontend
 # Install node-gyp requirements
 RUN apk add --no-cache python3 make g++
 
-COPY ./ /kjudge
-
 WORKDIR /kjudge/frontend
 
-RUN yarn && yarn --prod --frozen-lockfile build 
+COPY ./frontend/package.json ./frontend/yarn.lock .
+RUN yarn install --frozen-lockfile
 
-# Stage 3: Build back-end
+COPY ./ /kjudge
+RUN yarn --prod --frozen-lockfile build 
+
+# Stage 2: Build back-end
 FROM golang:alpine AS backend
 
 RUN apk add --no-cache grep gcc g++ musl
@@ -33,11 +35,11 @@ RUN go mod download
 
 COPY --from=frontend /kjudge/. /kjudge
 
-RUN sh scripts/install_tools.sh 
+RUN sh scripts/install_tools.sh
 RUN sed -i 's/^debug/# debug/' fileb0x.yaml
 RUN go generate && go build -tags production -o kjudge cmd/kjudge/main.go
 
-# Stage 4: Create awesome output image
+# Stage 3: Create awesome output image
 FROM alpine:3
 
 RUN apk add --no-cache libcap make g++ openssl bash
