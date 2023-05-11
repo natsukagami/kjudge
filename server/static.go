@@ -36,6 +36,6 @@ func serveFile(file string, c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	http.ServeContent(c.Response(), c.Request(), stat.Name(), stat.ModTime(), f.(io.ReadSeeker))
+	http.ServeContent(c.Response(), c.Request(), stat.Name(), stat.ModTime(), f.(io.ReadSeeker)) // returned file always comes from embed or os.DirFS
 	return nil
 }
