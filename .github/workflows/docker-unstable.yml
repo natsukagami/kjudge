@@ -40,8 +40,6 @@ jobs:
           push: ${{ github.event_name == 'push' }}
           tags: ${{ env.tags }}
           file: ./docker/gcc-only.dockerfile
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
   unstable-gcc:
     name: GCC-only
     runs-on: ubuntu-latest
@@ -77,5 +75,3 @@ jobs:
           push: ${{ github.event_name == 'push' }}
           tags: ${{ env.tags }}
           file: ./docker/gcc-only.dockerfile
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
