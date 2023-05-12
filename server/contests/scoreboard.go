@@ -2,7 +2,6 @@ package contests
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -10,6 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
+	"github.com/natsukagami/kjudge/server/httperr"
 	"github.com/natsukagami/kjudge/server/user"
 )
 
@@ -22,19 +22,19 @@ type ScoreboardCtx struct {
 // Show decides whether the scoreboard can be shown.
 func (s *ScoreboardCtx) Show() error {
 	if s.Contest.StartTime.After(time.Now()) {
-		return errors.New("Contest has not started")
+		return httperr.BadRequestf("Contest has not started")
 	}
 	if s.Contest.EndTime.Before(time.Now()) {
 		return nil
 	}
 	switch s.Contest.ScoreboardViewStatus {
 	case models.ScoreboardViewStatusNoScoreboard:
-		return errors.New("Scoreboard has been disabled by the contest organizers until the end of the contest")
+		return httperr.Unauthorizedf("Scoreboard has been disabled by the contest organizers until the end of the contest")
 	case models.ScoreboardViewStatusUser:
 		if s.GetMe() != nil {
 			return nil
 		}
-		return errors.New("Please log in to see the scoreboard.")
+		return httperr.Unauthorizedf("Please log in to see the scoreboard.")
 	default:
 		return nil
 	}
@@ -96,24 +96,20 @@ func (g *Group) ScoreboardJSONGet(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	// if contest has ended, scoreboard should be accessible to everyone
-	if ctx.Contest.EndTime.Before(time.Now()) {
-		return ctx.RenderJSON(c)
+	if err := ctx.Show(); err != nil {
+		return err
 	}
 
-	// allow users to access scoreboard JSON based on ScoreboardViewStatus
-	if ctx.Contest.ScoreboardViewStatus == models.ScoreboardViewStatusNoScoreboard ||
-		ctx.Contest.ScoreboardViewStatus == models.ScoreboardViewStatusUser && ctx.AuthCtx.Me == nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "Scoreboard access is not granted")
-	} else {
-		return ctx.RenderJSON(c)
-	}
+	return ctx.RenderJSON(c)
 }
 
 // ScoreboardCSVGet implements GET /contests/:id/scoreboard/csv
 func (g *Group) ScoreboardCSVGet(c echo.Context) error {
 	ctx, err := getScoreboardCtx(g.db, c)
 	if err != nil {
+		return err
+	}
+	if err := ctx.Show(); err != nil {
 		return err
 	}
 	var buf bytes.Buffer
