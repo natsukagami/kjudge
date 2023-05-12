@@ -22,7 +22,10 @@ import hd from "humanize-duration";
         const html = `${nowStr.substring(
             0,
             nowStr.length - 7,
-        )} (<span class="font-mono">${iso.substring(0, iso.length - 8)}</span>)`; // Strip timezone and seconds branch
+        )} (<span class="font-mono">${iso.substring(
+            0,
+            iso.length - 8,
+        )}</span>)`; // Strip timezone and seconds branch
         for (const elem of document.getElementsByClassName(
             "utc-current-time",
         )) {
