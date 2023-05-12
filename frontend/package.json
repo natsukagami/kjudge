@@ -29,7 +29,7 @@
         "test": "echo No tests... yet",
         "fmt": "prettier \"css/**/*\" \"ts/**/*\" \"*.json\" \"*.js\"",
         "dev": "parcel watch \"html/**/*.html\"",
-        "build": "mkdir -p ../templates && rm -rf ../templates/* && parcel build --no-source-maps --no-cache \"html/**/*.html\""
+        "build": "mkdir -p ../embed/templates && rm -rf ../embed/templates/* && parcel build --no-source-maps --no-cache \"html/**/*.html\""
     },
     "alias": {
         "react": "preact/compat",
