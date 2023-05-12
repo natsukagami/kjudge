@@ -23,7 +23,7 @@ func BadRequestf(format string, args ...interface{}) error {
 	return Newf(http.StatusBadRequest, format, args...)
 }
 
-// Unauthorizedf creates an HTTP error with "bad request" code and a message.
+// Unauthorizedf creates an HTTP error with "unauthorized" code and a message.
 func Unauthorizedf(format string, args ...interface{}) error {
 	return Newf(http.StatusUnauthorized, format, args...)
 }
