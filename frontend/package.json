@@ -30,7 +30,7 @@
         "fmt": "prettier \"css/**/*\" \"ts/**/*\" \"*.json\" \"*.js\"",
         "dev": "parcel watch \"html/**/*.html\"",
         "build": "mkdir -p ../embed/templates && rm -rf ../embed/templates/* && parcel build --no-source-maps --no-cache \"html/**/*.html\""
-        "build:windows": "pwsh --command ../scripts/windows/build.ps1"
+        "build:windows": "pwsh --command ../scripts/windows/frontend_build.ps1"
     },
     "alias": {
         "react": "preact/compat",

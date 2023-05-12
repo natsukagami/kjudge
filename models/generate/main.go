@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"sort"
 	"strings"
 	"text/template"
@@ -331,14 +332,26 @@ func init() {
 	template.Must(t.Parse(FileTemplate))
 }
 
+func removeLeftoverGeneratedFiles() {
+	files, err := filepath.Glob("models/*_generated.go")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, file := range files {
+		if err := os.Remove(file); err != nil {
+			log.Fatal(err);
+		}
+	}
+}
+
 func main() {
 	var tables TomlTables
 	if _, err := toml.DecodeFile("models/models.toml", &tables); err != nil {
 		log.Fatal(err)
 	}
-	if err := exec.Command("rm", "-fv", "models/*_generated.go").Run(); err != nil {
-		log.Fatal(err)
-	}
+	removeLeftoverGeneratedFiles()
+
 	files := []string{"-w"} // This is actually goimports's parameters.
 	for name, fields := range tables {
 		table := TableFromToml(tables, name, fields)
