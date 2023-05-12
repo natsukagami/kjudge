@@ -1,9 +1,8 @@
-Set-PSDebug -Trace 1
 $ErrorActionPreference = "Stop"
 
 Set-Location .\frontend
 yarn
-yarn run --prod build
+yarn run --prod build:windows
 Set-Location ..
 
 go generate
