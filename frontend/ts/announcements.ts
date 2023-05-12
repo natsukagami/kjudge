@@ -1,12 +1,16 @@
-declare interface Window {
-    contestId: number;
-    announcements: {
-        setLast: (x: number | string) => void;
-        markUnread: () => void;
-    };
+declare global {
+    interface Window {
+        contestId: number;
+        announcements: {
+            setLast: (x: number | string) => void;
+            markUnread: () => void;
+        };
+    }
 }
 
-const notificationSound = new Audio(require("../sounds/notification.ogg"));
+const notificationSound = new Audio(
+    new URL("../sounds/notification.ogg", import.meta.url).toString(),
+);
 
 // Stores the last announcement and clarification read.
 interface Store {

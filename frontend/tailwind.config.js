@@ -1,20 +1,23 @@
-const defaultTheme = require("tailwindcss/defaultTheme");
-const colors = require("tailwindcss/colors");
+import colors from "tailwindcss/colors";
+import defaultTheme from "tailwindcss/defaultTheme";
 
-module.exports = {
-    purge: false,
+/**
+ * @type {import("tailwindcss").Config}
+ */
+const tailwindConfig = {
+    content: ["./html/**/*.html", "./ts/**/*.{ts,tsx}"],
     theme: {
-        extend: {},
-        fontFamily: {
-            ...defaultTheme.fontFamily,
-            mono: ['"IBM Plex Mono"', ...defaultTheme.fontFamily.mono],
-        },
-        colors: {
-            ...defaultTheme.colors,
-            teal: colors.teal,
-            orange: colors.orange,
+        extend: {
+            fontFamily: {
+                mono: ['"IBM Plex Mono"', ...defaultTheme.fontFamily.mono],
+            },
+            colors: {
+                teal: colors.teal,
+                orange: colors.orange,
+            },
         },
     },
-    variants: {},
     plugins: [],
 };
+
+export default tailwindConfig;

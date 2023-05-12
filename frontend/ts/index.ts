@@ -1,6 +1,6 @@
 // Muli font
-import "fontsource-muli";
-import "fontsource-ibm-plex-mono";
+import "@fontsource/mulish";
+import "@fontsource/ibm-plex-mono";
 
 // Moment.js
 import hd from "humanize-duration";

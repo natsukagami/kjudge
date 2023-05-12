@@ -1,7 +1,10 @@
+import "regenerator-runtime/runtime";
+
 import { render } from "preact";
 import { useState, useEffect } from "preact/hooks";
-import FlipMove from "react-flip-move";
-import "regenerator-runtime/runtime";
+import FlipMoveModule from "react-flip-move";
+
+const FlipMove = FlipMoveModule as any;
 
 declare global {
     interface Document {
