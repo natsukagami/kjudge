@@ -6,23 +6,30 @@
     "author": "Natsu Kagami",
     "license": "AGPL-3.0",
     "private": true,
-    "devDependencies": {        
-        "@fullhuman/postcss-purgecss": "5.0.0",
-        "@types/humanize-duration": "3.27.1",
-        "@types/node": "20.1.3",
-        "@types/react": "18.2.6",
-        "autoprefixer": "10.4.14",
-        "parcel": "2.8.3",
-        "postcss": "8.4.23",
-        "prettier": "2.8.8",
-        "tailwindcss": "3.3.2",
-        "typescript": "5.0.4"
+    "browserslist": "> 0.25%, not dead",
+    "targets": {
+        "default": {
+            "distDir": "../embed/templates",
+            "publicUrl": "/static"
+        }
+    },
+    "devDependencies": {
+        "@fullhuman/postcss-purgecss": "^5.0.0",
+        "@types/humanize-duration": "^3.27.1",
+        "@types/node": "^20.1.3",
+        "@types/react": "^18.2.6",
+        "autoprefixer": "^10.4.14",
+        "parcel": "^2.8.3",
+        "postcss": "^8.4.23",
+        "prettier": "^2.8.8",
+        "tailwindcss": "^3.3.2",
+        "typescript": "^5.0.4"
     },
     "scripts": {
         "test": "echo No tests... yet",
         "fmt": "prettier \"css/**/*\" \"ts/**/*\" \"*.json\" \"*.js\"",
-        "dev": "parcel watch \"html/**/*.html\" --dist-dir ../embed/templates",
-        "build": "parcel build \"html/**/*.html\" --no-source-maps --dist-dir ../embed/templates"
+        "dev": "parcel watch \"html/**/*.html\"",
+        "build": "mkdir -p ../templates && rm -rf ../templates/* && parcel build --no-source-maps --no-cache \"html/**/*.html\""
     },
     "alias": {
         "react": "preact/compat",
@@ -31,12 +38,12 @@
         "preact/jsx-dev-runtime": "preact/jsx-runtime"
     },
     "dependencies": {
-        "@fontsource/ibm-plex-mono": "4.5.13",
-        "@fontsource/mulish": "4.5.14",
-        "highlight.js": "11.8.0",
-        "humanize-duration": "3.28.0",
-        "preact": "10.13.2",
-        "react-flip-move": "3.0.5",
-        "regenerator-runtime": "0.13.11"
+        "@fontsource/ibm-plex-mono": "^4.5.13",
+        "@fontsource/mulish": "^4.5.14",
+        "highlight.js": "^11.8.0",
+        "humanize-duration": "^3.28.0",
+        "preact": "^10.13.2",
+        "react-flip-move": "^3.0.5",
+        "regenerator-runtime": "^0.13.11"
     }
 }

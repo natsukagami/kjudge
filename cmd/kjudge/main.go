@@ -18,7 +18,7 @@ import (
 
 var (
 	dbfile      = flag.String("file", "kjudge.db", "Path to the database file.")
-	sandboxImpl = flag.String("sandbox", "isolate", "The sandbox implementation to be used (isolate, raw). If anything other than 'raw' is given, isolate is used.")
+	sandboxImpl = flag.String("sandbox", "raw", "The sandbox implementation to be used (isolate, raw). If anything other than 'raw' is given, isolate is used.")
 	port        = flag.Int("port", 8088, "The port for the server to listen on.")
 
 	httpsDir = flag.String("https", "", "Path to the directory where the HTTPS private key (kjudge.key) and certificate (kjudge.crt) is located. If omitted or empty, HTTPS is disabled.")
