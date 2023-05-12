@@ -1,5 +1,7 @@
+export {};
+
 declare global {
-    interface Window {
+    interface Document {
         contestId: number;
         announcements: {
             setLast: (x: number | string) => void;
@@ -20,7 +22,7 @@ interface Store {
 }
 
 // Periodically fetch announcements
-window.announcements = (() => {
+document.announcements = (() => {
     const announcementKey = "kjudge-announcement-last";
     const get = () =>
         JSON.parse(localStorage.getItem(announcementKey) as string) as Store;
@@ -28,9 +30,9 @@ window.announcements = (() => {
         localStorage.setItem(announcementKey, JSON.stringify(x));
     // Set a default value
     localStorage.getItem(announcementKey) === null ||
-    get().contestId !== window.contestId
+    get().contestId !== document.contestId
         ? set({
-              contestId: window.contestId,
+              contestId: document.contestId,
               lastAnnouncement: 0,
               lastClarification: 0,
           })
@@ -61,7 +63,7 @@ window.announcements = (() => {
     const fetchAnnouncements = () => {
         const info = get();
         return fetch(
-            `/contests/${window.contestId}/messages/unread?last_announcement=${info.lastAnnouncement}&last_clarification=${info.lastClarification}`,
+            `/contests/${document.contestId}/messages/unread?last_announcement=${info.lastAnnouncement}&last_clarification=${info.lastClarification}`,
         )
             .then((v) => v.json())
             .then(setAnnouncementCount);
@@ -85,7 +87,7 @@ window.announcements = (() => {
                     ...document.getElementsByClassName("announcement"),
                 ].map((item) => Number(item.getAttribute("data-id")));
                 set({
-                    contestId: window.contestId,
+                    contestId: document.contestId,
                     lastAnnouncement: Math.max(...announcements, 0),
                     lastClarification: Math.max(...clars, 0),
                 });

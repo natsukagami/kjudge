@@ -31,9 +31,10 @@
 {{ template "send-clarification" . }}
 {{ end }}
 
-<script>
-    window.announcements.markUnread();
-    window.announcements.setLast();
+<script type="module">
+    import "../../ts/announcements.ts"; // wait for this to load first
+    document.announcements.markUnread();
+    document.announcements.setLast();
 </script>
 
 {{ end }}
