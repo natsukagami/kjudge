@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 
 <head>
+    <meta charset="utf-8">
     <title>{{block "title" .}}{{end}} - kjudge</title>
     <link rel="stylesheet" type="text/css" href="../css/index.css">
     <link rel="stylesheet" type="text/css" href="../node_modules/highlight.js/styles/monokai-sublime.css">
@@ -10,7 +11,7 @@
     <div class="container mx-auto">
         {{block "main" .}}{{end}}
     </div>
-    <script src="../ts/index.ts"></script>
+    <script type="module" src="../ts/index.ts"></script>
 </body>
 
 {{/* Common components */}}

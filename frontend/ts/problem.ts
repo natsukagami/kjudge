@@ -2,7 +2,7 @@ import hd from "humanize-duration";
 
 // Tab handling
 (() => {
-    let currentTab = new URL(document.URL).hash.substr(1);
+    let currentTab = new URL(document.URL).hash.substring(1);
     if (
         currentTab !== "statements" &&
         currentTab !== "files" &&

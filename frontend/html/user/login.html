@@ -36,10 +36,7 @@
         </div>
     </form>
 </div>
-<script src="../../ts/login.ts"></script>
 {{ if .AllowRegistration }}
-<script>
-    window.handleRegistration();
-</script>
+<script type="module" src="../../ts/login.ts"></script>
 {{ end }}
 {{ end }}

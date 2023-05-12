@@ -3,7 +3,7 @@
 {{ define "nav" }}
 {{ $contest_link := printf "/contests/%d" .Contest.ID }}
 <script type="application/javascript">
-    window.contestId = "{{.Contest.ID }}";
+    document.contestId = "{{.Contest.ID }}";
 </script>
 <div class="py-1">
     <div class="text-lg pl-4 mb-2 py-2 font-semibold">
@@ -21,7 +21,7 @@
                 <div class="rounded-full bg-red-600 text-white font-bold px-2 hidden" id="messages-counter"></div>
             </div>
         </a>
-        <script src="../../ts/announcements.ts"></script>
+        <script type="module" src="../../ts/announcements.ts"></script>
         <a href="{{$contest_link}}/scoreboard">
             <div class="bg-gray-300 rounded-sm hover:bg-gray-400 m-2 py-2 pl-4">Scoreboard</div>
         </a>

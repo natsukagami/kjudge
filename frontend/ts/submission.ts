@@ -31,9 +31,7 @@ hs.initHighlightingOnLoad();
     async function fetchResultAsUser(id: string): Promise<Result> {
         return (
             await fetch(
-                `/contests/${
-                    (window as any).contestId
-                }/submissions/${id}/verdict`,
+                `/contests/${document.contestId}/submissions/${id}/verdict`,
             )
         ).json() as Promise<Result>;
     }

@@ -1,9 +1,5 @@
-interface Window {
-    handleRegistration: () => void;
-}
-
 // Handle login/register dynamics
-window.handleRegistration = () => {
+(() => {
     let status: "register" | "login" =
         window.location.pathname === "/user/register" ? "register" : "login";
 
@@ -38,4 +34,4 @@ window.handleRegistration = () => {
         status = status === "login" ? "register" : "login";
         apply();
     });
-};
+})();
