@@ -64,9 +64,9 @@ func main() {
 	go queue.Start()
 	go startServer(server)
 
-	<-stop
+	received_signal := <- stop
 
-	log.Println("Shutting down")
+	log.Printf("Shutting down on receiving %s", received_signal)
 }
 
 func startServer(server *server.Server) {
