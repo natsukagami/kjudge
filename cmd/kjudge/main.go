@@ -18,7 +18,7 @@ import (
 
 var (
 	dbfile      = flag.String("file", "kjudge.db", "Path to the database file.")
-	sandboxImpl = flag.String("sandbox", "isolate", "The sandbox implementation to be used (isolate, raw). If anything other than 'raw' is given, isolate is used.")
+	sandboxImpl = flag.String("sandbox", "isolate", "The sandbox implementation to be used (isolate, raw). Defaults to isolate.")
 	port        = flag.Int("port", 8088, "The port for the server to listen on.")
 
 	httpsDir = flag.String("https", "", "Path to the directory where the HTTPS private key (kjudge.key) and certificate (kjudge.crt) is located. If omitted or empty, HTTPS is disabled.")
@@ -34,11 +34,17 @@ func main() {
 	defer db.Close()
 
 	var sandbox worker.Sandbox
-	if *sandboxImpl == "raw" {
-		log.Println("'raw' sandbox selected. WE ARE NOT RESPONSIBLE FOR ANY BREAKAGE CAUSED BY FOREIGN CODE.")
-		sandbox = &raw.Sandbox{}
-	} else {
-		sandbox = isolate.New()
+	switch *sandboxImpl {
+		case "raw": {
+			log.Println("'raw' sandbox selected. WE ARE NOT RESPONSIBLE FOR ANY BREAKAGE CAUSED BY FOREIGN CODE.")
+			sandbox = &raw.Sandbox{}
+		}
+		case "isolate": {
+			sandbox = isolate.New()
+		}
+		default: {
+			log.Fatalf("Sandbox %s doesn't exists or not yet implemented.", *sandboxImpl);
+		}
 	}
 
 	// Start the queue
