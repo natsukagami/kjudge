@@ -35,16 +35,13 @@ func main() {
 
 	var sandbox worker.Sandbox
 	switch *sandboxImpl {
-		case "raw": {
+		case "raw":
 			log.Println("'raw' sandbox selected. WE ARE NOT RESPONSIBLE FOR ANY BREAKAGE CAUSED BY FOREIGN CODE.")
 			sandbox = &raw.Sandbox{}
-		}
-		case "isolate": {
+		case "isolate":
 			sandbox = isolate.New()
-		}
-		default: {
+		default:
 			log.Fatalf("Sandbox %s doesn't exists or not yet implemented.", *sandboxImpl);
-		}
 	}
 
 	// Start the queue

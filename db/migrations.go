@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"io/fs"
 	"log"
-	"path"
+	"path/filepath"
 	"regexp"
 	"sort"
 
@@ -44,7 +44,7 @@ func (db *DB) migrate() error {
 
 	// Do migrations one by one
 	for _, name := range versions {
-		sqlFile := path.Join(assetsSql, name+".sql")
+		sqlFile := filepath.Join(assetsSql, name+".sql")
 		file, err := fs.ReadFile(embed.Content, sqlFile)
 		if err != nil {
 			return errors.Wrapf(err, "File %s", sqlFile)
