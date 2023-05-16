@@ -51,6 +51,17 @@ func New(filename string) (*DB, error) {
 	return db, nil
 }
 
+// Close attempts to close the database.
+func (db *DB) Close() error {
+	sqlxErr := db.DB.Close()
+	pcErr := db.PersistentConn.Close()
+
+	if sqlxErr != nil || pcErr != nil {
+		return errors.Errorf("cannot close database: %v / %v", sqlxErr, pcErr)
+	}
+	return nil
+}
+
 // Rollback performs a rollback on the transaction.
 // Logs the error down on error.
 func Rollback(tx *sqlx.Tx) {

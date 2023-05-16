@@ -3,9 +3,11 @@ package test
 
 import (
 	_ "embed"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -21,6 +23,33 @@ import (
 //go:embed data.sql
 var testData string
 
+// Content of the kjudge.db containing the full test database.
+var databaseContent []byte
+
+func init() {
+	tmpDir, err := os.MkdirTemp(os.TempDir(), "kjudge_test")
+	if err != nil {
+		log.Panic("cannot create temp dir:", err)
+	}
+	defer os.RemoveAll(tmpDir)
+	dbFile := filepath.Join(tmpDir, "kjudge.db")
+	tmpDb, err := db.New(dbFile)
+	if err != nil {
+		log.Panic("cannot create temp database:", errors.WithStack(err))
+	}
+	if _, err := tmpDb.Exec(testData); err != nil {
+		log.Panic("Cannot import test data:", err)
+	}
+	if err := tmpDb.Close(); err != nil {
+		log.Panic("cannot create temp database:", errors.WithStack(err))
+	}
+	dbFileContent, err := os.ReadFile(dbFile)
+	if err != nil {
+		log.Panic("cannot read temp database:", errors.WithStack(err))
+	}
+	databaseContent = dbFileContent
+}
+
 // TestServer wraps Server and adds some fancy stuff.
 type TestServer struct {
 	*server.Server
@@ -30,14 +59,14 @@ type TestServer struct {
 // NewDB creates and populates a test database.
 func NewDB(t *testing.T) *db.DB {
 	tmpDbFile := filepath.Join(t.TempDir(), "kjudge.db")
+	if err := os.WriteFile(tmpDbFile, databaseContent, 0644); err != nil {
+		t.Fatal("cannot create temp database:", errors.WithStack(err))
+	}
 	tmpDb, err := db.New(tmpDbFile)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
 
-	if _, err := tmpDb.Exec(testData); err != nil {
-		t.Fatal("Cannot import test data: ", err)
-	}
 	return tmpDb
 }
 
