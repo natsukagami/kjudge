@@ -49,15 +49,15 @@ jobs:
         - name: Run generation
           run: |
             scripts/generate.sh
-        - name: Run tests on go code
+        - name: Vet go code
           run: |
             # Check formatting
             test -z "$(goimports -l . | tee /dev/stderr)"
             # vet
             go vet ./...
             golangci-lint run --build-tags production
-            # setup db
-            scripts/setup_db.sh
+        - name: Run go tests
+          run: |
             # test
             scripts/test.sh
         - name: Try building in production mode
