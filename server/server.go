@@ -120,6 +120,11 @@ Please check out the open issues and help opening a new one if possible on https
 	}
 }
 
+// ServeHTTP serves a single HTTP request. Useful for testing.
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.echo.ServeHTTP(w, r)
+}
+
 // Start starts the server, listening for requests.
 func (s *Server) Start(port int) error {
 	return s.echo.Start(fmt.Sprintf(":%d", port))
