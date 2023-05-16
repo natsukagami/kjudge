@@ -14,7 +14,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-const sessionName = "kjudge_user"
+// SessionName is the kjudge session cookie name.
+const SessionName = "kjudge_user"
 
 // MustAuth returns the middleware that redirects to /login if authentication is not found.
 func MustAuth(db *db.DB) echo.MiddlewareFunc {
@@ -37,11 +38,11 @@ func MustAuth(db *db.DB) echo.MiddlewareFunc {
 // Might return a nil user with a nil error.
 func Authenticate(db db.DBContext, c echo.Context) (*models.User, error) {
 	// Search the cache
-	if user, ok := c.Get(sessionName).(*models.User); ok {
+	if user, ok := c.Get(SessionName).(*models.User); ok {
 		return user, nil
 	}
 
-	sess, err := session.Get(sessionName, c)
+	sess, err := session.Get(SessionName, c)
 	if err != nil {
 		return nil, Remove(c)
 	}
@@ -61,18 +62,19 @@ func Authenticate(db db.DBContext, c echo.Context) (*models.User, error) {
 	}
 
 	// Save to cache
-	c.Set(sessionName, user)
+	c.Set(SessionName, user)
 
 	return user, nil
 }
 
 // Store stores the user as a cookie.
 func Store(u *models.User, timeout time.Duration, c echo.Context) error {
-	sess, err := session.Get(sessionName, c)
+	sess, err := session.Get(SessionName, c)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 	sess.Values["username"] = u.ID
+	sess.Options.HttpOnly = true
 	if timeout != 0 {
 		sess.Options.MaxAge = int(timeout / time.Second)
 	}
@@ -81,7 +83,7 @@ func Store(u *models.User, timeout time.Duration, c echo.Context) error {
 
 // Remove removes the authentication cookie.
 func Remove(c echo.Context) error {
-	sess, _ := session.Get(sessionName, c)
+	sess, _ := session.Get(SessionName, c)
 	sess.Options.MaxAge = -1
 	return errors.WithStack(sess.Save(c.Request(), c.Response()))
 }

@@ -37,4 +37,8 @@ func main() {
 	if _, err := database.Exec(string(sql)); err != nil {
 		log.Fatalf("%+v", errors.WithStack(err))
 	}
+
+	if err := database.Close(); err != nil {
+		log.Fatalf("Error closing the database: %+v", err)
+	}
 }

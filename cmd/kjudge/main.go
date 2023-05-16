@@ -31,6 +31,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("%+v", err)
 	}
+	defer db.Close()
 
 	var sandbox worker.Sandbox
 	if *sandboxImpl == "raw" {
