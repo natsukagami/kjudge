@@ -53,3 +53,27 @@ func TestLogin(t *testing.T) {
 		}
 	})
 }
+
+func TestLogout(t *testing.T) {
+	ts := test.NewServer(t)
+
+	withMisaka := ts.WithMisaka(t)
+
+	t.Run("success", func(t *testing.T) {
+		res := ts.Serve(ts.PostForm(t, "/user/logout", url.Values{}), withMisaka)
+		if res.StatusCode >= 400 {
+			t.Errorf("Expected OK got %d", res.StatusCode)
+		}
+		cookies := res.Cookies()
+		if len(cookies) != 1 {
+			t.Errorf("Expected one cookie, got %#v", cookies)
+		}
+		cookie := cookies[0]
+		if cookie.Name != auth.SessionName {
+			t.Errorf("Expected %s cookie name, got %s", auth.SessionName, cookie.Name)
+		}
+		if cookie.Expires.After(time.Now()) {
+			t.Errorf("Cookie expired at %v", cookie.Expires)
+		}
+	})
+}

@@ -60,8 +60,35 @@ func (ts *TestServer) PostForm(t *testing.T, path string, body url.Values) *http
 }
 
 // Serve serves a HTTP request and returns its response.
-func (ts *TestServer) Serve(req *http.Request) *http.Response {
+func (ts *TestServer) Serve(req *http.Request, opts ...ReqOpt) *http.Response {
+	for _, opt := range opts {
+		opt(req)
+	}
 	rec := httptest.NewRecorder()
 	ts.ServeHTTP(rec, req)
 	return rec.Result()
 }
+
+// WithMisaka logs in as Misaka for the next request.
+func (ts *TestServer) WithMisaka(t *testing.T) ReqOpt {
+	// Perform the log in.
+	form := url.Values{}
+	form.Set("id", "misaka")
+	form.Set("password", "misaka")
+	resp := ts.Serve(ts.PostForm(t, "/user/login", form))
+
+	if resp.StatusCode >= 400 {
+		t.Fatalf("Cannot login as misaka: got code %d", resp.StatusCode)
+	}
+	cookies := resp.Cookies()
+	if len(cookies) != 1 {
+		t.Fatalf("Cannot login as misaka: expect one cookie, got %#v", cookies)
+	}
+
+	return func(req *http.Request) {
+		req.AddCookie(cookies[0])
+	}
+}
+
+// ReqOpt is an option for sending requests.
+type ReqOpt func(*http.Request)
