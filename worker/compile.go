@@ -60,7 +60,7 @@ func Compile(c *CompileContext) (bool, error) {
 	} else if !hasFile {
 		// Batch compile mode enabled, but this language is not supported.
 		c.Sub.CompiledSource = nil
-		c.Sub.Verdict = VerdictCompileError
+		c.Sub.Verdict = models.VerdictCompileError
 		c.Sub.CompilerOutput = []byte("Custom Compilers are not enabled for this language.")
 		return false, c.Sub.Write(c.DB)
 	}
@@ -94,7 +94,7 @@ func Compile(c *CompileContext) (bool, error) {
 		c.Sub.CompiledSource = output
 	} else {
 		c.Sub.CompiledSource = nil
-		c.Sub.Verdict = VerdictCompileError
+		c.Sub.Verdict = models.VerdictCompileError
 	}
 	log.Printf("[WORKER] Compiling submission %v succeeded (result = %v).", c.Sub.ID, result)
 

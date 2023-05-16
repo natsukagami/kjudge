@@ -10,13 +10,6 @@ import (
 	"github.com/natsukagami/kjudge/models"
 )
 
-const (
-	VerdictCompileError = "Compile Error"
-	VerdictScored       = "Scored"
-	VerdictAccepted     = "Accepted"
-	VerdictIsInQueue 	= "..."
-)
-
 // ScoreContext is a context for calculating a submission's score
 // and update the user's problem scores.
 type ScoreContext struct {
@@ -43,7 +36,7 @@ func Score(s *ScoreContext) error {
 		return models.BatchInsertJobs(s.DB, models.NewJobCompile(s.Sub.ID), models.NewJobScore(s.Sub.ID))
 	} else if source == nil {
 		log.Printf("[WORKER] Not running a submission that failed to compile.\n")
-		s.Sub.Verdict = VerdictCompileError
+		s.Sub.Verdict = models.VerdictCompileError
 		if err := s.Sub.Write(s.DB); err != nil {
 			return err
 		}
@@ -102,7 +95,7 @@ func Score(s *ScoreContext) error {
 func UpdateVerdict(tests []*models.TestGroupWithTests, sub *models.Submission) {
 	score, _, counts := scoreOf(sub)
 	if !counts {
-		sub.Verdict = VerdictCompileError
+		sub.Verdict = models.VerdictCompileError
 		return
 	}
 
@@ -114,9 +107,9 @@ func UpdateVerdict(tests []*models.TestGroupWithTests, sub *models.Submission) {
 	}
 
 	if score == maxPossibleScore {
-		sub.Verdict = VerdictAccepted
+		sub.Verdict = models.VerdictAccepted
 	} else {
-		sub.Verdict = VerdictScored
+		sub.Verdict = models.VerdictScored
 	}
 }
 
@@ -230,12 +223,12 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 		}
 		if s.Problem.ScoringMode == models.ScoringModeMin {
 			if sub == which {
-				if sub.Verdict != VerdictAccepted {
+				if sub.Verdict != models.VerdictAccepted {
 					failedAttempts++
 				}
 				break
 			}
-		} else if sub.Verdict == VerdictAccepted {
+		} else if sub.Verdict == models.VerdictAccepted {
 			break
 		}
 		failedAttempts++
@@ -258,7 +251,7 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 	contestType := s.Contest.ContestType
 	if contestType == models.ContestTypeWeighted && maxScore == 0.0 {
 		penalty = 0
-	} else if contestType == models.ContestTypeUnweighted && which.Verdict != VerdictAccepted {
+	} else if contestType == models.ContestTypeUnweighted && which.Verdict != models.VerdictAccepted {
 		penalty = 0
 	}
 	return &models.ProblemResult{
@@ -266,7 +259,7 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 		FailedAttempts:   failedAttempts,
 		Penalty:          penalty,
 		Score:            maxScore,
-		Solved:           which.Verdict == VerdictAccepted,
+		Solved:           which.Verdict == models.VerdictAccepted,
 		ProblemID:        s.Problem.ID,
 		UserID:           s.Sub.UserID,
 	}

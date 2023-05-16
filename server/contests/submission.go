@@ -9,7 +9,6 @@ import (
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/server/httperr"
-	"github.com/natsukagami/kjudge/worker"
 	"github.com/pkg/errors"
 )
 
@@ -111,7 +110,7 @@ func (g *Group) SubmissionVerdictGet(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	if ctx.Submission.Verdict == "..." || ctx.Submission.Verdict == worker.VerdictCompileError {
+	if ctx.Submission.Verdict == models.VerdictIsInQueue || ctx.Submission.Verdict == models.VerdictCompileError {
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"verdict": ctx.Submission.Verdict,
 		})

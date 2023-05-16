@@ -24,6 +24,13 @@ const (
 	LanguageRust Language = "rustc"
 )
 
+const (
+	VerdictCompileError = "Compile Error"
+	VerdictScored       = "Scored"
+	VerdictAccepted     = "Accepted"
+	VerdictIsInQueue 	= "..."
+)
+
 var availableLanguages []string
 
 // LanguageByExt returns a language based on the file extension.
