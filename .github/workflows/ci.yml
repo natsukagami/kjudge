@@ -59,7 +59,7 @@ jobs:
             # setup db
             scripts/setup_db.sh
             # test
-            go test ./...
+            scripts/test.sh
         - name: Try building in production mode
           run: |
             scripts/production_build.sh
