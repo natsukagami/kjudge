@@ -13,38 +13,56 @@ import (
 	"github.com/pkg/errors"
 )
 
-// The string that will be used as the admin key.
-var adminKey string
+// AdminAuth hosts the authentication module for admin.
+type AdminAuth struct {
+	// The string that will be used as the admin key.
+	hashedAdminKey []byte
+	// Random session key, will change every restart. Guarantees re-login of admin panel.
+	sessionKey string
+}
 
-// The admin key environment variable.
-const adminKeyEnv = "ADMIN_KEY"
+// AdminKeyEnv is the admin key environment variable to look for.
+const AdminKeyEnv = "ADMIN_KEY"
 
 // The key name for the admin session.
-const adminSessionName = "kjudge_admin"
+const (
+	adminSessionName     = "kjudge_admin"
+	adminSessionKeyField = "key"
+)
 
-func init() {
-	val := os.Getenv(adminKeyEnv)
+// NewAdmin creates a new AdminAuth.
+func NewAdmin() (*AdminAuth, error) {
+	val := os.Getenv(AdminKeyEnv)
 	if val != "" {
 		if len(val) < 6 {
-			log.Fatalf("The admin key should be at least 6 characters long.")
+			return nil, errors.New("The admin key should be at least 6 characters long.")
 		}
-		adminKey = val
-		return
+	} else {
+		log.Printf("%s variable not set. A random key will be generated and displayed.", AdminKeyEnv)
+		b := make([]byte, 16)
+		if _, err := rand.Read(b); err != nil {
+			log.Fatalf("%+v", errors.WithStack(err))
+		}
+		val = fmt.Sprintf("%x", b)
+		log.Printf("The Admin Panel access key is `%s`\n", val)
 	}
-
-	log.Println("ADMIN_KEY variable not set. A random key will be generated and displayed.")
-	b := make([]byte, 16)
-	if _, err := rand.Read(b); err != nil {
-		log.Fatalf("%+v", errors.WithStack(err))
+	// store the hashed version of it in memory
+	adminKey, err := PasswordHash(val)
+	if err != nil {
+		return nil, errors.Wrap(err, "error generating hashed key")
 	}
-	adminKey = fmt.Sprintf("%x", b)
-	log.Printf("The Admin Panel access key is `%s`\n", adminKey)
+	// generate a session key
+	sessionKey := make([]byte, 64)
+	if _, err := rand.Read(sessionKey); err != nil {
+		return nil, errors.Wrap(err, "error generating session key")
+	}
+	return &AdminAuth{hashedAdminKey: adminKey, sessionKey: fmt.Sprintf("%x", sessionKey)}, nil
 }
 
 // MustAdmin is a middleware that ensures admin access.
-func MustAdmin(h echo.HandlerFunc) echo.HandlerFunc {
+func (au *AdminAuth) MustAdmin(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		res, err := AuthenticateAdmin(c)
+		res, err := au.AuthenticateAdmin(c)
 		if err != nil {
 			return nil
 		}
@@ -57,7 +75,7 @@ func MustAdmin(h echo.HandlerFunc) echo.HandlerFunc {
 }
 
 // AuthenticateAdmin returns whether the context has admin panel access.
-func AuthenticateAdmin(c echo.Context) (bool, error) {
+func (au *AdminAuth) AuthenticateAdmin(c echo.Context) (bool, error) {
 	sess, err := session.Get(adminSessionName, c)
 	if err != nil {
 		return false, errors.Wrapf(RemoveAdmin(c), "handling err %v", err)
@@ -65,26 +83,26 @@ func AuthenticateAdmin(c echo.Context) (bool, error) {
 	if sess.IsNew {
 		return false, nil
 	}
-	hashedKey, ok := sess.Values["key"].(string)
+	key, ok := sess.Values[adminSessionKeyField].(string)
 	if !ok {
 		return false, nil
 	}
 
-	return CheckPassword(adminKey, hashedKey)
+	return key == au.sessionKey, nil
 }
 
 // SaveAdmin saves the admin cookie.
-func SaveAdmin(key string, c echo.Context) error {
-	if key != adminKey {
+func (au *AdminAuth) SaveAdmin(key string, c echo.Context) error {
+	if ok, err := CheckPassword(key, string(au.hashedAdminKey)); err != nil {
+		return err
+	} else if !ok {
 		return errors.New("Invalid admin key")
 	}
 	sess, _ := session.Get(adminSessionName, c)
 	sess.Options.MaxAge = 0
-	hashedKey, err := PasswordHash(adminKey)
-	if err != nil {
-		return err
-	}
-	sess.Values["key"] = string(hashedKey)
+	sess.Options.HttpOnly = true
+	sess.Options.SameSite = http.SameSiteStrictMode
+	sess.Values[adminSessionKeyField] = au.sessionKey
 	return errors.WithStack(sess.Save(c.Request(), c.Response()))
 }
 
