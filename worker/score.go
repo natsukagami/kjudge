@@ -14,6 +14,7 @@ const (
 	VerdictCompileError = "Compile Error"
 	VerdictScored       = "Scored"
 	VerdictAccepted     = "Accepted"
+	VerdictIsInQueue 	= "..."
 )
 
 // ScoreContext is a context for calculating a submission's score
