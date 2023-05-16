@@ -135,30 +135,30 @@ func (s *Scoreboard) JSON() JSONScoreboard {
 // Returns (comparison, is it just tie-breaking)
 func compareUserRanking(userResult []*UserResult, contestType ContestType, i, j int) (bool, bool) {
 	a, b := userResult[i], userResult[j]
-	if contestType == ContestTypeWeighted {
-		// sort based on totalScore if two users have same totalScore sort based on totalPenalty in an ascending order
-		if a.TotalScore != b.TotalScore {
-			return a.TotalScore > b.TotalScore, false
-		}
-		if a.TotalPenalty != b.TotalPenalty {
-			return a.TotalPenalty < b.TotalPenalty, false
-		}
-		return a.User.ID < b.User.ID, true
-	} else if contestType == ContestTypeUnweighted {
-		// sort based on solvedProblems if two users have same solvedProblems sort based on totalPenalty in an ascending order
-		if a.SolvedProblems != b.SolvedProblems {
-			return a.SolvedProblems > b.SolvedProblems, false
-		}
-		if a.TotalPenalty != b.TotalPenalty {
-			return a.TotalPenalty < b.TotalPenalty, false
-		}
-		return a.User.ID < b.User.ID, true
-	} else {
-		// in no case should this path be reached
-		// this just stays here in case someone implements a custom contest type
-		log.Panicf("Contest type %s does not exists or not yet implemented", contestType)
-		return true, true
+	switch contestType {
+		case ContestTypeWeighted:
+			// sort based on totalScore if two users have same totalScore sort based on totalPenalty in an ascending order
+			if a.TotalScore != b.TotalScore {
+				return a.TotalScore > b.TotalScore, false
+			}
+			if a.TotalPenalty != b.TotalPenalty {
+				return a.TotalPenalty < b.TotalPenalty, false
+			}
+			return a.User.ID < b.User.ID, true
+		case ContestTypeUnweighted:
+			// sort based on solvedProblems if two users have same solvedProblems sort based on totalPenalty in an ascending order
+			if a.SolvedProblems != b.SolvedProblems {
+				return a.SolvedProblems > b.SolvedProblems, false
+			}
+			if a.TotalPenalty != b.TotalPenalty {
+				return a.TotalPenalty < b.TotalPenalty, false
+			}
+			return a.User.ID < b.User.ID, true
 	}
+	// in no case should this path be reached
+	// this just stays here in case someone implements a custom contest type
+	log.Panicf("Contest type %s does not exists or not yet implemented", contestType)
+	return true, true
 }
 
 // Get scoreboard given problems and contest
