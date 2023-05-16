@@ -24,9 +24,9 @@ type AdminAuth struct {
 // AdminKeyEnv is the admin key environment variable to look for.
 const AdminKeyEnv = "ADMIN_KEY"
 
-// The key name for the admin session.
 const (
-	adminSessionName     = "kjudge_admin"
+	// AdminSessionName is the key name for the admin session cookie.
+	AdminSessionName     = "kjudge_admin"
 	adminSessionKeyField = "key"
 )
 
@@ -76,7 +76,7 @@ func (au *AdminAuth) MustAdmin(h echo.HandlerFunc) echo.HandlerFunc {
 
 // AuthenticateAdmin returns whether the context has admin panel access.
 func (au *AdminAuth) AuthenticateAdmin(c echo.Context) (bool, error) {
-	sess, err := session.Get(adminSessionName, c)
+	sess, err := session.Get(AdminSessionName, c)
 	if err != nil {
 		return false, errors.Wrapf(RemoveAdmin(c), "handling err %v", err)
 	}
@@ -98,7 +98,7 @@ func (au *AdminAuth) SaveAdmin(key string, c echo.Context) error {
 	} else if !ok {
 		return errors.New("Invalid admin key")
 	}
-	sess, _ := session.Get(adminSessionName, c)
+	sess, _ := session.Get(AdminSessionName, c)
 	sess.Options.MaxAge = 0
 	sess.Options.HttpOnly = true
 	sess.Options.SameSite = http.SameSiteStrictMode
@@ -108,7 +108,7 @@ func (au *AdminAuth) SaveAdmin(key string, c echo.Context) error {
 
 // RemoveAdmin removes the admin cookie session.
 func RemoveAdmin(c echo.Context) error {
-	sess, _ := session.Get(adminSessionName, c)
+	sess, _ := session.Get(AdminSessionName, c)
 	sess.Options.MaxAge = -1
 	return errors.WithStack(sess.Save(c.Request(), c.Response()))
 }

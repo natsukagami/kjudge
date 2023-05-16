@@ -2,7 +2,9 @@
 package test
 
 import (
+	"crypto/rand"
 	_ "embed"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -15,6 +17,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/server"
+	"github.com/natsukagami/kjudge/server/auth"
 	"github.com/pkg/errors"
 )
 
@@ -72,6 +75,13 @@ func NewDB(t *testing.T) *db.DB {
 
 // NewServer creates a new kjudge server running on a test database.
 func NewServer(t *testing.T) *TestServer {
+	// generate an admin key
+	adminKey := make([]byte, 32)
+	if _, err := rand.Read(adminKey); err != nil {
+		t.Fatal("generating admin key:", err)
+	}
+	t.Setenv(auth.AdminKeyEnv, fmt.Sprintf("%x", adminKey))
+
 	db := NewDB(t)
 	s, err := server.New(db)
 	if err != nil {
@@ -84,6 +94,16 @@ func NewServer(t *testing.T) *TestServer {
 func (ts *TestServer) PostForm(t *testing.T, path string, body url.Values) *http.Request {
 	req := httptest.NewRequest(http.MethodPost, path, strings.NewReader(body.Encode()))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
+
+	return req
+}
+
+// Get fires a new GET request with URL queries.
+func (ts *TestServer) Get(t *testing.T, path string, queries url.Values) *http.Request {
+	if len(queries) > 0 {
+		path = path + "?" + queries.Encode()
+	}
+	req := httptest.NewRequest(http.MethodGet, path, nil)
 
 	return req
 }
@@ -112,6 +132,26 @@ func (ts *TestServer) WithMisaka(t *testing.T) ReqOpt {
 	cookies := resp.Cookies()
 	if len(cookies) != 1 {
 		t.Fatalf("Cannot login as misaka: expect one cookie, got %#v", cookies)
+	}
+
+	return func(req *http.Request) {
+		req.AddCookie(cookies[0])
+	}
+}
+
+// WithAdmin logs in with the admin panel cookie for the next request.
+func (ts *TestServer) WithAdmin(t *testing.T) ReqOpt {
+	// Perform the log in.
+	form := url.Values{}
+	form.Set("key", os.Getenv(auth.AdminKeyEnv))
+	resp := ts.Serve(ts.PostForm(t, "/admin/login", form))
+
+	if resp.StatusCode >= 400 {
+		t.Fatalf("Cannot login to admin panel: got code %d", resp.StatusCode)
+	}
+	cookies := resp.Cookies()
+	if len(cookies) != 1 {
+		t.Fatalf("Cannot login to admin panel: expect one cookie, got %#v", cookies)
 	}
 
 	return func(req *http.Request) {
