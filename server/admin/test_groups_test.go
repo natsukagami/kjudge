@@ -116,6 +116,13 @@ func TestUploadMultipleTests(t *testing.T) {
 			if testsBefore[i].ID == test.ID { // but different IDs
 				t.Errorf("test %d: unexpected same ID", i)
 			}
+
+			if string(test.Input) != fmt.Sprintf("%d\n", i+1) {
+				t.Errorf("test %d: unexpected inputs: %v", i, test.Input)
+			}
+			if string(test.Output) != fmt.Sprintf("%d\n", 3*(i+1)) {
+				t.Errorf("test %d: unexpected inputs: %v", i, test.Input)
+			}
 		}
 	})
 
