@@ -17,6 +17,7 @@ import (
 	"github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/models/verify"
 	"github.com/natsukagami/kjudge/server/admin"
+	"github.com/natsukagami/kjudge/server/auth"
 	"github.com/natsukagami/kjudge/server/contests"
 	"github.com/natsukagami/kjudge/server/template"
 	"github.com/natsukagami/kjudge/server/user"
@@ -59,7 +60,11 @@ func New(db *db.DB) (*Server, error) {
 
 	s.SetupProfiling()
 
-	if _, err := admin.New(s.db, s.echo.Group("/admin")); err != nil {
+	au, err := auth.NewAdmin()
+	if err != nil {
+		return nil, err
+	}
+	if _, err := admin.New(s.db, au, s.echo.Group("/admin")); err != nil {
 		return nil, err
 	}
 	if _, err := user.New(s.db, s.echo.Group("/user")); err != nil {

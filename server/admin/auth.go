@@ -23,7 +23,7 @@ func (l *LoginCtx) Render(c echo.Context) error {
 
 // LoginGet implements GET /admin/login.
 func (g *Group) LoginGet(c echo.Context) error {
-	if ok, err := alreadyLoggedIn(c); err != nil {
+	if ok, err := g.alreadyLoggedIn(c); err != nil {
 		return err
 	} else if ok {
 		return nil
@@ -34,14 +34,14 @@ func (g *Group) LoginGet(c echo.Context) error {
 
 // LoginPost implements POST /admin/login.
 func (g *Group) LoginPost(c echo.Context) error {
-	if ok, err := alreadyLoggedIn(c); err != nil {
+	if ok, err := g.alreadyLoggedIn(c); err != nil {
 		return err
 	} else if ok {
 		return nil
 	}
 
 	key := c.FormValue("key")
-	if err := auth.SaveAdmin(key, c); err != nil {
+	if err := g.au.SaveAdmin(key, c); err != nil {
 		return (&LoginCtx{Error: err}).Render(c)
 	}
 	last := c.QueryParam("last")
@@ -64,8 +64,8 @@ func (g *Group) LogoutPost(c echo.Context) error {
 }
 
 // Redirect if already logged in.
-func alreadyLoggedIn(c echo.Context) (bool, error) {
-	ok, err := auth.AuthenticateAdmin(c)
+func (g *Group) alreadyLoggedIn(c echo.Context) (bool, error) {
+	ok, err := g.au.AuthenticateAdmin(c)
 	if err != nil {
 		return false, err
 	}
