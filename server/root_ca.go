@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
 )
 
@@ -18,6 +19,9 @@ func (s *Server) ServeHTTPRootCA(address, rootCA string) error {
 		return errors.Errorf("cannot use rootCA: %s is a directory", rootCA)
 	}
 	server := echo.New()
+	if s.verbose {
+		server.Use(middleware.Logger())
+	}
 	server.GET("/ca", func(c echo.Context) error {
 		return c.Attachment(rootCA, "root.pem")
 	})
