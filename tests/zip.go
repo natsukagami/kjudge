@@ -16,6 +16,13 @@ type LazyTest struct {
 	Input, Output *zip.File
 }
 
+// Verify calls the underlying Verify method, respecting their wish to have input and output non-null.
+func (lz *LazyTest) Verify() error {
+	lz.Test.Input = []byte{}
+	lz.Test.Output = []byte{}
+	return lz.Test.Verify()
+}
+
 type textMap = map[string]*zip.File
 
 // Unpack try to unpack a zip file and extract tests from the given pattern.
