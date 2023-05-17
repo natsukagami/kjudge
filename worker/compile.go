@@ -2,8 +2,10 @@ package worker
 
 // Compiling anything that's more compicated than single file:
 //
-// - Prepare a "compile_%s.sh" file, with %s being the language (cc, go, rs, java, py2, py3, pas).
-// - Prepare any more files as needed. They will all be put into the CWD of the script.
+// - Prepare a "compile_%s.%ext" file, with %s being the language (cc, go, rs, java, py2, py3, pas) and
+//      TODO: %ext being the shell extension (.sh for linux and .bat/.ps1 for windows).
+// - Prepare any more files as needed. They will all be put into the CWD of the script,
+//      TODO: except for "special" files.
 // - The CWD also contains "code.%s" (%s being the language's respective extension) file, which is the contestant's source code.
 // - The script should do whatever it wants (unsandboxed, because it's not my job to do so) within 20 seconds.
 // - It should produce a single binary called "code" in the CWD.
@@ -101,8 +103,11 @@ func Compile(c *CompileContext) (bool, error) {
 	return result, c.Sub.Write(c.DB)
 }
 
-// CompileAction is an action revolving writing the source into a file in "Source",
-// compile it with "Command" and taking the "Output" as the result.
+// CompileAction represents the following steps:
+// 1. Write the source into a file in "Source".
+// 2. Copy all files in Files into "Source"
+// 3. Compile the source with "Command".
+// 4. Produce "Output" as the result.
 type CompileAction struct {
 	Source   *models.File
 	Files    []*models.File
