@@ -28,13 +28,19 @@ import (
 type Server struct {
 	db   *db.DB
 	echo *echo.Echo
+
+	verbose bool
 }
 
 // New creates a new server.
-func New(db *db.DB) (*Server, error) {
-	s := Server{
+func New(db *db.DB, opts ...Opt) (*Server, error) {
+	s := &Server{
 		db:   db,
 		echo: echo.New(),
+	}
+
+	for _, opt := range opts {
+		opt(s)
 	}
 
 	// Load the configuration
@@ -58,6 +64,10 @@ func New(db *db.DB) (*Server, error) {
 	s.echo.Use(middleware.Recover())
 	s.echo.Use(middleware.Gzip())
 
+	if s.verbose {
+		s.echo.Use(middleware.Logger())
+	}
+
 	s.SetupProfiling()
 
 	au, err := auth.NewAdmin()
@@ -79,7 +89,7 @@ func New(db *db.DB) (*Server, error) {
 	s.echo.GET("*", StaticFiles)
 	s.echo.POST("*", NotFoundHandler)
 
-	return &s, nil
+	return s, nil
 }
 
 // NotFoundHandler handles the "not found" situation. It should be a catch-all for all urls.
