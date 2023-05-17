@@ -28,7 +28,7 @@ const (
 	VerdictCompileError = "Compile Error"
 	VerdictScored       = "Scored"
 	VerdictAccepted     = "Accepted"
-	VerdictIsInQueue 	= "..."
+	VerdictIsInQueue    = "..."
 )
 
 var availableLanguages []string
