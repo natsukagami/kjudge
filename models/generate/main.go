@@ -340,7 +340,7 @@ func removeLeftoverGeneratedFiles() {
 
 	for _, file := range files {
 		if err := os.Remove(file); err != nil {
-			log.Fatal(err);
+			log.Fatal(err)
 		}
 	}
 }

@@ -35,13 +35,13 @@ func main() {
 
 	var sandbox worker.Sandbox
 	switch *sandboxImpl {
-		case "raw":
-			log.Println("'raw' sandbox selected. WE ARE NOT RESPONSIBLE FOR ANY BREAKAGE CAUSED BY FOREIGN CODE.")
-			sandbox = &raw.Sandbox{}
-		case "isolate":
-			sandbox = isolate.New()
-		default:
-			log.Fatalf("Sandbox %s doesn't exists or not yet implemented.", *sandboxImpl);
+	case "raw":
+		log.Println("'raw' sandbox selected. WE ARE NOT RESPONSIBLE FOR ANY BREAKAGE CAUSED BY FOREIGN CODE.")
+		sandbox = &raw.Sandbox{}
+	case "isolate":
+		sandbox = isolate.New()
+	default:
+		log.Fatalf("Sandbox %s doesn't exists or not yet implemented.", *sandboxImpl)
 	}
 
 	// Start the queue
@@ -61,7 +61,7 @@ func main() {
 	go queue.Start()
 	go startServer(server)
 
-	received_signal := <- stop
+	received_signal := <-stop
 
 	log.Printf("Shutting down on receiving %s", received_signal)
 }
