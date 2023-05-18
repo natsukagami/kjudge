@@ -155,9 +155,7 @@ func compareUserRanking(userResult []*UserResult, contestType ContestType, i, j 
 		}
 		return a.User.ID < b.User.ID, true
 	}
-	// in no case should this path be reached
-	// this just stays here in case someone implements a custom contest type
-	log.Panicf("Contest type %s does not exists or not yet implemented", contestType)
+	log.Panicf("unexpected contest type %s", contestType)
 	return true, true
 }
 
