@@ -64,7 +64,7 @@ Write-Host "- Common name = $CERT_CN"
 Write-Host "- Email address = $CERT_EMAIL"
 Write-Host "- Alt hosts = $CERT_ALTNAMES"
 
-Function generateKey {
+Function Build-Key {
     If ([System.IO.File]::Exists([IO.Path]::Combine($ROOT_DIR, ".certs_generated"))){
         Write-Host "Certificate has already been generated."
         return 0
@@ -93,7 +93,7 @@ Function generateKey {
     Write-Host "Certificate generation complete."
     Out-File -FilePath "$CERT_GPATH"
 }
-generateKey
+Build-Key
 
 Write-Host "To re-generate the keys, delete " "$CERT_GPATH"
 Write-Host "Please keep $ROOT_KEY and $KJUDGE_KEY secret, while distributing" `
