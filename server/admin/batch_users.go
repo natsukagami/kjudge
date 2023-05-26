@@ -45,9 +45,9 @@ func (g *Group) BatchUsersEmptyGet(c echo.Context) error {
 
 // BatchUsersGenerateForm is the form for generating a CSV users file.
 type BatchUsersGenerateForm struct {
-	Prefix string `form:"prefix"`
-	Count  int    `form:"count"`
-	Offset int    `form:"offset"`
+	Prefix string `query:"prefix"`
+	Count  int    `query:"count"`
+	Offset int    `query:"offset"`
 }
 
 // Verify verifies the content of the form.
