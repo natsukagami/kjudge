@@ -1,5 +1,3 @@
-export {};
-
 declare global {
     interface Document {
         contestId: number;
@@ -60,16 +58,16 @@ document.announcements = (() => {
     };
 
     // Fetch announcements count
-    const fetchAnnouncements = () => {
+    const fetchAnnouncements = async () => {
         const info = get();
-        return fetch(
+        const res = await fetch(
             `/contests/${document.contestId}/messages/unread?last_announcement=${info.lastAnnouncement}&last_clarification=${info.lastClarification}`,
-        )
-            .then((v) => v.json())
-            .then(setAnnouncementCount);
+        );
+        return setAnnouncementCount(await res.json());
     };
 
     setInterval(fetchAnnouncements, 10 * 1000);
+
     const firstLoad = fetchAnnouncements();
 
     return {

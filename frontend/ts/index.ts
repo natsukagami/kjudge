@@ -13,7 +13,7 @@ import hd from "humanize-duration";
 })();
 
 // Set timezone
-(function () {
+(() => {
     setInterval(() => {
         // Parse and update the "the current time is" nodes.
         const now = new Date();
@@ -43,7 +43,7 @@ import hd from "humanize-duration";
 })();
 
 // require-confirm forms
-(function () {
+(() => {
     for (const elem of document.getElementsByClassName("require-confirm")) {
         (elem as HTMLFormElement).addEventListener("submit", (ev) => {
             if (!confirm("Are you sure you want to delete this item?"))

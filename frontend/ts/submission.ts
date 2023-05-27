@@ -1,14 +1,21 @@
-const hs = require("highlight.js/lib/core.js");
 import "regenerator-runtime/runtime";
 
-hs.registerLanguage("cpp", require("highlight.js/lib/languages/cpp"));
-hs.registerLanguage("python", require("highlight.js/lib/languages/python"));
-hs.registerLanguage("java", require("highlight.js/lib/languages/java"));
-hs.registerLanguage("rust", require("highlight.js/lib/languages/rust"));
-hs.registerLanguage("go", require("highlight.js/lib/languages/go"));
-hs.registerLanguage("pascal", require("highlight.js/lib/languages/delphi"));
+import hs from "highlight.js/lib/core.js";
+import hsCpp from "highlight.js/lib/languages/cpp";
+import hsPas from "highlight.js/lib/languages/delphi";
+import hsGo from "highlight.js/lib/languages/go";
+import hsJava from "highlight.js/lib/languages/java";
+import hsPy from "highlight.js/lib/languages/python";
+import hsRust from "highlight.js/lib/languages/rust";
 
-hs.initHighlightingOnLoad();
+hs.registerLanguage("cpp", hsCpp);
+hs.registerLanguage("pascal", hsPas);
+hs.registerLanguage("go", hsGo);
+hs.registerLanguage("java", hsJava);
+hs.registerLanguage("python", hsPy);
+hs.registerLanguage("rust", hsRust);
+
+hs.highlightAll();
 
 // Live updating verdicts
 (() => {
@@ -22,19 +29,17 @@ hs.initHighlightingOnLoad();
               penalty: number;
           };
 
-    async function fetchResult(id: string): Promise<Result> {
-        return (
-            await fetch(`/admin/submissions/${id}/verdict`)
-        ).json() as Promise<Result>;
-    }
+    const fetchResult = async (id: string): Promise<Result> => {
+        return (await fetch(`/admin/submissions/${id}/verdict`)).json();
+    };
 
-    async function fetchResultAsUser(id: string): Promise<Result> {
+    const fetchResultAsUser = async (id: string): Promise<Result> => {
         return (
             await fetch(
                 `/contests/${document.contestId}/submissions/${id}/verdict`,
             )
-        ).json() as Promise<Result>;
-    }
+        ).json();
+    };
 
     for (const field of document.getElementsByClassName("live-update")) {
         const id = field.getAttribute("data-id");

@@ -202,7 +202,7 @@ const Row = ({
                     contest_type={contest_type}
                     result={user.problem_results[p.id]}
                     first_solver_submission={problem_first_solvers[p.id]}
-                ></Cell>
+                />
             ))}
         </div>
     );
