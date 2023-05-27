@@ -24,7 +24,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Server this the root entry of the server.
+// Server is the root entry of the server.
 type Server struct {
 	db   *db.DB
 	echo *echo.Echo

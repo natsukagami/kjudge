@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"log"
 	"sort"
 	"time"
 
@@ -134,7 +135,8 @@ func (s *Scoreboard) JSON() JSONScoreboard {
 // Returns (comparison, is it just tie-breaking)
 func compareUserRanking(userResult []*UserResult, contestType ContestType, i, j int) (bool, bool) {
 	a, b := userResult[i], userResult[j]
-	if contestType == ContestTypeWeighted {
+	switch contestType {
+	case ContestTypeWeighted:
 		// sort based on totalScore if two users have same totalScore sort based on totalPenalty in an ascending order
 		if a.TotalScore != b.TotalScore {
 			return a.TotalScore > b.TotalScore, false
@@ -143,7 +145,7 @@ func compareUserRanking(userResult []*UserResult, contestType ContestType, i, j 
 			return a.TotalPenalty < b.TotalPenalty, false
 		}
 		return a.User.ID < b.User.ID, true
-	} else {
+	case ContestTypeUnweighted:
 		// sort based on solvedProblems if two users have same solvedProblems sort based on totalPenalty in an ascending order
 		if a.SolvedProblems != b.SolvedProblems {
 			return a.SolvedProblems > b.SolvedProblems, false
@@ -153,6 +155,8 @@ func compareUserRanking(userResult []*UserResult, contestType ContestType, i, j 
 		}
 		return a.User.ID < b.User.ID, true
 	}
+	log.Panicf("unexpected contest type %s", contestType)
+	return true, true
 }
 
 // Get scoreboard given problems and contest

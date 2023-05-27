@@ -20,7 +20,7 @@ func batchScoreJobs(subIDs ...int) []*Job {
 
 // Remove the submission's `score`, `penalty` and `verdict`.
 func resetScore(db db.DBContext, subIDs ...int) error {
-	query, params, err := sqlx.In(`UPDATE submissions SET score = NULL, penalty = NULL, verdict = "..." WHERE id IN (?)`, subIDs)
+	query, params, err := sqlx.In(`UPDATE submissions SET score = NULL, penalty = NULL, verdict =  ? WHERE id IN (?)`, VerdictIsInQueue, subIDs)
 	if err != nil {
 		return errors.WithStack(err)
 	}

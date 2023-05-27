@@ -164,7 +164,7 @@ func (g *Group) SubmitPost(c echo.Context) error {
 		Source:      source,
 		Language:    lang,
 		SubmittedAt: now,
-		Verdict:     "...",
+		Verdict:     models.VerdictIsInQueue,
 	}
 
 	if err := sub.Write(tx); err != nil {

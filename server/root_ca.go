@@ -9,8 +9,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// ServeHTTPRootCA starts a HTTP server running on `address`
-// serving the root CA from "/ca". It rejects all other requests.
+// ServeHTTPRootCA starts a HTTP server running on `address` serving the .pem file at
+// rootCA, serving the root CA from "/ca". It rejects all other requests.
 func (s *Server) ServeHTTPRootCA(address, rootCA string) error {
 	if stat, err := os.Stat(rootCA); err != nil {
 		return errors.WithStack(err)

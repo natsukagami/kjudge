@@ -126,7 +126,7 @@ func RunSingleCommand(sandbox Sandbox, r *RunContext, source []byte) (output *Sa
 	return output, nil
 }
 
-func RunMutipleCommands(sandbox Sandbox, r *RunContext, source []byte, stages []string) (output *SandboxOutput, err error) {
+func RunMultipleCommands(sandbox Sandbox, r *RunContext, source []byte, stages []string) (output *SandboxOutput, err error) {
 	command, args, err := RunCommand(r.Sub.Language)
 	if err != nil {
 		return nil, err
@@ -193,7 +193,7 @@ func Run(sandbox Sandbox, r *RunContext) error {
 	} else {
 		// Problem Type is Chained Type, we need to run mutiple commands with arguments from .stages (file)
 		stages := strings.Split(string(file.Content), "\n")
-		output, err = RunMutipleCommands(sandbox, r, source, stages)
+		output, err = RunMultipleCommands(sandbox, r, source, stages)
 		if err != nil {
 			return err
 		}

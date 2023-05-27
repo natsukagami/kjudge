@@ -68,6 +68,8 @@ Usage of ./kjudge:
 
 ## Build Instructions
 
+Warning: Windows support for kjudge is a WIP (and by that we mean machine-wrecking WIP). Run at your own risk.
+
 External Dependencies:
 
 ```yaml
