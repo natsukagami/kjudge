@@ -9,7 +9,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/natsukagami/kjudge/db"
@@ -244,6 +243,7 @@ func (g *Group) TestGroupRejudgePost(c echo.Context) error {
 
 // WriteTests writes the given set of tests into the Database.
 // If override is set, all tests in the test group gets deleted first.
+// The LazyTests are STILL invalid models.Tests. DO NOT USE.
 func (r *TestGroupCtx) WriteTests(db db.DBContext, tests []*tests.LazyTest, override bool) error {
 	for _, test := range tests {
 		test.TestGroupID = r.ID
@@ -256,12 +256,7 @@ func (r *TestGroupCtx) WriteTests(db db.DBContext, tests []*tests.LazyTest, over
 			return errors.WithStack(err)
 		}
 	}
-	var (
-		terms []string
-		vars  []interface{}
-	)
 	for _, test := range tests {
-		terms = append(terms, "(?, ?, ?, ?)")
 		input, err := readZip(test.Input)
 		if err != nil {
 			return errors.Wrapf(err, "test %v input", test.Name)
@@ -270,18 +265,15 @@ func (r *TestGroupCtx) WriteTests(db db.DBContext, tests []*tests.LazyTest, over
 		if err != nil {
 			return errors.Wrapf(err, "test %v output", test.Name)
 		}
-		vars = append(vars, test.Name, test.TestGroupID, input, output)
-	}
-	res, err := db.Exec(fmt.Sprintf("INSERT INTO tests(name, test_group_id, input, output) VALUES %s", strings.Join(terms, ", ")), vars...)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	id, err := res.LastInsertId()
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	for i, test := range tests {
-		test.ID = int(id) - len(tests) + i + 1
+		if _, err := db.Exec(
+			"INSERT INTO tests(name, test_group_id, input, output) VALUES (?, ?, ?, ?)",
+			test.Name,
+			test.TestGroupID,
+			input,
+			output,
+		); err != nil {
+			return errors.Wrapf(err, "inserting test `%s`", test.Name)
+		}
 	}
 	return nil
 }

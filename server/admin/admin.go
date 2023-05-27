@@ -11,19 +11,21 @@ import (
 type Group struct {
 	*echo.Group
 	db *db.DB
+	au *auth.AdminAuth
 }
 
 // New creates a new group.
-func New(db *db.DB, unauthed *echo.Group) (*Group, error) {
+func New(db *db.DB, au *auth.AdminAuth, unauthed *echo.Group) (*Group, error) {
 	grp := &Group{
 		Group: unauthed,
 		db:    db,
+		au:    au,
 	}
 	// Authentication
 	unauthed.GET("/login", grp.LoginGet)
 	unauthed.POST("/login", grp.LoginPost)
 
-	g := unauthed.Group("", auth.MustAdmin)
+	g := unauthed.Group("", au.MustAdmin)
 	g.GET("/logout", grp.LogoutPost)
 	g.GET("", grp.Home)
 	// Contest List
