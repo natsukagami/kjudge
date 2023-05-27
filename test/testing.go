@@ -83,7 +83,7 @@ func NewServer(t *testing.T) *TestServer {
 	t.Setenv(auth.AdminKeyEnv, fmt.Sprintf("%x", adminKey))
 
 	db := NewDB(t)
-	s, err := server.New(db)
+	s, err := server.New(db, server.Verbose())
 	if err != nil {
 		t.Fatal(err)
 	}

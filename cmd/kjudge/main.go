@@ -20,6 +20,7 @@ var (
 	dbfile      = flag.String("file", "kjudge.db", "Path to the database file.")
 	sandboxImpl = flag.String("sandbox", "isolate", "The sandbox implementation to be used (isolate, raw). Defaults to isolate.")
 	port        = flag.Int("port", 8088, "The port for the server to listen on.")
+	verbose     = flag.Bool("verbose", false, "Log every http requests")
 
 	httpsDir = flag.String("https", "", "Path to the directory where the HTTPS private key (kjudge.key) and certificate (kjudge.crt) is located. If omitted or empty, HTTPS is disabled.")
 )
@@ -44,11 +45,16 @@ func main() {
 		log.Fatalf("Sandbox %s doesn't exists or not yet implemented.", *sandboxImpl)
 	}
 
+	opts := []server.Opt{}
+	if *verbose {
+		opts = append(opts, server.Verbose())
+	}
+
 	// Start the queue
 	queue := worker.Queue{Sandbox: sandbox, DB: db}
 
 	// Build the server
-	server, err := server.New(db)
+	server, err := server.New(db, opts...)
 	if err != nil {
 		log.Fatalf("%+v", err)
 	}
