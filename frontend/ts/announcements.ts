@@ -70,7 +70,6 @@ document.announcements = (() => {
     };
 
     setInterval(fetchAnnouncements, 10 * 1000);
-
     const firstLoad = fetchAnnouncements();
 
     return {
