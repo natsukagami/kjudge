@@ -3,7 +3,7 @@
     function handleTable(table: HTMLTableElement) {
         const selectAll = table.getElementsByClassName(
             "select-all",
-        )[0] as HTMLTableHeaderCellElement;
+        )[0] as HTMLTableCellElement;
         const rows = table.getElementsByClassName(
             "table-row",
         ) as HTMLCollectionOf<HTMLTableRowElement>;

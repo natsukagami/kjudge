@@ -1,9 +1,8 @@
+// @ts-check
 import colors from "tailwindcss/colors";
 import defaultTheme from "tailwindcss/defaultTheme";
 
-/**
- * @type {import("tailwindcss").Config}
- */
+/** @type {import("tailwindcss").Config} */
 const tailwindConfig = {
     content: ["./html/**/*.html", "./ts/**/*.{ts,tsx}"],
     theme: {
