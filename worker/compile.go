@@ -113,6 +113,35 @@ type CompileAction struct {
 	Output   string
 }
 
+var batchFilenames = []string{
+	"compile_cc.sh", "compile_go.sh", "compile_java.sh", "compile_rs.sh", "compile_pas.sh", "compile_py2.sh", "compile_py3.sh",
+}
+
+func isBatchFile(filename string) bool {
+	for _, f := range batchFilenames {
+		if f == filename {
+			return true
+		}
+	}
+	return false
+}
+
+var recognizedFilenames = []string {
+	"statements.pdf", "statements.md", "compare", ".stages",
+}
+
+func isRecognizedFile(filename string) bool {
+	if isBatchFile(filename) {
+		return true
+	}
+	for _, f := range recognizedFilenames {
+		if f == filename {
+			return true
+		}
+	}
+	return false
+}
+
 // Prepare prepares a temporary folder and copies all the content there.
 func (c *CompileAction) Prepare(dir string) error {
 	// Copy over all files and the source code.
@@ -120,6 +149,9 @@ func (c *CompileAction) Prepare(dir string) error {
 		return errors.WithStack(err)
 	}
 	for _, file := range c.Files {
+		if isRecognizedFile(file.Filename) {
+			continue
+		}
 		if err := os.WriteFile(filepath.Join(dir, file.Filename), file.Content, 0666); err != nil {
 			return errors.Wrapf(err, "copying file %s", file.Filename)
 		}
@@ -165,19 +197,6 @@ func (c *CompileAction) Perform(cwd string) (succeeded bool, messages []byte) {
 		}
 	}
 	return true, allOutputs.Bytes()
-}
-
-var batchFilenames = []string{
-	"compile_cc.sh", "compile_go.sh", "compile_java.sh", "compile_rs.sh", "compile_pas.sh", "compile_py2.sh", "compile_py3.sh",
-}
-
-func isBatchFile(filename string) bool {
-	for _, f := range batchFilenames {
-		if f == filename {
-			return true
-		}
-	}
-	return false
 }
 
 // CompileBatch returns a compile action, along with the required batch filename
