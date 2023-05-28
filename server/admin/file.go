@@ -12,7 +12,7 @@ import (
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/server/httperr"
-	"github.com/natsukagami/kjudge/worker"
+	"github.com/natsukagami/kjudge/worker/compile"
 	"github.com/pkg/errors"
 )
 
@@ -75,7 +75,7 @@ func (g *Group) FileCompile(c echo.Context) error {
 		return err
 	}
 
-	output, err := worker.CustomCompile(file, files)
+	output, err := compile.CustomCompile(file, files)
 	if err != nil {
 		return httperr.BadRequestf("%v", err)
 	}
