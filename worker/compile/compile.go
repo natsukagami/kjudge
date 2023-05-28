@@ -69,7 +69,7 @@ func getAction(c *CompileContext) (*CompileAction, error) {
 	return nil, errors.Errorf("no scheme accepted context")
 }
 
-var recognizedFilenames = []string {
+var recognizedFilenames = []string{
 	"statements.pdf", "statements.md", "compare", ".stages",
 }
 

@@ -88,6 +88,6 @@ func CompileBatch(c *CompileContext) (*CompileAction, error) {
 	if !compilable || err != nil {
 		return nil, err
 	}
-	
+
 	return action, nil
 }

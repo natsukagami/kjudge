@@ -1,4 +1,5 @@
 package compile
+
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/natsukagami/kjudge/models"
@@ -9,7 +10,7 @@ type CompileContext struct {
 	DB      *sqlx.Tx
 	Sub     *models.Submission
 	Problem *models.Problem
-	Files 	[]*models.File
+	Files   []*models.File
 }
 
 // Creates a CompileContext, get the problem's file list from the database and assign
