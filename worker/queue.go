@@ -7,6 +7,7 @@ import (
 	"github.com/mattn/go-sqlite3"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
+	"github.com/natsukagami/kjudge/worker/compile"
 	"github.com/pkg/errors"
 )
 
@@ -60,7 +61,11 @@ func (q *Queue) HandleJob(job *models.Job) error {
 	}
 	switch job.Type {
 	case models.JobTypeCompile:
-		if _, err := Compile(&CompileContext{DB: tx, Sub: sub, Problem: problem}); err != nil {
+		c, err := compile.NewCompileContext(tx, sub, problem)
+		if err != nil {
+			return err
+		}
+		if _, err := compile.Compile(c); err != nil {
 			return err
 		}
 	case models.JobTypeRun:

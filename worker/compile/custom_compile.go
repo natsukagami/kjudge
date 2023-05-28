@@ -1,4 +1,4 @@
-package worker
+package compile
 
 import (
 	"os"
@@ -16,7 +16,7 @@ func CustomCompile(source *models.File, files []*models.File) (*models.File, err
 		return nil, err
 	}
 	// Find out the batch command
-	action, err := CompileSingle(language)
+	action, err := getCompileSingleAction(language)
 	if err != nil {
 		return nil, err
 	}
