@@ -17,7 +17,7 @@ var batchFilenames = []string{
 	"compile_cc.sh", "compile_go.sh", "compile_java.sh", "compile_rs.sh", "compile_pas.sh", "compile_py2.sh", "compile_py3.sh",
 }
 
-func verifyBatchScheme(c *CompileContext, expected string) (bool, []byte, error) {
+func verifyBatchScheme(c *CompileContext, expected string) (bool, error) {
 	hasBatch := false
 	for _, file := range c.Files {
 		for _, f := range batchFilenames {
@@ -26,7 +26,7 @@ func verifyBatchScheme(c *CompileContext, expected string) (bool, []byte, error)
 			}
 		}
 		if file.Filename == expected {
-			return true, file.Content, nil
+			return true, nil
 		}
 	}
 	if hasBatch {
@@ -34,9 +34,9 @@ func verifyBatchScheme(c *CompileContext, expected string) (bool, []byte, error)
 		c.Sub.CompiledSource = nil
 		c.Sub.Verdict = models.VerdictCompileError
 		c.Sub.CompilerOutput = []byte("Custom Compilers are not enabled for this language.")
-		return false, nil, c.Sub.Write(c.DB)
+		return false, c.Sub.Write(c.DB)
 	}
-	return false, nil, nil
+	return false, nil
 }
 
 // getCompileBatchAction returns a compile action, along with the required batch filename
@@ -81,7 +81,7 @@ func CompileBatch(c *CompileContext) (*CompileAction, error) {
 	if err != nil {
 		return nil, err
 	}
-	compilable, batchContent, err := verifyBatchScheme(c, batchFile)
+	compilable, err := verifyBatchScheme(c, batchFile)
 	if !compilable || err != nil {
 		return nil, err
 	}

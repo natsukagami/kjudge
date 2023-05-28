@@ -79,11 +79,6 @@ func isRecognizedFile(filename string) bool {
 			return true
 		}
 	}
-	for _, f := range batchFilenames {
-		if f == filename {
-			return true
-		}
-	}
 	return false
 }
 
