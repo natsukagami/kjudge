@@ -12,6 +12,8 @@ type CompileContext struct {
 	Files 	[]*models.File
 }
 
+// Creates a CompileContext, get the problem's file list from the database and assign
+// them to the Files field.
 func NewCompileContext(DB *sqlx.Tx, Sub *models.Submission, Problem *models.Problem) (*CompileContext, error) {
 	files, err := models.GetProblemFiles(DB, Problem.ID)
 	if err != nil {

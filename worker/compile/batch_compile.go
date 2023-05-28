@@ -76,6 +76,9 @@ func getCompileBatchAction(l models.Language) (*CompileAction, string, error) {
 	}, batch, nil
 }
 
+// CompileBatch returns nil if the problem is not setup for batch-compile
+// and returns an action otherwise. Throws if batch-compilable but language
+// of the submission is not supported (no batch file for specified language).
 func CompileBatch(c *CompileContext) (*CompileAction, error) {
 	action, batchFile, err := getCompileBatchAction(c.Sub.Language)
 	if err != nil {
