@@ -74,6 +74,10 @@ var recognizedFilenames = []string{
 }
 
 func isRecognizedFile(filename string) bool {
+	// Admins may upload compare.* files and compile them.
+	if strings.HasPrefix(filename, "compare.") {
+		return true
+	}
 	for _, f := range recognizedFilenames {
 		if f == filename {
 			return true
@@ -117,7 +121,7 @@ func (c *CompileAction) Cleanup(dir string) {
 }
 
 // Perform performs the compile action on the given directory.
-// The directory MUST contain all files given by the Problem, PLUS the written "Source" file.
+// The directory MUST contain all *non-recognizable* files given by the Problem, PLUS the written "Source" file.
 func (c *CompileAction) Perform(cwd string) (succeeded bool, messages []byte) {
 	allOutputs := bytes.Buffer{}
 	for _, command := range c.Commands {
