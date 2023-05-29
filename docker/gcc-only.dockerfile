@@ -17,7 +17,7 @@ RUN apk add --no-cache python3 make g++
 
 WORKDIR /kjudge/frontend
 
-COPY ./frontend/package.json ./frontend/yarn.lock ./
+COPY ./frontend/package.json ./frontend/yarn.lock .
 RUN yarn install --frozen-lockfile
 
 COPY ./ /kjudge
