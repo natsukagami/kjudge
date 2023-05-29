@@ -1,7 +1,21 @@
-# Stage 0: Compile isolate
-FROM ubuntu:jammy AS isolate
+# Stage -1: Update apt-get
+FROM ubuntu:jammy AS base-ubuntu
 
-RUN apt-get update && apt-get install -y libcap-dev gcc git make
+# Mount apt's cache folders to cache install but maintain
+# reproducibility on local machine. More details at:
+# https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md#run---mounttypecache
+
+# Set sharing=locked to avoid race condition with between stages.
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get upgrade -y
+
+# Stage 0: Compile isolate
+FROM base-ubuntu AS isolate
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y libcap-dev gcc git make
 
 WORKDIR /isolate
 
@@ -17,7 +31,7 @@ RUN apk add --no-cache python3 make g++
 
 WORKDIR /kjudge/frontend
 
-COPY ./frontend/package.json ./frontend/yarn.lock .
+COPY ./frontend/package.json ./frontend/yarn.lock ./
 RUN yarn install --frozen-lockfile
 
 COPY ./ /kjudge
@@ -37,11 +51,16 @@ RUN scripts/install_tools.sh
 RUN go generate && go build -tags production -o kjudge cmd/kjudge/main.go
 
 # Stage 3: Create awesome output image
-FROM ubuntu:jammy
+FROM base-ubuntu
 
-RUN apt-get update && DEBIAN_FRONTEND="noninteractive" TZ="Asia/Ho_Chi_Minh" apt-get install -y \
-    build-essential openjdk-11-jdk-headless fp-compiler python3.6 cgroup-lite python2.7 rustc golang libcap-dev # Compilers  \
-    openssl # For HTTPS support
+# Python PPA
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y software-properties-common && add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && DEBIAN_FRONTEND="noninteractive" TZ="Asia/Ho_Chi_Minh" apt-get install -y \
+    build-essential openjdk-11-jdk-headless fp-compiler cgroup-lite \
+    python3.6 python2.7 rustc golang libcap-dev \
+    openssl
 
 COPY --from=isolate /isolate/ /isolate
 
@@ -59,4 +78,3 @@ EXPOSE 80 443
 
 WORKDIR /
 ENTRYPOINT ["scripts/start_container.sh"]
-
