@@ -53,7 +53,6 @@ RUN go generate && go build -tags production -o kjudge cmd/kjudge/main.go
 # Stage 3: Create awesome output image
 FROM base-ubuntu
 
-# Python PPA
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && DEBIAN_FRONTEND="noninteractive" TZ="Asia/Ho_Chi_Minh" apt-get install -y \
