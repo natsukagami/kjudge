@@ -2,7 +2,7 @@
 FROM ubuntu:jammy AS base-ubuntu
 
 # Mount apt's cache folders to cache install but maintain
-# reproducibility on local machine. More details at:
+# reproducibility on local machines. More details at:
 # https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md#run---mounttypecache
 
 # Set sharing=locked to avoid race condition with between stages.
@@ -56,10 +56,9 @@ FROM base-ubuntu
 # Python PPA
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && apt-get install -y software-properties-common && add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && DEBIAN_FRONTEND="noninteractive" TZ="Asia/Ho_Chi_Minh" apt-get install -y \
     build-essential openjdk-11-jdk-headless fp-compiler cgroup-lite \
-    python3.6 python2.7 rustc golang libcap-dev \
+    python3.10 python2.7 rustc golang libcap-dev \
     openssl
 
 COPY --from=isolate /isolate/ /isolate
