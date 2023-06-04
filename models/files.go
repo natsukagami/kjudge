@@ -19,17 +19,19 @@ func crlftoLF(content []byte) ([]byte, error) {
 func lftoCRLF(content []byte) ([]byte, error) {
 	lf := bytes.Count(content, []byte("\n"))
 	crlf := bytes.Count(content, []byte("\r\n"))
-	if crlf == 0 {
-		return bytes.ReplaceAll(content, []byte("\r\n"), []byte("\n")), nil
-	}
 	if crlf == lf {
 		return content, nil
 	}
-	return nil, errors.Errorf("number of crlf and lf (%v, %v) does not match", crlf, lf)
+	var err error = nil
+	if crlf != 0 {
+		err = errors.Errorf("number of crlf and lf (%v, %v) does not match", crlf, lf)
+	}
+	return bytes.ReplaceAll(content, []byte("\r\n"), []byte("\n")), err
 }
 
 // NormalizeEndings normalize file line endings to the target OS's endings
-// target accepts "windows" or "linux"
+// target accepts "windows" or "linux". Returns error if OS is not supported
+// or there is LF and CRLF mixed together
 func NormalizeEndings(content []byte, target string) ([]byte, error) {
 	switch (target){
 	case "windows":
