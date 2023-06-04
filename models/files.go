@@ -47,6 +47,13 @@ func NormalizeEndingsNative(content []byte) ([]byte, error) {
 	return NormalizeEndings(content, runtime.GOOS)
 }
 
+// IsTextFile applies heuristics to determine
+// whether specified filename is a text file
+func IsTextFile(filename string) bool {
+	ext := filepath.Ext(filename)
+	return !(ext == "" || ext == "exe" || ext == "pdf")
+}
+
 // GetFileWithName returns a file with a given name.
 func GetFileWithName(db db.DBContext, problemID int, filename string) (*File, error) {
 	var f File
