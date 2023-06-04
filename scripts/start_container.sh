@@ -44,8 +44,7 @@ case ${HTTPS} in
 esac
 
 if [ "${useHTTPS}" = true ]; then
-    kjudge -port 443 -file /data/kjudge.db -https /certs
+    kjudge -port 443 -file /data/kjudge.db -https /certs "$@"
 else
-    kjudge -port 80 -file /data/kjudge.db
+    kjudge -port 80 -file /data/kjudge.db "$@"
 fi
-
