@@ -105,7 +105,15 @@ func (g *Group) TestGroupUploadSingle(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	input, err = models.NormalizeEndingsNative(input)
+	if err != nil {
+		return err
+	}
 	output, err := readFromForm("output", mp)
+	if err != nil {
+		return err
+	}
+	output, err = models.NormalizeEndingsNative(output)
 	if err != nil {
 		return err
 	}
@@ -150,7 +158,7 @@ func (g *Group) TestGroupUploadMultiple(c echo.Context) error {
 	if err != nil {
 		return httperr.BadRequestf("cannot unpack tests: %v", err)
 	}
-	if err := tg.WriteTests(tx, tests, override); err != nil {
+	if err := tg.WriteTestsNormalized(tx, tests, override); err != nil {
 		return httperr.BadRequestf("Cannot write tests: %v", err)
 	}
 	if err := tx.Commit(); err != nil {
@@ -241,10 +249,10 @@ func (g *Group) TestGroupRejudgePost(c echo.Context) error {
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/problems/%d/submissions", tg.ProblemID))
 }
 
-// WriteTests writes the given set of tests into the Database.
-// If override is set, all tests in the test group gets deleted first.
-// The LazyTests are STILL invalid models.Tests. DO NOT USE.
-func (r *TestGroupCtx) WriteTests(db db.DBContext, tests []*tests.LazyTest, override bool) error {
+// WriteTestsNormalized normalizes line endings and writes the given set of
+// tests into the Database. If override is set, all tests in the test group
+// gets deleted first. The LazyTests are STILL invalid models.Tests. DO NOT USE.
+func (r *TestGroupCtx) WriteTestsNormalized(db db.DBContext, tests []*tests.LazyTest, override bool) error {
 	for _, test := range tests {
 		test.TestGroupID = r.ID
 		if err := test.Verify(); err != nil {
@@ -261,7 +269,15 @@ func (r *TestGroupCtx) WriteTests(db db.DBContext, tests []*tests.LazyTest, over
 		if err != nil {
 			return errors.Wrapf(err, "test %v input", test.Name)
 		}
+		input, err = models.NormalizeEndingsNative(input)
+		if err != nil {
+			return errors.Wrapf(err, "test %v input", test.Name)
+		}
 		output, err := readZip(test.Output)
+		if err != nil {
+			return errors.Wrapf(err, "test %v output", test.Name)
+		}
+		output, err = models.NormalizeEndingsNative(output)
 		if err != nil {
 			return errors.Wrapf(err, "test %v output", test.Name)
 		}

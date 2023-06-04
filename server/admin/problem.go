@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -208,7 +207,7 @@ func (g *Group) ProblemAddFile(c echo.Context) error {
 		if models.IsTextFile(file.Filename) {
 			file.Content, err = models.NormalizeEndingsNative(file.Content)
 			if err != nil {
-				log.Printf("%v while processing %v", err, file.Filename)
+				return err
 			}
 		}
 	}
