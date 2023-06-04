@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/natsukagami/kjudge/worker"
+	"github.com/natsukagami/kjudge/worker/sandbox"
 	"github.com/pkg/errors"
 )
 
@@ -34,7 +34,7 @@ type Sandbox struct {
 	private struct{} // Makes the sandbox not simply constructible
 }
 
-var _ worker.Sandbox = (*Sandbox)(nil)
+var _ sandbox.Sandbox = (*Sandbox)(nil)
 
 // Panics on not having "isolate" accessible.
 func mustHaveIsolate() {
@@ -55,7 +55,7 @@ func New() *Sandbox {
 }
 
 // Run implements Sandbox.Run.
-func (s *Sandbox) Run(input *worker.SandboxInput) (*worker.SandboxOutput, error) {
+func (s *Sandbox) Run(input *sandbox.SandboxInput) (*sandbox.SandboxOutput, error) {
 	// Init the sandbox
 	defer s.cleanup()
 	dirBytes, err := exec.Command(isolateCommand, "--init", "--cg").Output()
@@ -86,7 +86,7 @@ func (s *Sandbox) Run(input *worker.SandboxInput) (*worker.SandboxOutput, error)
 	}
 
 	// Parse the meta file
-	output := &worker.SandboxOutput{
+	output := &sandbox.SandboxOutput{
 		Stdout: stdout.Bytes(),
 		Stderr: stderr.Bytes(),
 	}
@@ -97,7 +97,7 @@ func (s *Sandbox) Run(input *worker.SandboxInput) (*worker.SandboxOutput, error)
 	return output, nil
 }
 
-func parseMetaFile(path string, output *worker.SandboxOutput) error {
+func parseMetaFile(path string, output *sandbox.SandboxOutput) error {
 	meta, err := ReadMetaFile(path)
 	if err != nil {
 		return err
@@ -114,7 +114,7 @@ func parseMetaFile(path string, output *worker.SandboxOutput) error {
 }
 
 // Build the command for isolate --run.
-func buildCmd(dir, metaFile string, input *worker.SandboxInput) *exec.Cmd {
+func buildCmd(dir, metaFile string, input *sandbox.SandboxInput) *exec.Cmd {
 	// Calculate stuff
 	timeLimit := float64(input.TimeLimit) / float64(time.Second)
 

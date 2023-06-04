@@ -18,16 +18,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/natsukagami/kjudge/worker"
+	"github.com/natsukagami/kjudge/worker/sandbox"
 )
 
 // Sandbox implements worker.Sandbox.
 type Sandbox struct{}
 
-var _ worker.Sandbox = (*Sandbox)(nil)
+var _ sandbox.Sandbox = (*Sandbox)(nil)
 
 // Run implements Sandbox.Run
-func (s *Sandbox) Run(input *worker.SandboxInput) (*worker.SandboxOutput, error) {
+func (s *Sandbox) Run(input *sandbox.SandboxInput) (*sandbox.SandboxOutput, error) {
 	dir := os.TempDir()
 
 	log.Printf("[SANDBOX] Running %s %v\n", input.Command, input.Args)
@@ -41,7 +41,7 @@ func (s *Sandbox) Run(input *worker.SandboxInput) (*worker.SandboxOutput, error)
 //   - MEMORY LIMITS ARE NOT SET. It always reports a memory usage of 0 (it cannot measure them).
 //   - THE PROGRAM DOES NOT MESS WITH THE COMPUTER. LMAO
 //   - The folder will be thrown away later.
-func (s *Sandbox) RunFrom(cwd string, input *worker.SandboxInput) (*worker.SandboxOutput, error) {
+func (s *Sandbox) RunFrom(cwd string, input *sandbox.SandboxInput) (*sandbox.SandboxOutput, error) {
 	if err := input.CopyTo(cwd); err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (s *Sandbox) RunFrom(cwd string, input *worker.SandboxInput) (*worker.Sandb
 	case <-time.After(input.TimeLimit):
 		cancel()
 		<-done
-		return &worker.SandboxOutput{
+		return &sandbox.SandboxOutput{
 			Success:      false,
 			MemoryUsed:   0,
 			RunningTime:  input.TimeLimit,
@@ -83,7 +83,7 @@ func (s *Sandbox) RunFrom(cwd string, input *worker.SandboxInput) (*worker.Sandb
 		}, nil
 	case commandErr := <-done:
 		runningTime := time.Since(startTime)
-		return &worker.SandboxOutput{
+		return &sandbox.SandboxOutput{
 			Success:      commandErr == nil,
 			MemoryUsed:   0,
 			RunningTime:  runningTime,
@@ -93,5 +93,4 @@ func (s *Sandbox) RunFrom(cwd string, input *worker.SandboxInput) (*worker.Sandb
 		}, nil
 
 	}
-
 }

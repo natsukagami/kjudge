@@ -7,20 +7,20 @@ import (
 	"github.com/mattn/go-sqlite3"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
+	"github.com/natsukagami/kjudge/worker/sandbox"
 	"github.com/pkg/errors"
 )
 
 // Queue implements a queue that runs each job one by one.
 type Queue struct {
 	DB      *db.DB
-	Sandbox Sandbox
+	Sandbox sandbox.Sandbox
 }
 
 // Start starts the queue. It is blocking, so might wanna "go run" it.
 func (q *Queue) Start() {
 	// Register the update callback
 	toUpdate := q.startHook()
-
 	for {
 		// Get the newest job
 		job, err := models.FirstJob(q.DB)
