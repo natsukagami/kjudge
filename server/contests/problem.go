@@ -158,6 +158,14 @@ func (g *Group) SubmitPost(c echo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
+	// Submitted files can be executable
+	if models.IsTextFile(file.Filename){
+		source, err = models.NormalizeEndingsNative(source)
+		if err != nil {
+			return err
+		}
+	}
 	sub := models.Submission{
 		ProblemID:   ctx.Problem.ID,
 		UserID:      ctx.Me.ID,
