@@ -1,14 +1,51 @@
 package models
 
 import (
+	"bytes"
 	"fmt"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models/verify"
 	"github.com/pkg/errors"
 )
+
+func crlftoLF(content []byte) ([]byte, error) {
+	return bytes.ReplaceAll(content, []byte("\r\n"), []byte("\n")), nil
+}
+
+func lftoCRLF(content []byte) ([]byte, error) {
+	lf := bytes.Count(content, []byte("\n"))
+	crlf := bytes.Count(content, []byte("\r\n"))
+	if crlf == 0 {
+		return bytes.ReplaceAll(content, []byte("\r\n"), []byte("\n")), nil
+	}
+	if crlf == lf {
+		return content, nil
+	}
+	return nil, errors.Errorf("number of crlf and lf (%v, %v) does not match", crlf, lf)
+}
+
+// NormalizeEndings normalize file line endings to the target OS's endings
+// target accepts "windows" or "linux"
+func NormalizeEndings(content []byte, target string) ([]byte, error) {
+	switch (target){
+	case "windows":
+		return lftoCRLF(content)
+	case "linux":
+		return crlftoLF(content)
+	default:
+		return nil, errors.Errorf("%s not supported for line ending conversion", runtime.GOOS)
+	}
+}
+
+// NormalizeEndings normalize file line endings to the current OS's endings
+// target accepts "windows" or "linux"
+func NormalizeEndingsNative(content []byte) ([]byte, error) {
+	return NormalizeEndings(content, runtime.GOOS)
+}
 
 // GetFileWithName returns a file with a given name.
 func GetFileWithName(db db.DBContext, problemID int, filename string) (*File, error) {
