@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -202,6 +203,14 @@ func (g *Group) ProblemAddFile(c echo.Context) error {
 	rename := c.FormValue("filename")
 	if rename != "" && len(files) == 1 {
 		files[0].Filename = rename
+	}
+	for _, file := range files {
+		if models.IsTextFile(file.Filename) {
+			file.Content, err = models.NormalizeEndingsNative(file.Content)
+			if err != nil {
+				log.Printf("%v while processing %v", err, file.Filename)
+			}
+		}
 	}
 	if err := ctx.Problem.WriteFiles(g.db, files); err != nil {
 		return httperr.BadRequestf("cannot write files: %v", err)
