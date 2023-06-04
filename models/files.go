@@ -53,7 +53,7 @@ func NormalizeEndingsNative(content []byte) ([]byte, error) {
 // whether specified filename is a text file
 func IsTextFile(filename string) bool {
 	ext := filepath.Ext(filename)
-	return !(ext == "" || ext == "exe" || ext == "pdf")
+	return !(ext == "" || ext == "exe" || ext == "pdf" || ext == "zip")
 }
 
 // GetFileWithName returns a file with a given name.
