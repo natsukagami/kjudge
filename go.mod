@@ -13,7 +13,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.0
 	github.com/pkg/errors v0.9.1
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
-	golang.org/x/net v0.7.0
+	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/text v0.7.0
 	golang.org/x/tools v0.1.12
 	google.golang.org/appengine v1.6.5 // indirect
