@@ -190,7 +190,6 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 			if which == nil {
 				which = sub
 				maxScore = score
-				break
 			}
 		case models.ScoringModeLast:
 			which = sub
