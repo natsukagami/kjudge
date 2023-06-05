@@ -10,16 +10,16 @@ import (
 )
 
 var (
-	dbfile			= flag.String("file", "kjudge-test.db", "Path to database file.")
-	outputfile		= flag.String("output", "kjudge-test.json", "Path to output file.")
-	sandboxImpls	= flag.Args()
-	batchCount		= flag.Int("count", 10, "Number of iterations.")
-	batchSize		= flag.Int("count", 30, "Size of testset.")
+	dbfile       = flag.String("file", "kjudge-test.db", "Path to database file.")
+	outputfile   = flag.String("output", "kjudge-test.json", "Path to output file.")
+	sandboxImpls = flag.Args()
+	batchCount   = flag.Int("count", 10, "Number of iterations.")
+	batchSize    = flag.Int("count", 30, "Size of testset.")
 )
 
 func main() {
 	flag.Parse()
-	
+
 	db, err := db.New(*dbfile)
 	if err != nil {
 		log.Fatalf("%+v", err)
