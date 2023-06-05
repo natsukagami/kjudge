@@ -1,8 +1,7 @@
-// Package performance provides performance testing
-package performance
+// Package perf_test provides performance testing
+package perf_test
 
 import (
-	"fmt"
 	"math/rand"
 
 	"github.com/natsukagami/kjudge/db"
@@ -31,24 +30,10 @@ type PerfTest struct {
 
 type PerfTestSet struct {
 	Name          string
-	TestCount     int
+	ExpectedTime  int // Expected running time of each test in ms
 	TestGenerator func(*rand.Rand) *PerfTest
-}
-
-// Generates O(1), multitest problem to compare sandbox spawn time.
-// The problem used is input one number, then output double of that number
-func spawnTimeProblem() *PerfTestSet {
-	return &PerfTestSet{
-		Name:      "SPAWN",
-		TestCount: 1000,
-		TestGenerator: func(r *rand.Rand) *PerfTest {
-			value := r.Int31() / 2
-			return &PerfTest{
-				Input:  []byte(fmt.Sprintf("%v", value)),
-				Output: []byte(fmt.Sprintf("%v", value*2)),
-			}
-		},
-	}
+	TestCode      []byte // Solution to tested problem
+	ExpectedAC    bool
 }
 
 func GenerateContest() {
