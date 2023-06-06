@@ -20,7 +20,7 @@ func BigInputProblem() *PerfTestSet {
 	return &PerfTestSet{
 		Name:         "INPUT",
 		CapTime:      5000,
-		Count:    10,
+		Count:    50,
 		Generator: func(r *rand.Rand) []byte {
 			strSize := maxSize - r.Intn(10)
 			input := make([]byte, strSize)

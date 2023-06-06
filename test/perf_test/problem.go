@@ -13,6 +13,7 @@ import (
 
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
+	"github.com/natsukagami/kjudge/server/auth"
 	"github.com/pkg/errors"
 )
 
@@ -78,8 +79,25 @@ func (r *PerfTestSet) addProblem(db db.DBContext, seed int64, index int, contest
 	return problem.ID, nil
 }
 
-func (r *PerfTestSet) addSolution(db db.DBContext, problemID int, N int) error {
+func (r *PerfTestSet) addSolution(db db.DBContext, problemID int, userID string) error {
+	sub := models.Submission{
+		ProblemID:   problemID,
+		UserID:      userID,
+		Source:      r.Solution,
+		Language:    models.LanguageCpp,
+		SubmittedAt: time.Now(),
+		Verdict:     models.VerdictIsInQueue,
+	}
+	if err := sub.Write(db); err != nil {
+		return err
+	}
 
+	job := models.NewJobScore(sub.ID)
+	if err := job.Write(db); err != nil {
+		return err
+	}
+	
+	return nil
 }
 
 // Generates contest and returns contest ID
@@ -99,8 +117,21 @@ func createContest(db db.DBContext) (int, error) {
 }
 
 // Generates user and returns user ID
-func createUser(db db.DBContext) (int, error) {
-	
+func createUser(db db.DBContext) (string, error) {
+	password, err := auth.PasswordHash("bigquestions")
+	if err != nil {
+		return "", errors.Wrap(err, "while hashing password")
+	}
+	user := &models.User{
+		ID: "Iroh",
+		Password: string(password),
+		DisplayName: "The Dragon of the West",
+		Organization: "Order of the White Lotus",
+	}
+	if err := user.Write(db); err != nil {
+		return "", errors.Wrap(err, "while creating user")
+	}
+	return user.ID, nil
 }
 
 func generateDB(dbFile string, N int, testList ...*PerfTestSet) error {
@@ -124,12 +155,14 @@ func generateDB(dbFile string, N int, testList ...*PerfTestSet) error {
 		if err != nil {
 			return errors.Wrapf(err, "creating testset %v's problem", testset.Name)
 		}
-		testset.addSolution(benchDB, problemID, N)
+		for i := 0; i < N; i++ {
+			testset.addSolution(benchDB, problemID, userID)
+		}
 	}
 	return nil
 }
 
-func generateTestSuite(b *testing.B){
+func GenerateTestSuite(b *testing.B) {
 	tmpDir, err := os.MkdirTemp(os.TempDir(), "kjudge_bench")
 	if err != nil {
 		log.Panic("cannot create temp dir:", err)
@@ -137,4 +170,5 @@ func generateTestSuite(b *testing.B){
 	defer os.RemoveAll(tmpDir)
 	dbFile := filepath.Join(tmpDir, "kjudge.db")
 	generateDB(dbFile, b.N, BigInputProblem(), SpawnTimeProblem())
+
 }
