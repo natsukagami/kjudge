@@ -1,12 +1,8 @@
 package perf_test
 
-import (
-	"fmt"
-	"math/rand"
-)
+import "math/rand"
 
-const bigInputCode = 
-`#include <stdio.h>
+const bigInputCode = `#include <stdio.h>
 int main(){
 	int r = 0;
 	while (char c = get_char()){
@@ -23,17 +19,15 @@ func BigInputProblem() *PerfTestSet {
 	maxSize := 50000000 // 50MB
 	return &PerfTestSet{
 		Name:         "INPUT",
+		CapTime:      5000,
 		ExpectedTime: 2000, // TODO
-		TestGenerator: func(r *rand.Rand) *PerfTest {
+		TestGenerator: func(r *rand.Rand) []byte {
 			strSize := maxSize - r.Intn(10)
 			input := make([]byte, strSize)
 			for i := range input {
 				input[i] = byte(r.Intn(26) + 'A')
 			}
-			return &PerfTest{
-				Input:  input,
-				Output: []byte(fmt.Sprintf("%v", strSize)),
-			}
+			return input
 		},
 		TestCode: []byte(bigInputCode),
 	}

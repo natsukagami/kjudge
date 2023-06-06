@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"math/rand"
 )
-const spawnTimeCode =
-`#include <stdio.h>
+
+const spawnTimeCode = `#include <stdio.h>
 int main(){
 	int a; scanf("%i", &a);
 	printf("%i", a*2);
@@ -20,12 +20,10 @@ func SpawnTimeProblem() *PerfTestSet {
 	return &PerfTestSet{
 		Name:         "SPAWN",
 		ExpectedTime: 1,
-		TestGenerator: func(r *rand.Rand) *PerfTest {
+		CapTime:      100,
+		TestGenerator: func(r *rand.Rand) []byte {
 			value := r.Intn(maxValue)
-			return &PerfTest{
-				Input:  []byte(fmt.Sprintf("%v", value)),
-				Output: []byte(fmt.Sprintf("%v", value*2)),
-			}
+			return []byte(fmt.Sprintf("%v", value))
 		},
 		TestCode: []byte(spawnTimeCode), // TODO
 	}
