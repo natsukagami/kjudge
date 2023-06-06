@@ -33,7 +33,7 @@ func lftoCRLF(content []byte) ([]byte, error) {
 // target accepts "windows" or "linux". Returns error if OS is not supported
 // or there is LF and CRLF mixed together
 func NormalizeEndings(content []byte, target string) ([]byte, error) {
-	switch (target){
+	switch target {
 	case "windows":
 		return lftoCRLF(content)
 	case "linux":
