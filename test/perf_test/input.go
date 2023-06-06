@@ -5,6 +5,18 @@ import (
 	"math/rand"
 )
 
+const bigInputCode = 
+`#include <stdio.h>
+int main(){
+	int r = 0;
+	while (char c = get_char()){
+		if ('a' <= c && c <= 'b') r++;
+		else break;
+	}
+	printf("%i", r);
+}
+`
+
 // 50MB input to compare disk read time. O(1) memory.
 // Problem: Given a string, print it's length
 func BigInputProblem() *PerfTestSet {
@@ -23,7 +35,6 @@ func BigInputProblem() *PerfTestSet {
 				Output: []byte(fmt.Sprintf("%v", strSize)),
 			}
 		},
-		TestCode: []byte(""), // TODO
-		ExpectedAC: true,
+		TestCode: []byte(bigInputCode),
 	}
 }
