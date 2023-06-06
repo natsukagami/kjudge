@@ -14,6 +14,8 @@ import (
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/server/auth"
+	"github.com/natsukagami/kjudge/worker"
+	"github.com/natsukagami/kjudge/worker/sandbox"
 	"github.com/pkg/errors"
 )
 
@@ -137,9 +139,9 @@ func createUser(db db.DBContext) (string, error) {
 func generateDB(dbFile string, N int, testList ...*PerfTestSet) error {
 	benchDB, err := db.New(dbFile)
 	if err != nil {
-		return errors.Wrap(err, "creating DB")
+		return errors.Wrapf(err, "creating db file")
 	}
-
+	defer benchDB.Close()
 	contestID, err := createContest(benchDB)
 	if err != nil {
 		return errors.Wrap(err, "creating contest")
@@ -162,13 +164,33 @@ func generateDB(dbFile string, N int, testList ...*PerfTestSet) error {
 	return nil
 }
 
-func GenerateTestSuite(b *testing.B) {
+func runSingleTest()
+
+func BenchmarkAll(b *testing.B) {
 	tmpDir, err := os.MkdirTemp(os.TempDir(), "kjudge_bench")
 	if err != nil {
-		log.Panic("cannot create temp dir:", err)
+		b.Error(err)
 	}
 	defer os.RemoveAll(tmpDir)
+
 	dbFile := filepath.Join(tmpDir, "kjudge.db")
-	generateDB(dbFile, b.N, BigInputProblem(), SpawnTimeProblem())
+
+	b.Log("Generating test suite")
+	if err := generateDB(dbFile, b.N, BigInputProblem(), SpawnTimeProblem()); err != nil {
+		b.Error(err)
+	}
+
+	for _, sandboxName := range []string{"raw", "isolate"} {
+
+		sandbox, err := worker.NewSandbox(sandboxName)
+		if err != nil {
+			b.Error(err)
+		}
+		queue := worker.Queue{Sandbox: sandbox, DB: benchDB}
+		b.ResetTimer()
+		queue.Start()
+
+	}
+	
 
 }
