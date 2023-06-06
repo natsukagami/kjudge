@@ -20,8 +20,8 @@ func BigInputProblem() *PerfTestSet {
 	return &PerfTestSet{
 		Name:         "INPUT",
 		CapTime:      5000,
-		ExpectedTime: 2000, // TODO
-		TestGenerator: func(r *rand.Rand) []byte {
+		Count:    10,
+		Generator: func(r *rand.Rand) []byte {
 			strSize := maxSize - r.Intn(10)
 			input := make([]byte, strSize)
 			for i := range input {
@@ -29,6 +29,6 @@ func BigInputProblem() *PerfTestSet {
 			}
 			return input
 		},
-		TestCode: []byte(bigInputCode),
+		Solution: []byte(bigInputCode),
 	}
 }

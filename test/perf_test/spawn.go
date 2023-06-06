@@ -19,12 +19,12 @@ func SpawnTimeProblem() *PerfTestSet {
 	maxValue := 1 << 30
 	return &PerfTestSet{
 		Name:         "SPAWN",
-		ExpectedTime: 1,
+		Count:        10000,
 		CapTime:      100,
-		TestGenerator: func(r *rand.Rand) []byte {
+		Generator: func(r *rand.Rand) []byte {
 			value := r.Intn(maxValue)
 			return []byte(fmt.Sprintf("%v", value))
 		},
-		TestCode: []byte(spawnTimeCode), // TODO
+		Solution: []byte(spawnTimeCode), // TODO
 	}
 }
