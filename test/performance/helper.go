@@ -1,10 +1,10 @@
 // Package perf_test provides performance testing
-package perf_test
+package performance
 
 import (
 	"database/sql"
 	"fmt"
-	"log"
+	"io"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -15,7 +15,6 @@ import (
 	"github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/server/auth"
 	"github.com/natsukagami/kjudge/worker"
-	"github.com/natsukagami/kjudge/worker/sandbox"
 	"github.com/pkg/errors"
 )
 
@@ -136,12 +135,7 @@ func createUser(db db.DBContext) (string, error) {
 	return user.ID, nil
 }
 
-func generateDB(dbFile string, N int, testList ...*PerfTestSet) error {
-	benchDB, err := db.New(dbFile)
-	if err != nil {
-		return errors.Wrapf(err, "creating db file")
-	}
-	defer benchDB.Close()
+func writeTestDB(benchDB db.DBContext, N int, testList ...*PerfTestSet) error {
 	contestID, err := createContest(benchDB)
 	if err != nil {
 		return errors.Wrap(err, "creating contest")
@@ -164,33 +158,64 @@ func generateDB(dbFile string, N int, testList ...*PerfTestSet) error {
 	return nil
 }
 
-func runSingleTest()
+// Copy a file by 4096 bytes chunk
+func StreamCopy(src string, dst string) error {
+	inf, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer inf.Close()
 
-func BenchmarkAll(b *testing.B) {
-	tmpDir, err := os.MkdirTemp(os.TempDir(), "kjudge_bench")
+	ouf, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer ouf.Close()
+	
+	buf := make([]byte, 4096)
+	for {
+		readLen, err := inf.Read(buf)
+		lastIter := false
+		if err == io.EOF {
+			lastIter = true
+		} else if err != nil {
+			return err
+		}
+		
+		if _, err := ouf.Write(buf[:readLen]); err != nil {
+			return err
+		}
+		if lastIter {
+			break
+		}
+	}
+	return nil
+}
+
+func RunSingleTest(b *testing.B, tmpDir string, testset *PerfTestSet, sandboxName string) {
+	dbFile := filepath.Join(tmpDir, fmt.Sprintf("%v_%v_%v.db", testset.Name, sandboxName, b.N))
+	
+	benchDB, err := db.New(dbFile)
 	if err != nil {
 		b.Error(err)
+		b.FailNow()
 	}
-	defer os.RemoveAll(tmpDir)
-
-	dbFile := filepath.Join(tmpDir, "kjudge.db")
-
-	b.Log("Generating test suite")
-	if err := generateDB(dbFile, b.N, BigInputProblem(), SpawnTimeProblem()); err != nil {
-		b.Error(err)
-	}
-
-	for _, sandboxName := range []string{"raw", "isolate"} {
-
-		sandbox, err := worker.NewSandbox(sandboxName)
-		if err != nil {
-			b.Error(err)
-		}
-		queue := worker.Queue{Sandbox: sandbox, DB: benchDB}
-		b.ResetTimer()
-		queue.Start()
-
-	}
+	defer benchDB.Close()
 	
+	b.Logf("Generating %v test suite", testset.Name)
+	if err := writeTestDB(benchDB, b.N, testset); err != nil {
+		b.Error(err)
+		b.FailNow()
+	}
+	defer benchDB.Close()
 
+	sandbox, err := worker.NewSandbox(sandboxName)
+	if err != nil {
+		b.Error(err)
+		b.FailNow()
+	}
+
+	b.ResetTimer()
+	queue := &worker.Queue{Sandbox: sandbox, DB: benchDB}
+	queue.Run()
 }
