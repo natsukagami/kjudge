@@ -29,12 +29,12 @@ func init() {
 	}
 }
 
-// Sandbox implements worker.Sandbox.
-type Sandbox struct {
+// Runner implements worker.Runner.
+type Runner struct {
 	private struct{} // Makes the sandbox not simply constructible
 }
 
-var _ sandbox.Sandbox = (*Sandbox)(nil)
+var _ sandbox.Runner = (*Runner)(nil)
 
 // Panics on not having "isolate" accessible.
 func mustHaveIsolate() {
@@ -49,13 +49,13 @@ func mustHaveIsolate() {
 
 // New returns a new sandbox.
 // Panics if isolate is not installed.
-func New() *Sandbox {
+func New() *Runner {
 	mustHaveIsolate()
-	return &Sandbox{private: struct{}{}}
+	return &Runner{private: struct{}{}}
 }
 
-// Run implements Sandbox.Run.
-func (s *Sandbox) Run(input *sandbox.SandboxInput) (*sandbox.SandboxOutput, error) {
+// Run implements Runner.Run.
+func (s *Runner) Run(input *sandbox.Input) (*sandbox.Output, error) {
 	// Init the sandbox
 	defer s.cleanup()
 	dirBytes, err := exec.Command(isolateCommand, "--init", "--cg").Output()
@@ -86,7 +86,7 @@ func (s *Sandbox) Run(input *sandbox.SandboxInput) (*sandbox.SandboxOutput, erro
 	}
 
 	// Parse the meta file
-	output := &sandbox.SandboxOutput{
+	output := &sandbox.Output{
 		Stdout: stdout.Bytes(),
 		Stderr: stderr.Bytes(),
 	}
@@ -97,7 +97,7 @@ func (s *Sandbox) Run(input *sandbox.SandboxInput) (*sandbox.SandboxOutput, erro
 	return output, nil
 }
 
-func parseMetaFile(path string, output *sandbox.SandboxOutput) error {
+func parseMetaFile(path string, output *sandbox.Output) error {
 	meta, err := ReadMetaFile(path)
 	if err != nil {
 		return err
@@ -114,7 +114,7 @@ func parseMetaFile(path string, output *sandbox.SandboxOutput) error {
 }
 
 // Build the command for isolate --run.
-func buildCmd(dir, metaFile string, input *sandbox.SandboxInput) *exec.Cmd {
+func buildCmd(dir, metaFile string, input *sandbox.Input) *exec.Cmd {
 	// Calculate stuff
 	timeLimit := float64(input.TimeLimit) / float64(time.Second)
 
@@ -147,6 +147,6 @@ func buildCmd(dir, metaFile string, input *sandbox.SandboxInput) *exec.Cmd {
 	return cmd
 }
 
-func (s *Sandbox) cleanup() {
+func (s *Runner) cleanup() {
 	_ = exec.Command(isolateCommand, "--cleanup", "--cg").Run()
 }

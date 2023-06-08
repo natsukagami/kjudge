@@ -68,12 +68,12 @@ func (r *RunContext) CompiledSource() (bool, []byte) {
 }
 
 // RunInput creates a SandboxInput for running the submission's source.
-func (r *RunContext) RunInput(source []byte) (*sandbox.SandboxInput, error) {
+func (r *RunContext) RunInput(source []byte) (*sandbox.Input, error) {
 	command, args, err := RunCommand(r.Sub.Language)
 	if err != nil {
 		return nil, err
 	}
-	return &sandbox.SandboxInput{
+	return &sandbox.Input{
 		Command:     command,
 		Args:        args,
 		Files:       nil,
@@ -87,11 +87,11 @@ func (r *RunContext) RunInput(source []byte) (*sandbox.SandboxInput, error) {
 
 // CompareInput creates a SandboxInput for running the comparator.
 // Also returns whether we have diff-based or comparator-based input.
-func (r *RunContext) CompareInput(submissionOutput []byte) (input *sandbox.SandboxInput, useComparator bool, err error) {
+func (r *RunContext) CompareInput(submissionOutput []byte) (input *sandbox.Input, useComparator bool, err error) {
 	file, err := models.GetFileWithName(r.DB, r.Problem.ID, "compare")
 	if errors.Is(err, sql.ErrNoRows) {
 		// Use a simple diff
-		return &sandbox.SandboxInput{
+		return &sandbox.Input{
 			Command:     "/usr/bin/diff",
 			Args:        []string{"-wqts", "output", "expected"},
 			Files:       map[string][]byte{"output": submissionOutput, "expected": r.Test.Output},
@@ -103,7 +103,7 @@ func (r *RunContext) CompareInput(submissionOutput []byte) (input *sandbox.Sandb
 		return nil, false, err
 	}
 	// Use the given comparator.
-	return &sandbox.SandboxInput{
+	return &sandbox.Input{
 		Command:     "code",
 		Args:        []string{"input", "expected", "output"},
 		Files:       map[string][]byte{"input": r.Test.Input, "expected": r.Test.Output, "output": submissionOutput},
@@ -114,7 +114,7 @@ func (r *RunContext) CompareInput(submissionOutput []byte) (input *sandbox.Sandb
 	}, true, nil
 }
 
-func RunSingleCommand(s sandbox.Sandbox, r *RunContext, source []byte) (output *sandbox.SandboxOutput, err error) {
+func RunSingleCommand(s sandbox.Runner, r *RunContext, source []byte) (output *sandbox.Output, err error) {
 	// First, use the sandbox to run the submission itself.
 	input, err := r.RunInput(source)
 	if err != nil {
@@ -127,7 +127,7 @@ func RunSingleCommand(s sandbox.Sandbox, r *RunContext, source []byte) (output *
 	return output, nil
 }
 
-func RunMultipleCommands(s sandbox.Sandbox, r *RunContext, source []byte, stages []string) (output *sandbox.SandboxOutput, err error) {
+func RunMultipleCommands(s sandbox.Runner, r *RunContext, source []byte, stages []string) (output *sandbox.Output, err error) {
 	command, args, err := RunCommand(r.Sub.Language)
 	if err != nil {
 		return nil, err
@@ -141,7 +141,7 @@ func RunMultipleCommands(s sandbox.Sandbox, r *RunContext, source []byte, stages
 		}
 		stageArgs := strings.Split(stage, " ")
 
-		sandboxInput := &sandbox.SandboxInput{
+		sandboxInput := &sandbox.Input{
 			Command:     command,
 			Args:        append(stageArgs, args...),
 			Files:       nil,
@@ -167,7 +167,7 @@ func RunMultipleCommands(s sandbox.Sandbox, r *RunContext, source []byte, stages
 }
 
 // Run runs a RunContext.
-func Run(s sandbox.Sandbox, r *RunContext) error {
+func Run(s sandbox.Runner, r *RunContext) error {
 	compiled, source := r.CompiledSource()
 	if !compiled {
 		// Add a compilation job and re-add ourselves.
@@ -181,7 +181,7 @@ func Run(s sandbox.Sandbox, r *RunContext) error {
 
 	log.Printf("[WORKER] Running submission %v on [test `%v`, group `%v`]\n", r.Sub.ID, r.Test.Name, r.TestGroup.Name)
 
-	var output *sandbox.SandboxOutput
+	var output *sandbox.Output
 	file, err := models.GetFileWithName(r.DB, r.Problem.ID, ".stages")
 	if errors.Is(err, sql.ErrNoRows) {
 		// Problem type is not Chained Type, run a single command
@@ -230,7 +230,7 @@ func Run(s sandbox.Sandbox, r *RunContext) error {
 }
 
 // Parse the comparator's output and reflect it into `result`.
-func parseComparatorOutput(s *sandbox.SandboxOutput, result *models.TestResult, useComparator bool) error {
+func parseComparatorOutput(s *sandbox.Output, result *models.TestResult, useComparator bool) error {
 	if useComparator {
 		// Paste the comparator's output to result
 		result.Verdict = strings.TrimSpace(string(s.Stderr))
@@ -259,7 +259,7 @@ func parseComparatorOutput(s *sandbox.SandboxOutput, result *models.TestResult, 
 }
 
 // Parse the sandbox output into a TestResult.
-func parseSandboxOutput(s *sandbox.SandboxOutput, r *RunContext) *models.TestResult {
+func parseSandboxOutput(s *sandbox.Output, r *RunContext) *models.TestResult {
 	score := 1.0
 	if !s.Success {
 		score = 0.0

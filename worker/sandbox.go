@@ -7,10 +7,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-func NewSandbox(name string) (sandbox.Sandbox, error) {
+func NewSandbox(name string) (sandbox.Runner, error) {
 	switch name {
 	case "raw":
-		return &raw.Sandbox{}, nil
+		return &raw.Runner{}, nil
 	case "isolate":
 		return isolate.New(), nil
 	default:
