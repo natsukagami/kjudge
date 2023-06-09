@@ -10,6 +10,7 @@ import (
 	"github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/server/auth"
 	"github.com/natsukagami/kjudge/worker"
+	"github.com/natsukagami/kjudge/worker/sandbox"
 	"github.com/pkg/errors"
 )
 
@@ -117,7 +118,7 @@ func (ctx *BenchmarkContext) writeSolutions(N int, problemName string) error {
 }
 
 func RunSingleTest(b *testing.B, ctx *BenchmarkContext, testset *PerfTestSet, sandboxName string) {
-	sandbox, err := worker.NewSandbox(sandboxName)
+	sandbox, err := worker.NewSandbox(sandboxName, sandbox.IgnoreWarnings(true))
 	if err != nil {
 		b.Fatal(err)
 	}
