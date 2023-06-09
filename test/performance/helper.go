@@ -1,11 +1,6 @@
-// Package perf_test provides performance testing
 package performance
 
 import (
-	"database/sql"
-	"fmt"
-	"io"
-	"math/rand"
 	"os"
 	"path/filepath"
 	"testing"
@@ -18,92 +13,49 @@ import (
 	"github.com/pkg/errors"
 )
 
-// TODO: Output, Memory, Calculate, TLE
-
-type PerfTestSet struct {
-	Name          string
-	Count  		  int                    
-	CapTime       int                     // Time limit sent to sandbox
-	Generator func(*rand.Rand) []byte // Returns input
-	Solution      []byte                  // Solution to tested problem
-	
+type BenchmarkContext struct {
+	tdir     string
+	db       *db.DB
+	user     *models.User
+	contest  *models.Contest
+	problems map[string]*models.Problem
 }
 
-// Generates problem and returns id
-func (r *PerfTestSet) addProblem(db db.DBContext, seed int64, index int, contestID int) (int, error) {
-	// Creates problem
-	problem := &models.Problem{
-		ContestID:                 contestID,
-		DisplayName:               r.Name,
-		ID:                        0,
-		MaxSubmissionsCount:       0,
-		MemoryLimit:               1 << 20, // 1GB
-		Name:                      fmt.Sprintf("%v", index),
-		PenaltyPolicy:             models.PenaltyPolicyNone,
-		ScoringMode:               models.ScoringModeLast,
-		SecondsBetweenSubmissions: 0,
-		TimeLimit:                 r.CapTime,
-	}
-	if err := problem.Write(db); err != nil {
-		return 0, errors.Wrapf(err, "problem %v", r.Name)
-	}
-
-	// Creates test group
-	testGroup := &models.TestGroup{
-		ID:          0,
-		MemoryLimit: sql.NullInt64{Valid: false}, // nil
-		Name:        "main",
-		ProblemID:   problem.ID,
-		Score:       100,
-		ScoringMode: models.TestScoringModeSum,
-		TimeLimit:   sql.NullInt64{Valid: false}, // nil
-	}
-	if err := testGroup.Write(db); err != nil {
-		return 0, errors.Wrapf(err, "test group %v", testGroup.Name)
-	}
-
-	// Creates tests.
-	rng := rand.New(rand.NewSource(seed))
-	for i := 1; i < r.Count; i++ {
-		test := &models.Test{
-			ID:          0,
-			Input:       r.Generator(rng),
-			Name:        fmt.Sprintf("%v", i),
-			Output:      []byte(""),
-			TestGroupID: testGroup.ID,
+func NewBenchmarkContext(tmpDir string) (*BenchmarkContext, error) {
+	benchDB, err := db.New(filepath.Join(tmpDir, "bench.db"))
+	if err != nil {
+		err2 := os.RemoveAll(tmpDir)
+		if err2 != nil {
+			return nil, errors.Wrapf(err2, "while handling %v", err)
 		}
-		if err := test.Write(db); err != nil {
-			return 0, errors.Wrapf(err, "test %v", i)
-		}
+		return nil, err
 	}
 
-	return problem.ID, nil
+	ctx := &BenchmarkContext{tdir: tmpDir, db: benchDB, problems: make(map[string]*models.Problem)}
+
+	if err := ctx.writeContest(); err != nil {
+		return nil, err
+	}
+
+	if err := ctx.writeUser(); err != nil {
+		return nil, err
+	}
+
+	return ctx, nil
 }
 
-func (r *PerfTestSet) addSolution(db db.DBContext, problemID int, userID string) error {
-	sub := models.Submission{
-		ProblemID:   problemID,
-		UserID:      userID,
-		Source:      r.Solution,
-		Language:    models.LanguageCpp,
-		SubmittedAt: time.Now(),
-		Verdict:     models.VerdictIsInQueue,
-	}
-	if err := sub.Write(db); err != nil {
+func (ctx *BenchmarkContext) Close() error {
+	if err := os.RemoveAll(ctx.tdir); err != nil {
 		return err
 	}
-
-	job := models.NewJobScore(sub.ID)
-	if err := job.Write(db); err != nil {
+	if err := ctx.db.Close(); err != nil {
 		return err
 	}
-	
 	return nil
 }
 
-// Generates contest and returns contest ID
-func createContest(db db.DBContext) (int, error) {
-	contest := &models.Contest{
+func (ctx *BenchmarkContext) writeContest() error {
+	ctx.contest = &models.Contest{
 		ContestType:          "weighted",
 		StartTime:            time.Now().AddDate(0, 0, -1),
 		EndTime:              time.Now().AddDate(0, 0, 1),
@@ -111,111 +63,81 @@ func createContest(db db.DBContext) (int, error) {
 		Name:                 "Performance Testing",
 		ScoreboardViewStatus: models.ScoreboardViewStatusPublic,
 	}
-	if err := contest.Write(db); err != nil {
-		return 0, err
-	}
-	return contest.ID, nil
+	return errors.Wrapf(ctx.contest.Write(ctx.db), "creating contest")
 }
 
-// Generates user and returns user ID
-func createUser(db db.DBContext) (string, error) {
+func (ctx *BenchmarkContext) writeUser() error {
 	password, err := auth.PasswordHash("bigquestions")
 	if err != nil {
-		return "", errors.Wrap(err, "while hashing password")
+		return errors.Wrap(err, "hashing password")
 	}
-	user := &models.User{
-		ID: "Iroh",
-		Password: string(password),
-		DisplayName: "The Dragon of the West",
+	ctx.user = &models.User{
+		ID:           "Iroh",
+		Password:     string(password),
+		DisplayName:  "The Dragon of the West",
 		Organization: "Order of the White Lotus",
 	}
-	if err := user.Write(db); err != nil {
-		return "", errors.Wrap(err, "while creating user")
-	}
-	return user.ID, nil
+	return errors.Wrap(ctx.user.Write(ctx.db), "creating user")
 }
 
-func writeTestDB(benchDB db.DBContext, N int, testList ...*PerfTestSet) error {
-	contestID, err := createContest(benchDB)
+func (ctx *BenchmarkContext) writeProblem(testset *PerfTestSet) error {
+	problem, err := testset.AddToDB(ctx.db, 2403, len(ctx.problems)+1, ctx.contest.ID)
 	if err != nil {
-		return errors.Wrap(err, "creating contest")
+		return errors.Wrapf(err, "creating testset %v's problem", testset.Name)
 	}
 
-	userID, err := createUser(benchDB)
-	if err != nil {
-		return errors.Wrap(err, "creating user")
-	}
+	ctx.problems[testset.Name] = problem
+	return nil
+}
 
-	for idx, testset := range testList {
-		problemID, err := testset.addProblem(benchDB, 2403, idx+1, contestID);
-		if err != nil {
-			return errors.Wrapf(err, "creating testset %v's problem", testset.Name)
+const testSolution = `#include "solution.hpp"
+`
+
+func (ctx *BenchmarkContext) writeSolutions(N int, problemName string) error {
+	problem := ctx.problems[problemName]
+	for i := 0; i < N; i++ {
+		sub := models.Submission{
+			ProblemID:   problem.ID,
+			UserID:      ctx.user.ID,
+			Source:      []byte(testSolution),
+			Language:    models.LanguageCpp,
+			SubmittedAt: time.Now(),
+			Verdict:     models.VerdictIsInQueue,
 		}
-		for i := 0; i < N; i++ {
-			testset.addSolution(benchDB, problemID, userID)
+		if err := sub.Write(ctx.db); err != nil {
+			return err
+		}
+
+		job := models.NewJobScore(sub.ID)
+		if err := job.Write(ctx.db); err != nil {
+			return err
 		}
 	}
 	return nil
 }
 
-// Copy a file by 4096 bytes chunk
-func StreamCopy(src string, dst string) error {
-	inf, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer inf.Close()
-
-	ouf, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer ouf.Close()
-	
-	buf := make([]byte, 4096)
-	for {
-		readLen, err := inf.Read(buf)
-		lastIter := false
-		if err == io.EOF {
-			lastIter = true
-		} else if err != nil {
-			return err
-		}
-		
-		if _, err := ouf.Write(buf[:readLen]); err != nil {
-			return err
-		}
-		if lastIter {
-			break
-		}
-	}
-	return nil
-}
-
-func RunSingleTest(b *testing.B, tmpDir string, testset *PerfTestSet, sandboxName string) {
-	dbFile := filepath.Join(tmpDir, fmt.Sprintf("%v_%v_%v.db", testset.Name, sandboxName, b.N))
-	
-	benchDB, err := db.New(dbFile)
-	if err != nil {
-		b.Error(err)
-		b.FailNow()
-	}
-	defer benchDB.Close()
-	
-	b.Logf("Generating %v test suite", testset.Name)
-	if err := writeTestDB(benchDB, b.N, testset); err != nil {
-		b.Error(err)
-		b.FailNow()
-	}
-	defer benchDB.Close()
-
+func RunSingleTest(b *testing.B, ctx *BenchmarkContext, testset *PerfTestSet, sandboxName string) {
 	sandbox, err := worker.NewSandbox(sandboxName)
 	if err != nil {
-		b.Error(err)
-		b.FailNow()
+		b.Fatal(err)
 	}
 
+	for i := 0; i < b.N; i++ {
+		ctx.writeSolutions(b.N, testset.Name)
+	}
+
+	queue := &worker.Queue{Sandbox: sandbox, DB: ctx.db}
+
 	b.ResetTimer()
-	queue := &worker.Queue{Sandbox: sandbox, DB: benchDB}
 	queue.Run()
+	b.StopTimer()
+
+	if err := ctx.assertRunComplete(testset); err != nil {
+		b.Fatal(err)
+	}
+}
+
+// TODO
+func (ctx *BenchmarkContext) assertRunComplete(testset *PerfTestSet) error {
+	return nil
 }

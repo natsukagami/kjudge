@@ -2,22 +2,34 @@ package performance
 
 import (
 	"fmt"
-	"os"
+	"log"
 	"testing"
 )
 
-func BenchmarkSandboxes(b *testing.B) {
-	tmpDir, err := os.MkdirTemp(os.TempDir(), "kjudge_bench")
-	if err != nil {
-		b.Error(err)
-		b.FailNow()
-	}
-	defer os.RemoveAll(tmpDir)
+var testList = []*PerfTestSet{BigInputProblem(), SpawnTimeProblem()}
+var sandboxList = []string{"raw", "isolate"}
 
-	for _, testset := range []*PerfTestSet{BigInputProblem(), SpawnTimeProblem()} {
-		for _, sandboxName := range []string{"raw", "isolate"} {
-			b.Run(fmt.Sprintf("%v %v", testset.Name, sandboxName),
-				func(b *testing.B) {RunSingleTest(b, tmpDir, testset, sandboxName)})
+func BenchmarkSandboxes(b *testing.B) {
+	log.Println("creating test DB")
+
+	ctx, err := NewBenchmarkContext(b.TempDir())
+	if err != nil {
+		b.Fatal(err)
+	}
+	defer ctx.Close()
+
+	for _, testset := range testList {
+		log.Printf("creating problem %v", testset.Name)
+		if err := ctx.writeProblem(testset); err != nil {
+			b.Fatal(err)
+		}
+	}
+
+	for _, testset := range testList {
+		for _, sandboxName := range sandboxList {
+			testName := fmt.Sprintf("%v %v", testset.Name, sandboxName)
+			log.Printf("running %v", testName)
+			b.Run(testName, func(b *testing.B) { RunSingleTest(b, ctx, testset, sandboxName) })
 		}
 	}
 }

@@ -18,9 +18,9 @@ func SpawnTimeProblem() *PerfTestSet {
 	// maxValue * 2 must not cause integer overflow
 	maxValue := 1 << 30
 	return &PerfTestSet{
-		Name:         "SPAWN",
-		Count:        10000,
-		CapTime:      100,
+		Name:    "SPAWN",
+		Count:   10000,
+		CapTime: 100,
 		Generator: func(r *rand.Rand) []byte {
 			value := r.Intn(maxValue)
 			return []byte(fmt.Sprintf("%v", value))

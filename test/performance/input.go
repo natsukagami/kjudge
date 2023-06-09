@@ -5,7 +5,7 @@ import "math/rand"
 const bigInputCode = `#include <stdio.h>
 int main(){
 	int r = 0;
-	while (char c = get_char()){
+	while (char c = getchar()){
 		if ('a' <= c && c <= 'b') r++;
 		else break;
 	}
@@ -18,9 +18,9 @@ int main(){
 func BigInputProblem() *PerfTestSet {
 	maxSize := 50000000 // 50MB
 	return &PerfTestSet{
-		Name:         "INPUT",
-		CapTime:      5000,
-		Count:    50,
+		Name:    "INPUT",
+		CapTime: 5000,
+		Count:   50,
 		Generator: func(r *rand.Rand) []byte {
 			strSize := maxSize - r.Intn(10)
 			input := make([]byte, strSize)
