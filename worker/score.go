@@ -180,7 +180,7 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 		subs[i], subs[j] = subs[j], subs[i]
 	}
 
-	getScoredSub:
+getScoredSub:
 	for _, sub := range subs {
 		score, _, counts := scoreOf(sub)
 		if !counts {
