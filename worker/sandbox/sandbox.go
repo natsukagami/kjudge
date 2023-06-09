@@ -8,19 +8,20 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Sandbox provides a way to run an arbitary command
+// Runner provides a way to run an arbitary command
 // within a sandbox, with configured input/outputs and
 // proper time and memory limits.
 //
 // kjudge currently implements two sandboxes, "isolate" (which requires "github.com/ioi/isolate" to be available)
 // and "raw" (NOT RECOMMENDED, RUN AT YOUR OWN RISK).
 // Which sandbox is used can be set at runtime with a command-line switch.
-type Sandbox interface {
-	Run(*SandboxInput) (*SandboxOutput, error)
+type Runner interface {
+	Settings() *Settings
+	Run(*Input) (*Output, error)
 }
 
-// SandboxInput is the input to a sandbox.
-type SandboxInput struct {
+// Input is the input to a sandbox.
+type Input struct {
 	Command     string            `json:"command"`      // The passed command
 	Args        []string          `json:"args"`         // any additional arguments, if needed
 	Files       map[string][]byte `json:"files"`        // Any additional files needed
@@ -31,8 +32,8 @@ type SandboxInput struct {
 	Input          []byte `json:"input"`
 }
 
-// SandboxOutput is the output which the sandbox needs to give back.
-type SandboxOutput struct {
+// Output is the output which the sandbox needs to give back.
+type Output struct {
 	Success     bool          `json:"success"`      // Whether the command exited zero.
 	RunningTime time.Duration `json:"running_time"` // The running time of the command.
 	MemoryUsed  int           `json:"memory_used"`  // in KBs
@@ -42,8 +43,23 @@ type SandboxOutput struct {
 	ErrorMessage string `json:"error_message,omitempty"`
 }
 
+type Settings struct {
+	IgnoreWarning bool
+}
+
+var DefaultSettings = Settings{IgnoreWarning: false}
+
+type Option func(Settings) Settings
+
+func IgnoreWarnings(ignore bool) Option {
+	return func(o Settings) Settings {
+		o.IgnoreWarning = ignore
+		return o
+	}
+}
+
 // CopyTo copies all the files it contains into cwd.
-func (input *SandboxInput) CopyTo(cwd string) error {
+func (input *Input) CopyTo(cwd string) error {
 	// Copy all the files into "cwd"
 	for name, file := range input.Files {
 		if err := os.WriteFile(filepath.Join(cwd, name), file, 0666); err != nil {

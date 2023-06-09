@@ -180,17 +180,18 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 		subs[i], subs[j] = subs[j], subs[i]
 	}
 
+getScoredSub:
 	for _, sub := range subs {
 		score, _, counts := scoreOf(sub)
 		if !counts {
 			continue
 		}
+		counted++
 		switch s.Problem.ScoringMode {
 		case models.ScoringModeOnce:
-			if which == nil {
-				which = sub
-				maxScore = score
-			}
+			which = sub
+			maxScore = score
+			break getScoredSub
 		case models.ScoringModeLast:
 			which = sub
 			maxScore = score
@@ -212,7 +213,6 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 		default:
 			panic(s)
 		}
-		counted++
 	}
 
 	for _, sub := range subs {

@@ -21,13 +21,26 @@ import (
 	"github.com/natsukagami/kjudge/worker/sandbox"
 )
 
-// Sandbox implements worker.Sandbox.
-type Sandbox struct{}
+// Runner implements worker.Runner.
+type Runner struct {
+	settings sandbox.Settings
+}
 
-var _ sandbox.Sandbox = (*Sandbox)(nil)
+var _ sandbox.Runner = (*Runner)(nil)
 
-// Run implements Sandbox.Run
-func (s *Sandbox) Run(input *sandbox.SandboxInput) (*sandbox.SandboxOutput, error) {
+func New(settings sandbox.Settings) *Runner {
+	if !settings.IgnoreWarning {
+		log.Println("'raw' sandbox selected. WE ARE NOT RESPONSIBLE FOR ANY BREAKAGE CAUSED BY FOREIGN CODE.")
+	}
+	return &Runner{settings: settings}
+}
+
+func (s *Runner) Settings() *sandbox.Settings {
+	return &s.settings
+}
+
+// Run implements Runner.Run
+func (s *Runner) Run(input *sandbox.Input) (*sandbox.Output, error) {
 	dir := os.TempDir()
 
 	log.Printf("[SANDBOX] Running %s %v\n", input.Command, input.Args)
@@ -41,7 +54,7 @@ func (s *Sandbox) Run(input *sandbox.SandboxInput) (*sandbox.SandboxOutput, erro
 //   - MEMORY LIMITS ARE NOT SET. It always reports a memory usage of 0 (it cannot measure them).
 //   - THE PROGRAM DOES NOT MESS WITH THE COMPUTER. LMAO
 //   - The folder will be thrown away later.
-func (s *Sandbox) RunFrom(cwd string, input *sandbox.SandboxInput) (*sandbox.SandboxOutput, error) {
+func (s *Runner) RunFrom(cwd string, input *sandbox.Input) (*sandbox.Output, error) {
 	if err := input.CopyTo(cwd); err != nil {
 		return nil, err
 	}
@@ -73,7 +86,7 @@ func (s *Sandbox) RunFrom(cwd string, input *sandbox.SandboxInput) (*sandbox.San
 	case <-time.After(input.TimeLimit):
 		cancel()
 		<-done
-		return &sandbox.SandboxOutput{
+		return &sandbox.Output{
 			Success:      false,
 			MemoryUsed:   0,
 			RunningTime:  input.TimeLimit,
@@ -83,7 +96,7 @@ func (s *Sandbox) RunFrom(cwd string, input *sandbox.SandboxInput) (*sandbox.San
 		}, nil
 	case commandErr := <-done:
 		runningTime := time.Since(startTime)
-		return &sandbox.SandboxOutput{
+		return &sandbox.Output{
 			Success:      commandErr == nil,
 			MemoryUsed:   0,
 			RunningTime:  runningTime,

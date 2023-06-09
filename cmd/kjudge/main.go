@@ -32,9 +32,6 @@ func main() {
 	}
 	defer db.Close()
 
-	if *sandboxImpl == "raw" {
-		log.Println("'raw' sandbox selected. WE ARE NOT RESPONSIBLE FOR ANY BREAKAGE CAUSED BY FOREIGN CODE.")
-	}
 	sandbox, err := worker.NewSandbox(*sandboxImpl)
 	if err != nil {
 		log.Fatalf("%v", err)

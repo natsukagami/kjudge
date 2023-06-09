@@ -14,7 +14,7 @@ import (
 // Queue implements a queue that runs each job one by one.
 type Queue struct {
 	DB      *db.DB
-	Sandbox sandbox.Sandbox
+	Sandbox sandbox.Runner
 }
 
 // Start starts the queue. It is blocking, so might wanna "go run" it.
