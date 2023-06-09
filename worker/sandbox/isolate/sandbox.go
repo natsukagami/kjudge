@@ -31,7 +31,8 @@ func init() {
 
 // Runner implements worker.Runner.
 type Runner struct {
-	private struct{} // Makes the sandbox not simply constructible
+	settings sandbox.Settings
+	private  struct{} // Makes the sandbox not simply constructible
 }
 
 var _ sandbox.Runner = (*Runner)(nil)
@@ -49,9 +50,13 @@ func mustHaveIsolate() {
 
 // New returns a new sandbox.
 // Panics if isolate is not installed.
-func New() *Runner {
+func New(settings sandbox.Settings) *Runner {
 	mustHaveIsolate()
-	return &Runner{private: struct{}{}}
+	return &Runner{settings: settings, private: struct{}{}}
+}
+
+func (s *Runner) Settings() *sandbox.Settings {
+	return &s.settings
 }
 
 // Run implements Runner.Run.

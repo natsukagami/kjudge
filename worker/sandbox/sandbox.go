@@ -16,6 +16,7 @@ import (
 // and "raw" (NOT RECOMMENDED, RUN AT YOUR OWN RISK).
 // Which sandbox is used can be set at runtime with a command-line switch.
 type Runner interface {
+	Settings() *Settings
 	Run(*Input) (*Output, error)
 }
 
@@ -40,6 +41,21 @@ type Output struct {
 	Stdout       []byte `json:"stdout"`
 	Stderr       []byte `json:"stderr"`
 	ErrorMessage string `json:"error_message,omitempty"`
+}
+
+type Settings struct {
+	IgnoreWarning bool
+}
+
+var DefaultSettings = Settings{IgnoreWarning: false}
+
+type Option func(Settings) Settings
+
+func IgnoreWarnings(ignore bool) Option {
+	return func(o Settings) Settings {
+		o.IgnoreWarning = ignore
+		return o
+	}
 }
 
 // CopyTo copies all the files it contains into cwd.

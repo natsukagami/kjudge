@@ -22,9 +22,22 @@ import (
 )
 
 // Runner implements worker.Runner.
-type Runner struct{}
+type Runner struct {
+	settings sandbox.Settings
+}
 
 var _ sandbox.Runner = (*Runner)(nil)
+
+func New(settings sandbox.Settings) *Runner {
+	if !settings.IgnoreWarning {
+		log.Println("'raw' sandbox selected. WE ARE NOT RESPONSIBLE FOR ANY BREAKAGE CAUSED BY FOREIGN CODE.")
+	}
+	return &Runner{settings: settings}
+}
+
+func (s *Runner) Settings() *sandbox.Settings {
+	return &s.settings
+}
 
 // Run implements Runner.Run
 func (s *Runner) Run(input *sandbox.Input) (*sandbox.Output, error) {
