@@ -1,7 +1,7 @@
 package sandbox
 
 type Settings struct {
-	LogSandbox bool
+	LogSandbox    bool
 	IgnoreWarning bool
 }
 

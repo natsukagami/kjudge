@@ -2,8 +2,8 @@ package queue
 
 type Settings struct {
 	LogCompile bool
-	LogRun bool
-	LogScore bool
+	LogRun     bool
+	LogScore   bool
 }
 
 var DefaultSettings = Settings{LogCompile: true, LogRun: true, LogScore: true}

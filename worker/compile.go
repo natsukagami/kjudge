@@ -25,9 +25,17 @@ import (
 
 // CompileContext is the information needed to perform compilation.
 type CompileContext struct {
-	DB      *sqlx.Tx
-	Sub     *models.Submission
-	Problem *models.Problem
+	DB        *sqlx.Tx
+	Sub       *models.Submission
+	Problem   *models.Problem
+	AllowLogs bool
+}
+
+func (c *CompileContext) Log(format string, v ...interface{}) {
+	if !c.AllowLogs {
+		return
+	}
+	log.Printf(format, v)
 }
 
 // Compile performs compilation.
@@ -65,7 +73,7 @@ func Compile(c *CompileContext) (bool, error) {
 		return false, c.Sub.Write(c.DB)
 	}
 
-	log.Printf("[WORKER] Compiling submission %v\n", c.Sub.ID)
+	c.Log("[WORKER] Compiling submission %v\n", c.Sub.ID)
 
 	// Now, create a temporary directory.
 	dir, err := os.MkdirTemp("", "*")
@@ -96,7 +104,8 @@ func Compile(c *CompileContext) (bool, error) {
 		c.Sub.CompiledSource = nil
 		c.Sub.Verdict = models.VerdictCompileError
 	}
-	log.Printf("[WORKER] Compiling submission %v succeeded (result = %v).", c.Sub.ID, result)
+
+	c.Log("[WORKER] Compiling submission %v succeeded (result = %v).", c.Sub.ID, result)
 
 	return result, c.Sub.Write(c.DB)
 }

@@ -14,8 +14,8 @@ import (
 
 // Queue implements a queue that runs each job one by one.
 type Queue struct {
-	DB      *db.DB
-	Sandbox sandbox.Runner
+	DB       *db.DB
+	Sandbox  sandbox.Runner
 	Settings Settings
 }
 
@@ -70,7 +70,8 @@ func (q *Queue) HandleJob(job *models.Job) error {
 	}
 	switch job.Type {
 	case models.JobTypeCompile:
-		if _, err := worker.Compile(&worker.CompileContext{DB: tx, Sub: sub, Problem: problem}); err != nil {
+		if _, err := worker.Compile(&worker.CompileContext{
+			DB: tx, Sub: sub, Problem: problem, AllowLogs: q.Settings.LogCompile}); err != nil {
 			return err
 		}
 	case models.JobTypeRun:
@@ -83,7 +84,7 @@ func (q *Queue) HandleJob(job *models.Job) error {
 			return err
 		}
 		if err := worker.Run(q.Sandbox, &worker.RunContext{
-			DB: tx, Sub: sub, Problem: problem, TestGroup: tg, Test: test}); err != nil {
+			DB: tx, Sub: sub, Problem: problem, TestGroup: tg, Test: test, AllowLogs: q.Settings.LogScore}); err != nil {
 			return err
 		}
 	case models.JobTypeScore:
@@ -91,7 +92,8 @@ func (q *Queue) HandleJob(job *models.Job) error {
 		if err != nil {
 			return err
 		}
-		if err := worker.Score(&worker.ScoreContext{DB: tx, Sub: sub, Problem: problem, Contest: contest}); err != nil {
+		if err := worker.Score(&worker.ScoreContext{
+			DB: tx, Sub: sub, Problem: problem, Contest: contest, AllowLogs: q.Settings.LogScore}); err != nil {
 			return err
 		}
 	}
