@@ -103,7 +103,7 @@ func (q *Queue) HandleJob(job *models.Job) error {
 			return err
 		}
 		if err := worker.Run(q.Sandbox, &worker.RunContext{
-			DB: tx, Sub: sub, Problem: problem, TestGroup: tg, Test: test, AllowLogs: q.Settings.LogScore}); err != nil {
+			DB: tx, Sub: sub, Problem: problem, TestGroup: tg, Test: test, AllowLogs: q.Settings.LogRun}); err != nil {
 			return err
 		}
 	case models.JobTypeScore:

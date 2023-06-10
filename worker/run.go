@@ -31,7 +31,7 @@ func (r *RunContext) Log(format string, v ...interface{}) {
 	if !r.AllowLogs {
 		return
 	}
-	log.Printf(format, v)
+	log.Printf(format, v...)
 }
 
 // TimeLimit returns the time limit of the context, in time.Duration.

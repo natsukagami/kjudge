@@ -35,7 +35,7 @@ func (c *CompileContext) Log(format string, v ...interface{}) {
 	if !c.AllowLogs {
 		return
 	}
-	log.Printf(format, v)
+	log.Printf(format, v...)
 }
 
 // Compile performs compilation.

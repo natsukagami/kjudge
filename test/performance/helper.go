@@ -11,6 +11,7 @@ import (
 	"github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/server/auth"
 	"github.com/natsukagami/kjudge/worker"
+	"github.com/natsukagami/kjudge/worker/queue"
 	"github.com/natsukagami/kjudge/worker/sandbox"
 	"github.com/pkg/errors"
 )
@@ -135,7 +136,7 @@ func RunSingleTest(b *testing.B, ctx *BenchmarkContext, testset *PerfTestSet, sa
 	}
 	log.Printf("Generated solutions")
 
-	queue := &worker.Queue{Sandbox: sandbox, DB: ctx.db}
+	queue := &queue.Queue{Sandbox: sandbox, DB: ctx.db}
 
 	b.ResetTimer()
 	queue.Run()

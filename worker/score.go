@@ -24,7 +24,7 @@ func (s *ScoreContext) Log(format string, v ...interface{}) {
 	if !s.AllowLogs {
 		return
 	}
-	log.Printf(format, v)
+	log.Printf(format, v...)
 }
 
 // Score does scoring on a submission and updates the user's ProblemResult.
