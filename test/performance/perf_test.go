@@ -7,7 +7,7 @@ import (
 )
 
 var testList = []*PerfTestSet{BigInputProblem(), SpawnTimeProblem()}
-var sandboxList = []string{"raw", "isolate"}
+var sandboxList = []string{"isolate", "raw"}
 
 func BenchmarkSandboxes(b *testing.B) {
 	log.Println("creating test DB")

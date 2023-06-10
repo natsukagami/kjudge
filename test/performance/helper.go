@@ -1,6 +1,7 @@
 package performance
 
 import (
+	"log"
 	"os"
 	"path/filepath"
 	"testing"
@@ -118,14 +119,21 @@ func (ctx *BenchmarkContext) writeSolutions(N int, problemName string) error {
 }
 
 func RunSingleTest(b *testing.B, ctx *BenchmarkContext, testset *PerfTestSet, sandboxName string) {
-	sandbox, err := worker.NewSandbox(sandboxName, sandbox.IgnoreWarnings(true))
+	log.Printf("running %v %v %v times", testset.Name, sandboxName, b.N)
+	sandbox, err := worker.NewSandbox(
+		sandboxName,
+		sandbox.IgnoreWarnings(true),
+		sandbox.EnableSandboxLogs(false))
+
 	if err != nil {
 		b.Fatal(err)
 	}
 
+	log.Printf("Generating %v solutions", b.N)
 	for i := 0; i < b.N; i++ {
 		ctx.writeSolutions(b.N, testset.Name)
 	}
+	log.Printf("Generated solutions")
 
 	queue := &worker.Queue{Sandbox: sandbox, DB: ctx.db}
 

@@ -43,21 +43,6 @@ type Output struct {
 	ErrorMessage string `json:"error_message,omitempty"`
 }
 
-type Settings struct {
-	IgnoreWarning bool
-}
-
-var DefaultSettings = Settings{IgnoreWarning: false}
-
-type Option func(Settings) Settings
-
-func IgnoreWarnings(ignore bool) Option {
-	return func(o Settings) Settings {
-		o.IgnoreWarning = ignore
-		return o
-	}
-}
-
 // CopyTo copies all the files it contains into cwd.
 func (input *Input) CopyTo(cwd string) error {
 	// Copy all the files into "cwd"
