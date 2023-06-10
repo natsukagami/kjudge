@@ -12,6 +12,7 @@ import (
 	_ "github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/server"
 	"github.com/natsukagami/kjudge/worker"
+	"github.com/natsukagami/kjudge/worker/queue"
 )
 
 var (
@@ -43,7 +44,7 @@ func main() {
 	}
 
 	// Start the queue
-	queue := worker.Queue{Sandbox: sandbox, DB: db}
+	queue := queue.NewQueue(db, sandbox)
 
 	// Build the server
 	server, err := server.New(db, opts...)

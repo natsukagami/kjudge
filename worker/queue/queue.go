@@ -1,4 +1,4 @@
-package worker
+package queue
 
 import (
 	"log"
@@ -7,6 +7,7 @@ import (
 	"github.com/mattn/go-sqlite3"
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models"
+	"github.com/natsukagami/kjudge/worker"
 	"github.com/natsukagami/kjudge/worker/sandbox"
 	"github.com/pkg/errors"
 )
@@ -15,6 +16,15 @@ import (
 type Queue struct {
 	DB      *db.DB
 	Sandbox sandbox.Runner
+	Settings Settings
+}
+
+func NewQueue(db *db.DB, sandbox sandbox.Runner, options ...Option) Queue {
+	setting := DefaultSettings
+	for _, option := range options {
+		setting = option(setting)
+	}
+	return Queue{DB: db, Sandbox: sandbox, Settings: setting}
 }
 
 // Start starts the queue. It is blocking, so might wanna "go run" it.
@@ -60,7 +70,7 @@ func (q *Queue) HandleJob(job *models.Job) error {
 	}
 	switch job.Type {
 	case models.JobTypeCompile:
-		if _, err := Compile(&CompileContext{DB: tx, Sub: sub, Problem: problem}); err != nil {
+		if _, err := worker.Compile(&worker.CompileContext{DB: tx, Sub: sub, Problem: problem}); err != nil {
 			return err
 		}
 	case models.JobTypeRun:
@@ -72,7 +82,7 @@ func (q *Queue) HandleJob(job *models.Job) error {
 		if err != nil {
 			return err
 		}
-		if err := Run(q.Sandbox, &RunContext{
+		if err := worker.Run(q.Sandbox, &worker.RunContext{
 			DB: tx, Sub: sub, Problem: problem, TestGroup: tg, Test: test}); err != nil {
 			return err
 		}
@@ -81,7 +91,7 @@ func (q *Queue) HandleJob(job *models.Job) error {
 		if err != nil {
 			return err
 		}
-		if err := Score(&ScoreContext{DB: tx, Sub: sub, Problem: problem, Contest: contest}); err != nil {
+		if err := worker.Score(&worker.ScoreContext{DB: tx, Sub: sub, Problem: problem, Contest: contest}); err != nil {
 			return err
 		}
 	}
