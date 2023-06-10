@@ -43,7 +43,9 @@ func (s *Runner) Settings() *sandbox.Settings {
 func (s *Runner) Run(input *sandbox.Input) (*sandbox.Output, error) {
 	dir := os.TempDir()
 
-	log.Printf("[SANDBOX] Running %s %v\n", input.Command, input.Args)
+	if s.Settings().LogSandbox {
+		log.Printf("[SANDBOX] Running %s %v\n", input.Command, input.Args)
+	}
 
 	return s.RunFrom(dir, input)
 }
