@@ -51,6 +51,25 @@ func (q *Queue) Start() {
 	}
 }
 
+// Run starts the queue, solves all pending jobs, then returns
+func (q *Queue) Run() {
+	for {
+		job, err := models.FirstJob(q.DB)
+		if err != nil {
+			log.Printf("[WORKER] Fetching job failed: %+v\n", err)
+			continue
+		}
+		if job == nil {
+			return
+		}
+
+		if err := q.HandleJob(job); err != nil {
+			log.Printf("[WORKER] Handling job failed: %+v\n", err)
+		}
+		_ = job.Delete(q.DB)
+	}
+}
+
 // HandleJob dispatches a job.
 func (q *Queue) HandleJob(job *models.Job) error {
 	// Start a job with a context and submission
