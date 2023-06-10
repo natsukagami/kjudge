@@ -136,7 +136,7 @@ func RunSingleTest(b *testing.B, ctx *BenchmarkContext, testset *PerfTestSet, sa
 	}
 	log.Printf("Generated solutions")
 
-	queue := &queue.Queue{Sandbox: sandbox, DB: ctx.db}
+	queue := queue.NewQueue(ctx.db, sandbox, queue.CompileLogs(false), queue.RunLogs(false), queue.ScoreLogs(false))
 
 	b.ResetTimer()
 	queue.Run()
