@@ -24,6 +24,14 @@ type RunContext struct {
 	Problem   *models.Problem
 	TestGroup *models.TestGroup
 	Test      *models.Test
+	AllowLogs bool
+}
+
+func (r *RunContext) Log(format string, v ...interface{}) {
+	if !r.AllowLogs {
+		return
+	}
+	log.Printf(format, v)
 }
 
 // TimeLimit returns the time limit of the context, in time.Duration.
@@ -171,15 +179,15 @@ func Run(s sandbox.Runner, r *RunContext) error {
 	compiled, source := r.CompiledSource()
 	if !compiled {
 		// Add a compilation job and re-add ourselves.
-		log.Printf("[WORKER] Submission %v not compiled, creating Compile job.\n", r.Sub.ID)
+		r.Log("[WORKER] Submission %v not compiled, creating Compile job.\n", r.Sub.ID)
 		return models.BatchInsertJobs(r.DB, models.NewJobCompile(r.Sub.ID), models.NewJobRun(r.Sub.ID, r.Test.ID))
 	}
 	if source == nil {
-		log.Printf("[WORKER] Not running a submission that failed to compile.\n")
+		r.Log("[WORKER] Not running a submission that failed to compile.\n")
 		return nil
 	}
 
-	log.Printf("[WORKER] Running submission %v on [test `%v`, group `%v`]\n", r.Sub.ID, r.Test.Name, r.TestGroup.Name)
+	r.Log("[WORKER] Running submission %v on [test `%v`, group `%v`]\n", r.Sub.ID, r.Test.Name, r.TestGroup.Name)
 
 	var output *sandbox.Output
 	file, err := models.GetFileWithName(r.DB, r.Problem.ID, ".stages")
@@ -223,7 +231,7 @@ func Run(s sandbox.Runner, r *RunContext) error {
 		return err
 	}
 
-	log.Printf("[WORKER] Done running submission %v on [test `%v`, group `%v`]: %.1f (t = %v, m = %v)\n",
+	r.Log("[WORKER] Done running submission %v on [test `%v`, group `%v`]: %.1f (t = %v, m = %v)\n",
 		r.Sub.ID, r.Test.Name, r.TestGroup.Name, result.Score, result.RunningTime, result.MemoryUsed)
 
 	return result.Write(r.DB)
