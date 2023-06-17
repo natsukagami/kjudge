@@ -13,10 +13,18 @@ import (
 // ScoreContext is a context for calculating a submission's score
 // and update the user's problem scores.
 type ScoreContext struct {
-	DB      *sqlx.Tx
-	Sub     *models.Submission
-	Problem *models.Problem
-	Contest *models.Contest
+	DB        *sqlx.Tx
+	Sub       *models.Submission
+	Problem   *models.Problem
+	Contest   *models.Contest
+	AllowLogs bool
+}
+
+func (s *ScoreContext) Log(format string, v ...interface{}) {
+	if !s.AllowLogs {
+		return
+	}
+	log.Printf(format, v...)
 }
 
 // Score does scoring on a submission and updates the user's ProblemResult.
@@ -32,10 +40,10 @@ func Score(s *ScoreContext) error {
 	}
 	if compiled, source := s.CompiledSource(); !compiled {
 		// Add a compilation job and re-add ourselves.
-		log.Printf("[WORKER] Submission %v not compiled, creating Compile job.\n", s.Sub.ID)
+		s.Log("[WORKER] Submission %v not compiled, creating Compile job.\n", s.Sub.ID)
 		return models.BatchInsertJobs(s.DB, models.NewJobCompile(s.Sub.ID), models.NewJobScore(s.Sub.ID))
 	} else if source == nil {
-		log.Printf("[WORKER] Not running a submission that failed to compile.\n")
+		s.Log("[WORKER] Not running a submission that failed to compile.\n")
 		s.Sub.Verdict = models.VerdictCompileError
 		if err := s.Sub.Write(s.DB); err != nil {
 			return err
@@ -46,12 +54,12 @@ func Score(s *ScoreContext) error {
 			return err
 		}
 		pr := s.CompareScores(subs)
-		log.Printf("[WORKER] Problem results updated for user %s, problem %d (score = %.1f, penalty = %d)\n", s.Sub.UserID, s.Problem.ID, pr.Score, pr.Penalty)
+		s.Log("[WORKER] Problem results updated for user %s, problem %d (score = %.1f, penalty = %d)\n", s.Sub.UserID, s.Problem.ID, pr.Score, pr.Penalty)
 
 		return pr.Write(s.DB)
 	}
 	if missing := MissingTests(tests, testResults); len(missing) > 0 {
-		log.Printf("[WORKER] Submission %v needs to run %d tests before being scored.\n", s.Sub.ID, len(missing))
+		s.Log("[WORKER] Submission %v needs to run %d tests before being scored.\n", s.Sub.ID, len(missing))
 		var jobs []*models.Job
 		for _, m := range missing {
 			jobs = append(jobs, models.NewJobRun(s.Sub.ID, m.ID))
@@ -60,7 +68,7 @@ func Score(s *ScoreContext) error {
 		return models.BatchInsertJobs(s.DB, jobs...)
 	}
 
-	log.Printf("[WORKER] Scoring submission %d\n", s.Sub.ID)
+	s.Log("[WORKER] Scoring submission %d\n", s.Sub.ID)
 	// Calculate the score by summing scores on each test group.
 	s.Sub.Score = sql.NullFloat64{Float64: 0.0, Valid: true}
 	for _, tg := range tests {
@@ -78,7 +86,7 @@ func Score(s *ScoreContext) error {
 	if err := s.Sub.Write(s.DB); err != nil {
 		return err
 	}
-	log.Printf("[WORKER] Submission %d scored (verdict = %s, score = %.1f). Updating problem results\n", s.Sub.ID, s.Sub.Verdict, s.Sub.Score.Float64)
+	s.Log("[WORKER] Submission %d scored (verdict = %s, score = %.1f). Updating problem results\n", s.Sub.ID, s.Sub.Verdict, s.Sub.Score.Float64)
 
 	// Update the ProblemResult
 	subs, err := models.GetUserProblemSubmissions(s.DB, s.Sub.UserID, s.Problem.ID)
@@ -86,7 +94,7 @@ func Score(s *ScoreContext) error {
 		return err
 	}
 	pr := s.CompareScores(subs)
-	log.Printf("[WORKER] Problem results updated for user %s, problem %d (score = %.1f, penalty = %d)\n", s.Sub.UserID, s.Problem.ID, pr.Score, pr.Penalty)
+	s.Log("[WORKER] Problem results updated for user %s, problem %d (score = %.1f, penalty = %d)\n", s.Sub.UserID, s.Problem.ID, pr.Score, pr.Penalty)
 
 	return pr.Write(s.DB)
 }
@@ -180,18 +188,18 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 		subs[i], subs[j] = subs[j], subs[i]
 	}
 
+getScoredSub:
 	for _, sub := range subs {
 		score, _, counts := scoreOf(sub)
 		if !counts {
 			continue
 		}
+		counted++
 		switch s.Problem.ScoringMode {
 		case models.ScoringModeOnce:
-			if which == nil {
-				which = sub
-				maxScore = score
-				break
-			}
+			which = sub
+			maxScore = score
+			break getScoredSub
 		case models.ScoringModeLast:
 			which = sub
 			maxScore = score
@@ -213,7 +221,6 @@ func (s *ScoreContext) CompareScores(subs []*models.Submission) *models.ProblemR
 		default:
 			panic(s)
 		}
-		counted++
 	}
 
 	for _, sub := range subs {

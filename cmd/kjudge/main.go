@@ -12,8 +12,7 @@ import (
 	_ "github.com/natsukagami/kjudge/models"
 	"github.com/natsukagami/kjudge/server"
 	"github.com/natsukagami/kjudge/worker"
-	"github.com/natsukagami/kjudge/worker/isolate"
-	"github.com/natsukagami/kjudge/worker/raw"
+	"github.com/natsukagami/kjudge/worker/queue"
 )
 
 var (
@@ -34,15 +33,9 @@ func main() {
 	}
 	defer db.Close()
 
-	var sandbox worker.Sandbox
-	switch *sandboxImpl {
-	case "raw":
-		log.Println("'raw' sandbox selected. WE ARE NOT RESPONSIBLE FOR ANY BREAKAGE CAUSED BY FOREIGN CODE.")
-		sandbox = &raw.Sandbox{}
-	case "isolate":
-		sandbox = isolate.New()
-	default:
-		log.Fatalf("Sandbox %s doesn't exists or not yet implemented.", *sandboxImpl)
+	sandbox, err := worker.NewSandbox(*sandboxImpl)
+	if err != nil {
+		log.Fatalf("%v", err)
 	}
 
 	opts := []server.Opt{}
@@ -51,7 +44,7 @@ func main() {
 	}
 
 	// Start the queue
-	queue := worker.Queue{Sandbox: sandbox, DB: db}
+	queue := queue.NewQueue(db, sandbox)
 
 	// Build the server
 	server, err := server.New(db, opts...)
