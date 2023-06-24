@@ -1,7 +1,7 @@
 package sandbox
 
 type Settings struct {
-	LogSandbox bool
+	LogSandbox    bool
 	IgnoreWarning bool
 }
 
@@ -26,6 +26,7 @@ func EnableSandboxLogs(enable bool) Option {
 	}
 }
 
+// MakeSettings creates a Settings object for sandboxes using options passed
 func MakeSettings(options ...Option) Settings {
 	setting := defaultSettings
 	for _, option := range options {
