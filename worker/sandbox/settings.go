@@ -7,6 +7,7 @@ type Settings struct {
 
 var defaultSettings = Settings{LogSandbox: true, IgnoreWarning: false}
 
+// Option represents a sandbox option.
 type Option func(Settings) Settings
 
 func IgnoreWarnings(ignore bool) Option {
