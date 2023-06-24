@@ -18,6 +18,7 @@ func IgnoreWarnings(ignore bool) Option {
 	}
 }
 
+// EnableSandboxLogs sets whether sandbox logs should be printed.
 func EnableSandboxLogs(enable bool) Option {
 	return func(o Settings) Settings {
 		o.LogSandbox = enable
