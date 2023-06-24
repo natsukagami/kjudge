@@ -10,6 +10,7 @@ var defaultSettings = Settings{LogSandbox: true, IgnoreWarning: false}
 // Option represents a sandbox option.
 type Option func(Settings) Settings
 
+// IgnoreWarnings sets whether sandbox warnings should be silenced.
 func IgnoreWarnings(ignore bool) Option {
 	return func(o Settings) Settings {
 		o.IgnoreWarning = ignore
