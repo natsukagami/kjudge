@@ -8,10 +8,7 @@ import (
 )
 
 func NewSandbox(name string, options ...sandbox.Option) (sandbox.Runner, error) {
-	setting := sandbox.DefaultSettings
-	for _, option := range options {
-		setting = option(setting)
-	}
+	setting := sandbox.MakeSettings(options...)
 	switch name {
 	case "raw":
 		return raw.New(setting), nil

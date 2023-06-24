@@ -5,7 +5,7 @@ type Settings struct {
 	IgnoreWarning bool
 }
 
-var DefaultSettings = Settings{LogSandbox: true, IgnoreWarning: false}
+var defaultSettings = Settings{LogSandbox: true, IgnoreWarning: false}
 
 type Option func(Settings) Settings
 
@@ -21,4 +21,12 @@ func EnableSandboxLogs(enable bool) Option {
 		o.LogSandbox = enable
 		return o
 	}
+}
+
+func MakeSettings(options ...Option) Settings {
+	setting := defaultSettings
+	for _, option := range options {
+		setting = option(setting)
+	}
+	return setting
 }
