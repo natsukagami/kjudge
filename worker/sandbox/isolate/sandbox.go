@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/natsukagami/kjudge/worker"
+	"github.com/natsukagami/kjudge/worker/sandbox"
 	"github.com/pkg/errors"
 )
 
@@ -29,12 +29,13 @@ func init() {
 	}
 }
 
-// Sandbox implements worker.Sandbox.
-type Sandbox struct {
-	private struct{} // Makes the sandbox not simply constructible
+// Runner implements worker.Runner.
+type Runner struct {
+	settings sandbox.Settings
+	private  struct{} // Makes the sandbox not simply constructible
 }
 
-var _ worker.Sandbox = (*Sandbox)(nil)
+var _ sandbox.Runner = (*Runner)(nil)
 
 // Panics on not having "isolate" accessible.
 func mustHaveIsolate() {
@@ -49,13 +50,17 @@ func mustHaveIsolate() {
 
 // New returns a new sandbox.
 // Panics if isolate is not installed.
-func New() *Sandbox {
+func New(settings sandbox.Settings) *Runner {
 	mustHaveIsolate()
-	return &Sandbox{private: struct{}{}}
+	return &Runner{settings: settings, private: struct{}{}}
 }
 
-// Run implements Sandbox.Run.
-func (s *Sandbox) Run(input *worker.SandboxInput) (*worker.SandboxOutput, error) {
+func (s *Runner) Settings() *sandbox.Settings {
+	return &s.settings
+}
+
+// Run implements Runner.Run.
+func (s *Runner) Run(input *sandbox.Input) (*sandbox.Output, error) {
 	// Init the sandbox
 	defer s.cleanup()
 	dirBytes, err := exec.Command(isolateCommand, "--init", "--cg").Output()
@@ -86,7 +91,7 @@ func (s *Sandbox) Run(input *worker.SandboxInput) (*worker.SandboxOutput, error)
 	}
 
 	// Parse the meta file
-	output := &worker.SandboxOutput{
+	output := &sandbox.Output{
 		Stdout: stdout.Bytes(),
 		Stderr: stderr.Bytes(),
 	}
@@ -97,7 +102,7 @@ func (s *Sandbox) Run(input *worker.SandboxInput) (*worker.SandboxOutput, error)
 	return output, nil
 }
 
-func parseMetaFile(path string, output *worker.SandboxOutput) error {
+func parseMetaFile(path string, output *sandbox.Output) error {
 	meta, err := ReadMetaFile(path)
 	if err != nil {
 		return err
@@ -114,7 +119,7 @@ func parseMetaFile(path string, output *worker.SandboxOutput) error {
 }
 
 // Build the command for isolate --run.
-func buildCmd(dir, metaFile string, input *worker.SandboxInput) *exec.Cmd {
+func buildCmd(dir, metaFile string, input *sandbox.Input) *exec.Cmd {
 	// Calculate stuff
 	timeLimit := float64(input.TimeLimit) / float64(time.Second)
 
@@ -147,6 +152,6 @@ func buildCmd(dir, metaFile string, input *worker.SandboxInput) *exec.Cmd {
 	return cmd
 }
 
-func (s *Sandbox) cleanup() {
+func (s *Runner) cleanup() {
 	_ = exec.Command(isolateCommand, "--cleanup", "--cg").Run()
 }
