@@ -43,8 +43,15 @@ case ${HTTPS} in
     ;;
 esac
 
+cmd="kjudge -file /data/kjudge.db"
+
 if [ "${useHTTPS}" = true ]; then
-    kjudge -port 443 -file /data/kjudge.db -https /certs "$@"
+    cmd="$cmd -port 443 -https /certs" 
 else
-    kjudge -port 80 -file /data/kjudge.db "$@"
+    cmd="$cmd -port 80"
 fi
+
+if [ -f "/data/favicon.ico" ]; then
+    cmd="$cmd -favicon /data/favicon.ico"
+
+"$cmd $@"
