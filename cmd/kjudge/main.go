@@ -16,6 +16,8 @@ import (
 
 var (
 	dbfile      = flag.String("file", "kjudge.db", "Path to the database file.")
+	faviconfile = flag.String("favicon", "", "Path to favicon file. Will not be served if not specified.")
+
 	sandboxImpl = flag.String("sandbox", "isolate", "The sandbox implementation to be used (isolate, raw). Defaults to isolate.")
 	port        = flag.Int("port", 8088, "The port for the server to listen on.")
 	verbose     = flag.Bool("verbose", false, "Log every http requests")
@@ -40,6 +42,9 @@ func main() {
 	opts := []server.Opt{}
 	if *verbose {
 		opts = append(opts, server.Verbose())
+	}
+	if *faviconfile != "" {
+		opts = append(opts, server.Favicon(*faviconfile))
 	}
 
 	// Start the queue

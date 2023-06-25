@@ -30,6 +30,7 @@ type Server struct {
 	echo *echo.Echo
 
 	verbose bool
+	faviconPath string
 }
 
 // New creates a new server.
@@ -37,6 +38,9 @@ func New(db *db.DB, opts ...Opt) (*Server, error) {
 	s := &Server{
 		db:   db,
 		echo: echo.New(),
+
+		verbose: false,
+		faviconPath: "",
 	}
 
 	for _, opt := range opts {
@@ -85,6 +89,7 @@ func New(db *db.DB, opts ...Opt) (*Server, error) {
 		return nil, err
 	}
 	s.echo.GET("", contests.ConestsGetNearestOngoingContest)
+	s.echo.Static("/favicon.ico", s.faviconPath)
 	s.echo.Group("/static").GET("*", StaticFiles)
 	s.echo.GET("*", StaticFiles)
 	s.echo.POST("*", NotFoundHandler)
