@@ -29,7 +29,7 @@ type Server struct {
 	db   *db.DB
 	echo *echo.Echo
 
-	verbose bool
+	verbose     bool
 	faviconPath string
 }
 
@@ -39,7 +39,7 @@ func New(db *db.DB, opts ...Opt) (*Server, error) {
 		db:   db,
 		echo: echo.New(),
 
-		verbose: false,
+		verbose:     false,
 		faviconPath: "",
 	}
 
