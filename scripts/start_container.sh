@@ -53,5 +53,6 @@ fi
 
 if [ -f "/data/favicon.ico" ]; then
     cmd="$cmd -favicon /data/favicon.ico"
+fi
 
-"$cmd $@"
+$cmd $@
