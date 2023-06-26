@@ -59,4 +59,4 @@ if [ -f "/data/favicon.ico" ]; then
     args="$args -favicon /data/favicon.ico"
 fi
 
-$cmd $args $*
+"$cmd $args $@"
