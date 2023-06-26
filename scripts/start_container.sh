@@ -59,4 +59,5 @@ if [ -f "/data/favicon.ico" ]; then
     args="$args -favicon /data/favicon.ico"
 fi
 
-"$cmd $args $@"
+# shellcheck disable=SC2086
+$cmd $args "$@"
