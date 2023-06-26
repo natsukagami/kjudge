@@ -46,7 +46,11 @@ func main() {
 
 	if *faviconfile != "" {
 		log.Printf("Serving favicon from %s", *faviconfile)
-		opts = append(opts, server.Favicon(*faviconfile))
+		opt, err := server.Favicon(*faviconfile)
+		if err != nil {
+			panic(err)
+		}
+		opts = append(opts, opt)
 	} else {
 		log.Printf("Not serving favicon")
 	}
