@@ -75,7 +75,7 @@ func New(db *db.DB, opts ...Opt) (*Server, error) {
 	s.SetupProfiling()
 
 	if s.faviconPath != "" {
-		s.echo.Static("/favicon.ico", s.faviconPath)
+		s.echo.File("/favicon.ico", s.faviconPath)
 	}
 
 	au, err := auth.NewAdmin()
