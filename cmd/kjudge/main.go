@@ -43,7 +43,7 @@ func main() {
 	if *verbose {
 		opts = append(opts, server.Verbose())
 	}
-	
+
 	if *faviconfile != "" {
 		log.Printf("Serving favicon from %s", *faviconfile)
 		opts = append(opts, server.Favicon(*faviconfile))
