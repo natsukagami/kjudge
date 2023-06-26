@@ -12,6 +12,7 @@ func Verbose() Opt {
 	}
 }
 
+// Favicon makes the server serves given file at /favicon.ico
 func Favicon(path string) Opt {
 	if _, err := os.Stat(path); err != nil {
 		panic(err)
