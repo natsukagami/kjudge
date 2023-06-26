@@ -19,7 +19,10 @@ showUsage() {
         - CERT_O        [nki inc.]                     Certificate Organization Name
         - CERT_CN       [kjudge]                       Certificate Common name
         - CERT_EMAIL    [not@nkagami.me]               Certificate Email address
-        - CERT_ALTNAMES [IP:127.0.0.1,DNS:localhost]   A list of hosts that kjudge will be listening on, either by IP (as 'IP:1.2.3.4') or DNS (as 'DNS:google.com'), separated by ','"
+        - CERT_ALTNAMES [IP:127.0.0.1,DNS:localhost]   A list of hosts that kjudge will be listening on, either by IP (as 'IP:1.2.3.4') or DNS (as 'DNS:google.com'), separated by ','
+    
+    favicon usage:
+        If /data/favicon.ico, start kjudge with favicon support."
 }
 
 if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
@@ -43,18 +46,17 @@ case ${HTTPS} in
     ;;
 esac
 
-cmd="kjudge -file /data/kjudge.db"
+cmd="kjudge"
+args="-file /data/kjudge.db"
 
 if [ "${useHTTPS}" = true ]; then
-    cmd="$cmd -port 443 -https /certs" 
+    args="$args -port 443 -https /certs"
 else
-    cmd="$cmd -port 80"
+    args="$args -port 80"
 fi
 
 if [ -f "/data/favicon.ico" ]; then
-    cmd="$cmd -favicon /data/favicon.ico"
+    args="$args -favicon /data/favicon.ico"
 fi
 
-cmd="$cmd $*"
-
-$cmd
+$cmd $args $*
