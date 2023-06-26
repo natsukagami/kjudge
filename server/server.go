@@ -74,6 +74,10 @@ func New(db *db.DB, opts ...Opt) (*Server, error) {
 
 	s.SetupProfiling()
 
+	if s.faviconPath != "" {
+		s.echo.Static("/favicon.ico", s.faviconPath)
+	}
+
 	au, err := auth.NewAdmin()
 	if err != nil {
 		return nil, err
@@ -89,7 +93,6 @@ func New(db *db.DB, opts ...Opt) (*Server, error) {
 		return nil, err
 	}
 	s.echo.GET("", contests.ConestsGetNearestOngoingContest)
-	s.echo.Static("/favicon.ico", s.faviconPath)
 	s.echo.Group("/static").GET("*", StaticFiles)
 	s.echo.GET("*", StaticFiles)
 	s.echo.POST("*", NotFoundHandler)
