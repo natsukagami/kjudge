@@ -43,12 +43,6 @@ func NormalizeEndings(content []byte, target string) ([]byte, error) {
 	}
 }
 
-// NormalizeEndings normalize file line endings to the current OS's endings
-// target accepts "windows" or "linux"
-func NormalizeEndingsNative(content []byte) ([]byte, error) {
-	return NormalizeEndings(content, runtime.GOOS)
-}
-
 // IsTextFile applies heuristics to determine
 // whether specified filename is a text file
 func IsTextFile(filename string) bool {
