@@ -12,10 +12,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+// NormalizeEndingsUnix normalize file line endings to LF
 func NormalizeEndingsUnix(content []byte) ([]byte, error) {
 	return bytes.ReplaceAll(content, []byte("\r\n"), []byte("\n")), nil
 }
 
+// NormalizeEndingsWindows normalize file line endings to CRLF
+// and throws if there is LF and CRLF mixed together
 func NormalizeEndingsWindows(content []byte) ([]byte, error) {
 	lf := bytes.Count(content, []byte("\n"))
 	crlf := bytes.Count(content, []byte("\r\n"))
