@@ -161,7 +161,7 @@ func (g *Group) SubmitPost(c echo.Context) error {
 
 	// Submitted files can be executable
 	if models.IsTextFile(file.Filename) {
-		source, err = models.NormalizeEndingsNative(source)
+		source, err = models.NormalizeEndingsUnix(source)
 		if err != nil {
 			return err
 		}

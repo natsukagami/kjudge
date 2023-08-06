@@ -105,7 +105,7 @@ func (g *Group) TestGroupUploadSingle(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	input, err = models.NormalizeEndingsNative(input)
+	input, err = models.NormalizeEndingsUnix(input)
 	if err != nil {
 		return err
 	}
@@ -113,7 +113,7 @@ func (g *Group) TestGroupUploadSingle(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	output, err = models.NormalizeEndingsNative(output)
+	output, err = models.NormalizeEndingsUnix(output)
 	if err != nil {
 		return err
 	}
@@ -269,7 +269,7 @@ func (r *TestGroupCtx) WriteTestsNormalized(db db.DBContext, tests []*tests.Lazy
 		if err != nil {
 			return errors.Wrapf(err, "test %v input", test.Name)
 		}
-		input, err = models.NormalizeEndingsNative(input)
+		input, err = models.NormalizeEndingsUnix(input)
 		if err != nil {
 			return errors.Wrapf(err, "test %v input", test.Name)
 		}
@@ -277,7 +277,7 @@ func (r *TestGroupCtx) WriteTestsNormalized(db db.DBContext, tests []*tests.Lazy
 		if err != nil {
 			return errors.Wrapf(err, "test %v output", test.Name)
 		}
-		output, err = models.NormalizeEndingsNative(output)
+		output, err = models.NormalizeEndingsUnix(output)
 		if err != nil {
 			return errors.Wrapf(err, "test %v output", test.Name)
 		}

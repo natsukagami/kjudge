@@ -12,11 +12,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-func crlftoLF(content []byte) ([]byte, error) {
+func NormalizeEndingsUnix(content []byte) ([]byte, error) {
 	return bytes.ReplaceAll(content, []byte("\r\n"), []byte("\n")), nil
 }
 
-func lftoCRLF(content []byte) ([]byte, error) {
+func NormalizeEndingsWindows(content []byte) ([]byte, error) {
 	lf := bytes.Count(content, []byte("\n"))
 	crlf := bytes.Count(content, []byte("\r\n"))
 	if crlf == lf {
@@ -35,9 +35,9 @@ func lftoCRLF(content []byte) ([]byte, error) {
 func NormalizeEndings(content []byte, target string) ([]byte, error) {
 	switch target {
 	case "windows":
-		return lftoCRLF(content)
+		return NormalizeEndingsWindows(content)
 	case "linux":
-		return crlftoLF(content)
+		return NormalizeEndingsUnix(content)
 	default:
 		return nil, errors.Errorf("%s not supported for line ending conversion", runtime.GOOS)
 	}

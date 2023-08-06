@@ -205,7 +205,7 @@ func (g *Group) ProblemAddFile(c echo.Context) error {
 	}
 	for _, file := range files {
 		if models.IsTextFile(file.Filename) {
-			file.Content, err = models.NormalizeEndingsNative(file.Content)
+			file.Content, err = models.NormalizeEndingsUnix(file.Content)
 			if err != nil {
 				return err
 			}
