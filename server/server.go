@@ -29,7 +29,8 @@ type Server struct {
 	db   *db.DB
 	echo *echo.Echo
 
-	verbose bool
+	verbose     bool
+	faviconPath string
 }
 
 // New creates a new server.
@@ -37,6 +38,9 @@ func New(db *db.DB, opts ...Opt) (*Server, error) {
 	s := &Server{
 		db:   db,
 		echo: echo.New(),
+
+		verbose:     false,
+		faviconPath: "",
 	}
 
 	for _, opt := range opts {
@@ -69,6 +73,10 @@ func New(db *db.DB, opts ...Opt) (*Server, error) {
 	}
 
 	s.SetupProfiling()
+
+	if s.faviconPath != "" {
+		s.echo.File("/favicon.ico", s.faviconPath)
+	}
 
 	au, err := auth.NewAdmin()
 	if err != nil {
