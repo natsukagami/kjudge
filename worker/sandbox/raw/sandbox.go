@@ -35,6 +35,8 @@ func New(settings sandbox.Settings) *Runner {
 	return &Runner{settings: settings}
 }
 
+func (s *Runner) Start() {}
+
 func (s *Runner) Settings() *sandbox.Settings {
 	return &s.settings
 }

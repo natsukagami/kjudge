@@ -56,6 +56,7 @@ func main() {
 
 	log.Println("Starting kjudge. Press Ctrl+C to stop")
 
+	go sandbox.Start()
 	go queue.Start()
 	go startServer(server)
 

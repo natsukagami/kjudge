@@ -13,46 +13,80 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"log"
 
 	"github.com/natsukagami/kjudge/worker/sandbox"
 	"github.com/pkg/errors"
 )
 
 var (
-	// The isolate command. Can be overridden with KJUDGE_ISOLATE environment variable.
-	isolateCommand = "isolate"
+	// The isolate command. Can be overridden with KJUDGE_ISOLATE_V1 environment variable.
+	isolateCommandV1 = "isolate"
+	isolateCommandV2 = "isolate"
+	isolateDaemonCommand = "isolate-cg-keeper"
 )
 
 func init() {
+	if v, ok := os.LookupEnv("KJUDGE_ISOLATE_V1"); ok {
+		isolateCommandV1 = v
+	}
 	if v, ok := os.LookupEnv("KJUDGE_ISOLATE"); ok {
-		isolateCommand = v
+		isolateCommandV2 = v
+	}
+	if v, ok := os.LookupEnv("KJUDGE_ISOLATE_DAEMON"); ok {
+		isolateDaemonCommand = v
 	}
 }
 
 // Runner implements worker.Runner.
 type Runner struct {
+	version  int // 1 or 2
 	settings sandbox.Settings
 	private  struct{} // Makes the sandbox not simply constructible
 }
 
 var _ sandbox.Runner = (*Runner)(nil)
 
+func (s *Runner) isolateCommand() string {
+	if s.version == 1 {
+		return isolateCommandV1
+	} else if s.version == 2 {
+		return isolateCommandV2
+	} else {
+		log.Panicf("Invalid isolate version: %d", s.version)
+		return ""
+	}
+}
+
 // Panics on not having "isolate" accessible.
-func mustHaveIsolate() {
-	output, err := exec.Command(isolateCommand, "--version").CombinedOutput()
+func (s *Runner) mustHaveIsolate() {
+	output, err := exec.Command(s.isolateCommand(), "--version").CombinedOutput()
 	if err != nil {
 		panic(errors.Wrap(err, "trying to run isolate"))
 	}
 	if !strings.Contains(string(output), "The process isolator") {
-		panic("Wrong isolate command found. Override the KJUDGE_ISOLATE environment variable to set a different path.")
+		panic("Wrong isolate command found. Override the KJUDGE_ISOLATE_V1/KJUDGE_ISOLATE environment variable to set a different path.")
 	}
 }
 
 // New returns a new sandbox.
 // Panics if isolate is not installed.
-func New(settings sandbox.Settings) *Runner {
-	mustHaveIsolate()
-	return &Runner{settings: settings, private: struct{}{}}
+func New(version int, settings sandbox.Settings) *Runner {
+	runner := &Runner{version: version, settings: settings, private: struct{}{}}
+	runner.mustHaveIsolate()
+	return runner
+}
+
+func (s *Runner) Start() {
+	if s.version == 1 {
+		return
+	} else if s.version == 2 {
+		if err := exec.Command(isolateDaemonCommand).Run(); err != nil {
+			log.Panic(errors.Wrap(err, "starting isolate v2 daemon"))
+		}
+	} else {
+		log.Panicf("Invalid isolate version: %v", s.version)
+	}
 }
 
 func (s *Runner) Settings() *sandbox.Settings {
@@ -63,7 +97,7 @@ func (s *Runner) Settings() *sandbox.Settings {
 func (s *Runner) Run(input *sandbox.Input) (*sandbox.Output, error) {
 	// Init the sandbox
 	defer s.cleanup()
-	dirBytes, err := exec.Command(isolateCommand, "--init", "--cg").Output()
+	dirBytes, err := exec.Command(s.isolateCommand(), "--init", "--cg").Output()
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -153,5 +187,5 @@ func buildCmd(dir, metaFile string, input *sandbox.Input) *exec.Cmd {
 }
 
 func (s *Runner) cleanup() {
-	_ = exec.Command(isolateCommand, "--cleanup", "--cg").Run()
+	_ = exec.Command(s.isolateCommand(), "--cleanup", "--cg").Run()
 }
