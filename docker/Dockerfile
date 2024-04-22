@@ -10,18 +10,18 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get upgrade -y
 
-# Stage 0: Compile isolate
-FROM base-ubuntu AS isolate
+# # Stage 0: Compile isolate
+# FROM base-ubuntu AS isolate
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && apt-get install -y libcap-dev gcc git make
+# RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+#     --mount=type=cache,target=/var/lib/apt,sharing=locked \
+#     apt-get update && apt-get install -y libcap-dev gcc git make
 
-WORKDIR /isolate
+# WORKDIR /isolate
 
-RUN git clone --branch v1.10.1 --single-branch https://github.com/ioi/isolate.git .
+# RUN git clone --branch v1.10.1 --single-branch https://github.com/ioi/isolate.git .
 
-RUN make isolate
+# RUN make isolate
 
 # Stage 1: Generate front-end
 FROM node:18-alpine AS frontend
@@ -51,7 +51,7 @@ RUN scripts/install_tools.sh
 RUN go generate && go build -tags production -o kjudge cmd/kjudge/main.go
 
 # Stage 3: Create awesome output image
-FROM base-ubuntu
+FROM ghcr.io/minhnhatnoe/isolate:latest
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -60,10 +60,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     python3.10 python2.7 rustc golang libcap-dev \
     openssl
 
-COPY --from=isolate /isolate/ /isolate
+# COPY --from=isolate /isolate/ /isolate
 
-WORKDIR /isolate
-RUN make install
+# WORKDIR /isolate
+# RUN make install
 
 COPY --from=backend /kjudge/kjudge /usr/local/bin
 COPY --from=backend /kjudge/scripts /scripts
