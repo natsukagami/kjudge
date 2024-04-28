@@ -1,4 +1,4 @@
-# Stage -1: Update apt-get
+# Stage 0: Update apt-get
 FROM ubuntu:jammy AS base-ubuntu
 
 # Mount apt's cache folders to cache install but maintain
@@ -9,19 +9,6 @@ FROM ubuntu:jammy AS base-ubuntu
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get upgrade -y
-
-# # Stage 0: Compile isolate
-# FROM base-ubuntu AS isolate
-
-# RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-#     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-#     apt-get update && apt-get install -y libcap-dev gcc git make
-
-# WORKDIR /isolate
-
-# RUN git clone --branch v1.10.1 --single-branch https://github.com/ioi/isolate.git .
-
-# RUN make isolate
 
 # Stage 1: Generate front-end
 FROM node:18-alpine AS frontend
@@ -59,11 +46,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     build-essential openjdk-11-jdk-headless fp-compiler cgroup-lite \
     python3.10 python2.7 rustc golang libcap-dev \
     openssl
-
-# COPY --from=isolate /isolate/ /isolate
-
-# WORKDIR /isolate
-# RUN make install
 
 COPY --from=backend /kjudge/kjudge /usr/local/bin
 COPY --from=backend /kjudge/scripts /scripts
