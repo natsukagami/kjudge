@@ -8,12 +8,12 @@ package isolate
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
-	"log"
 
 	"github.com/natsukagami/kjudge/worker/sandbox"
 	"github.com/pkg/errors"
@@ -21,8 +21,8 @@ import (
 
 var (
 	// The isolate command. Can be overridden with KJUDGE_ISOLATE_V1 environment variable.
-	isolateCommandV1 = "isolate"
-	isolateCommandV2 = "isolate"
+	isolateCommandV1     = "isolate"
+	isolateCommandV2     = "isolate"
 	isolateDaemonCommand = []string{"systemctl", "status", "isolate.service"}
 )
 
