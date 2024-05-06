@@ -23,7 +23,7 @@ var (
 	// The isolate command. Can be overridden with KJUDGE_ISOLATE_V1 environment variable.
 	isolateCommandV1     = "isolate"
 	isolateCommandV2     = "isolate"
-	isolateDaemonCommand = []string{"systemctl", "status", "isolate.service"}
+	isolateDaemonCommand = "systemctl status isolate.service"
 )
 
 func init() {
@@ -34,7 +34,7 @@ func init() {
 		isolateCommandV2 = v
 	}
 	if v, ok := os.LookupEnv("KJUDGE_ISOLATE_DAEMON"); ok {
-		isolateDaemonCommand = []string{v}
+		isolateDaemonCommand = v
 	}
 }
 
@@ -81,8 +81,8 @@ func (s *Runner) Start() {
 	if s.version == 1 {
 		return
 	} else if s.version == 2 {
-		if output, err := exec.Command(isolateDaemonCommand[0], isolateDaemonCommand[1:]...).CombinedOutput(); err != nil {
-			log.Panic(errors.Wrapf(err, "starting isolate v2 daemon. Is daemon installed? Output received:\n%s", output))
+		if output, err := exec.Command("/bin/sh", "-c", isolateDaemonCommand).CombinedOutput(); err != nil {
+			log.Panic(errors.Wrapf(err, "starting isolate v2 daemon. Is daemon installed and started? Output received:\n%s", output))
 		}
 	} else {
 		log.Panicf("Invalid isolate version: %v", s.version)
