@@ -6,8 +6,10 @@
 package isolate
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -41,6 +43,7 @@ func init() {
 // Runner implements worker.Runner.
 type Runner struct {
 	version  int // 1 or 2
+	cmd      *exec.Cmd
 	settings sandbox.Settings
 	private  struct{} // Makes the sandbox not simply constructible
 }
@@ -72,7 +75,7 @@ func (s *Runner) mustHaveIsolate() {
 // New returns a new sandbox.
 // Panics if isolate is not installed.
 func New(version int, settings sandbox.Settings) *Runner {
-	runner := &Runner{version: version, settings: settings, private: struct{}{}}
+	runner := &Runner{version: version, cmd: nil, settings: settings, private: struct{}{}}
 	runner.mustHaveIsolate()
 	return runner
 }
@@ -80,13 +83,54 @@ func New(version int, settings sandbox.Settings) *Runner {
 func (s *Runner) Start() {
 	if s.version == 1 {
 		return
-	} else if s.version == 2 {
-		if output, err := exec.Command("/bin/sh", "-c", isolateDaemonCommand).CombinedOutput(); err != nil {
-			log.Panic(errors.Wrapf(err, "starting isolate v2 daemon. Is daemon installed and started? Output received:\n%s", output))
-		}
-	} else {
+	} else if s.version != 2 {
 		log.Panicf("Invalid isolate version: %v", s.version)
 	}
+
+	s.cmd = exec.Command("/bin/sh", "-c", isolateDaemonCommand)
+
+	stdout, err := s.cmd.StdoutPipe()
+	if err != nil {
+		log.Panic(errors.Wrap(err, "getting stdout pipe"))
+	}
+
+	stderr, err := s.cmd.StderrPipe()
+	if err != nil {
+		log.Panic(errors.Wrap(err, "getting stderr pipe"))
+	}
+
+	multi := io.MultiReader(stdout, stderr)
+	reader := bufio.NewScanner(multi)
+
+	if err := s.cmd.Start(); err != nil {
+		log.Panic(errors.Wrap(err, "starting isolate daemon"))
+	}
+
+	for reader.Scan() {
+		log.Printf("[isolate v2 daemon]: %s", reader.Text())
+	}
+
+	if err := reader.Err(); err != nil {
+		log.Panic(errors.Wrapf(err, "isolate daemon dead. Is daemon installed and, if installed as a systemd unit, started?"))
+	}
+
+	if err := s.cmd.Wait(); err != nil {
+		log.Panic(errors.Wrap(err, "waiting for isolate daemon"))
+	}
+}
+
+func (s *Runner) Stop() error {
+	if s.cmd != nil {
+		if err := s.cmd.Process.Kill(); err != nil {
+			return errors.Wrap(err, "killing isolate daemon")
+		}
+
+		if err := s.cmd.Process.Release(); err != nil {
+			return errors.Wrap(err, "releasing isolate daemon")
+		}
+	}
+
+	return nil
 }
 
 func (s *Runner) Settings() *sandbox.Settings {
