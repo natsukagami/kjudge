@@ -38,7 +38,7 @@ RUN scripts/install_tools.sh
 RUN go generate && go build -tags production -o kjudge cmd/kjudge/main.go
 
 # Stage 3: Create awesome output image
-FROM ghcr.io/minhnhatnoe/isolate:v2.1.4
+FROM ghcr.io/minhnhatnoe/isolate:v2.1.5
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \

@@ -29,7 +29,7 @@ RUN sh scripts/install_tools.sh
 RUN go generate && go build -tags production -o kjudge cmd/kjudge/main.go
 
 # Stage 3: Create awesome output image
-FROM ghcr.io/minhnhatnoe/isolate:v2.1.4-alpine
+FROM ghcr.io/minhnhatnoe/isolate:v2.1.5-alpine
 
 RUN apk add --no-cache libcap make g++ openssl bash
 
