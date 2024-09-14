@@ -16,6 +16,8 @@ import (
 // and "raw" (NOT RECOMMENDED, RUN AT YOUR OWN RISK).
 // Which sandbox is used can be set at runtime with a command-line switch.
 type Runner interface {
+	Start()
+	Stop() error
 	Settings() *Settings
 	Run(*Input) (*Output, error)
 }

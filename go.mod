@@ -10,7 +10,7 @@ require (
 	github.com/labstack/echo-contrib v0.9.0
 	github.com/labstack/echo/v4 v4.9.0
 	github.com/mattn/go-colorable v0.1.12 // indirect
-	github.com/mattn/go-sqlite3 v1.14.0
+	github.com/mattn/go-sqlite3 v1.14.19
 	github.com/pkg/errors v0.9.1
 	golang.org/x/crypto v0.14.0
 	golang.org/x/net v0.17.0 // indirect

@@ -1,14 +1,3 @@
-# Stage 0: Compile isolate
-FROM alpine:3 AS isolate
-
-RUN apk add --no-cache libcap gcc make git g++ libcap-dev
-
-WORKDIR /isolate
-
-RUN git clone --branch v1.10.1 --single-branch https://github.com/ioi/isolate.git .
-
-RUN make isolate
-
 # Stage 1: Generate front-end
 FROM node:18-alpine AS frontend
 
@@ -40,14 +29,9 @@ RUN sh scripts/install_tools.sh
 RUN go generate && go build -tags production -o kjudge cmd/kjudge/main.go
 
 # Stage 3: Create awesome output image
-FROM alpine:3
+FROM ghcr.io/minhnhatnoe/isolate:v2.1.5-alpine
 
 RUN apk add --no-cache libcap make g++ openssl bash
-
-COPY --from=isolate /isolate/ /isolate
-
-WORKDIR /isolate
-RUN make install
 
 COPY --from=backend /kjudge/kjudge /usr/local/bin
 COPY --from=backend /kjudge/scripts /scripts

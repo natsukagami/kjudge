@@ -6,8 +6,11 @@
 package isolate
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
+	"io"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -19,40 +22,115 @@ import (
 )
 
 var (
-	// The isolate command. Can be overridden with KJUDGE_ISOLATE environment variable.
-	isolateCommand = "isolate"
+	// The isolate command. Can be overridden with KJUDGE_ISOLATE_V1 environment variable.
+	isolateCommandV1     = "isolate"
+	isolateCommandV2     = "isolate"
+	isolateDaemonCommand = "systemctl status isolate.service"
 )
 
 func init() {
+	if v, ok := os.LookupEnv("KJUDGE_ISOLATE_V1"); ok {
+		isolateCommandV1 = v
+	}
 	if v, ok := os.LookupEnv("KJUDGE_ISOLATE"); ok {
-		isolateCommand = v
+		isolateCommandV2 = v
+	}
+	if v, ok := os.LookupEnv("KJUDGE_ISOLATE_DAEMON"); ok {
+		isolateDaemonCommand = v
 	}
 }
 
 // Runner implements worker.Runner.
 type Runner struct {
+	version  int // 1 or 2
+	cmd      *exec.Cmd
 	settings sandbox.Settings
 	private  struct{} // Makes the sandbox not simply constructible
 }
 
 var _ sandbox.Runner = (*Runner)(nil)
 
+func (s *Runner) isolateCommand() string {
+	if s.version == 1 {
+		return isolateCommandV1
+	} else if s.version == 2 {
+		return isolateCommandV2
+	} else {
+		log.Panicf("Invalid isolate version: %d", s.version)
+		return ""
+	}
+}
+
 // Panics on not having "isolate" accessible.
-func mustHaveIsolate() {
-	output, err := exec.Command(isolateCommand, "--version").CombinedOutput()
+func (s *Runner) mustHaveIsolate() {
+	output, err := exec.Command(s.isolateCommand(), "--version").CombinedOutput()
 	if err != nil {
 		panic(errors.Wrap(err, "trying to run isolate"))
 	}
 	if !strings.Contains(string(output), "The process isolator") {
-		panic("Wrong isolate command found. Override the KJUDGE_ISOLATE environment variable to set a different path.")
+		panic("Wrong isolate command found. Override the KJUDGE_ISOLATE_V1/KJUDGE_ISOLATE environment variable to set a different path.")
 	}
 }
 
 // New returns a new sandbox.
 // Panics if isolate is not installed.
-func New(settings sandbox.Settings) *Runner {
-	mustHaveIsolate()
-	return &Runner{settings: settings, private: struct{}{}}
+func New(version int, settings sandbox.Settings) *Runner {
+	runner := &Runner{version: version, cmd: nil, settings: settings, private: struct{}{}}
+	runner.mustHaveIsolate()
+	return runner
+}
+
+func (s *Runner) Start() {
+	if s.version == 1 {
+		return
+	} else if s.version != 2 {
+		log.Panicf("Invalid isolate version: %v", s.version)
+	}
+
+	s.cmd = exec.Command("/bin/sh", "-c", isolateDaemonCommand)
+
+	stdout, err := s.cmd.StdoutPipe()
+	if err != nil {
+		log.Panic(errors.Wrap(err, "getting stdout pipe"))
+	}
+
+	stderr, err := s.cmd.StderrPipe()
+	if err != nil {
+		log.Panic(errors.Wrap(err, "getting stderr pipe"))
+	}
+
+	multi := io.MultiReader(stdout, stderr)
+	reader := bufio.NewScanner(multi)
+
+	if err := s.cmd.Start(); err != nil {
+		log.Panic(errors.Wrap(err, "starting isolate daemon"))
+	}
+
+	for reader.Scan() {
+		log.Printf("[isolate v2 daemon]: %s", reader.Text())
+	}
+
+	if err := reader.Err(); err != nil {
+		log.Panic(errors.Wrapf(err, "isolate daemon dead. Is daemon installed and, if installed as a systemd unit, started?"))
+	}
+
+	if err := s.cmd.Wait(); err != nil {
+		log.Panic(errors.Wrap(err, "waiting for isolate daemon"))
+	}
+}
+
+func (s *Runner) Stop() error {
+	if s.cmd != nil {
+		if err := s.cmd.Process.Kill(); err != nil {
+			return errors.Wrap(err, "killing isolate daemon")
+		}
+
+		if err := s.cmd.Process.Release(); err != nil {
+			return errors.Wrap(err, "releasing isolate daemon")
+		}
+	}
+
+	return nil
 }
 
 func (s *Runner) Settings() *sandbox.Settings {
@@ -63,7 +141,7 @@ func (s *Runner) Settings() *sandbox.Settings {
 func (s *Runner) Run(input *sandbox.Input) (*sandbox.Output, error) {
 	// Init the sandbox
 	defer s.cleanup()
-	dirBytes, err := exec.Command(isolateCommand, "--init", "--cg").Output()
+	dirBytes, err := exec.Command(s.isolateCommand(), "--init", "--cg").Output()
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -153,5 +231,5 @@ func buildCmd(dir, metaFile string, input *sandbox.Input) *exec.Cmd {
 }
 
 func (s *Runner) cleanup() {
-	_ = exec.Command(isolateCommand, "--cleanup", "--cg").Run()
+	_ = exec.Command(s.isolateCommand(), "--cleanup", "--cg").Run()
 }
