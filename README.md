@@ -80,7 +80,7 @@ External Dependencies:
 ```yaml
 cc:      anything that compiles SQLite 3
 go:      >= 1.16
-node.js: >= 12
+node.js: >= 18
 yarn:    >= 1
 ```
 
