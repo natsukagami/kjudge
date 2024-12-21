@@ -12,9 +12,8 @@ require (
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-sqlite3 v1.14.19
 	github.com/pkg/errors v0.9.1
-	golang.org/x/crypto v0.14.0
-	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/text v0.13.0
-	golang.org/x/tools v0.6.0
+	golang.org/x/crypto v0.31.0
+	golang.org/x/text v0.21.0
+	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d
 	google.golang.org/appengine v1.6.5 // indirect
 )
