@@ -1,14 +1,57 @@
 package models
 
 import (
+	"bytes"
 	"fmt"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/natsukagami/kjudge/db"
 	"github.com/natsukagami/kjudge/models/verify"
 	"github.com/pkg/errors"
 )
+
+// NormalizeEndingsUnix normalize file line endings to LF
+func NormalizeEndingsUnix(content []byte) ([]byte, error) {
+	return bytes.ReplaceAll(content, []byte("\r\n"), []byte("\n")), nil
+}
+
+// NormalizeEndingsWindows normalize file line endings to CRLF
+// and throws if there is LF and CRLF mixed together
+func NormalizeEndingsWindows(content []byte) ([]byte, error) {
+	lf := bytes.Count(content, []byte("\n"))
+	crlf := bytes.Count(content, []byte("\r\n"))
+	if crlf == lf {
+		return content, nil
+	}
+	var err error = nil
+	if crlf != 0 {
+		err = errors.Errorf("number of crlf and lf (%v, %v) does not match", crlf, lf)
+	}
+	return bytes.ReplaceAll(content, []byte("\r\n"), []byte("\n")), err
+}
+
+// NormalizeEndings normalize file line endings to the target OS's endings
+// target accepts "windows" or "linux". Returns error if OS is not supported
+// or there is LF and CRLF mixed together
+func NormalizeEndings(content []byte, target string) ([]byte, error) {
+	switch target {
+	case "windows":
+		return NormalizeEndingsWindows(content)
+	case "linux":
+		return NormalizeEndingsUnix(content)
+	default:
+		return nil, errors.Errorf("%s not supported for line ending conversion", runtime.GOOS)
+	}
+}
+
+// IsTextFile applies heuristics to determine
+// whether specified filename is a text file
+func IsTextFile(filename string) bool {
+	ext := filepath.Ext(filename)
+	return !(ext == "" || ext == "exe" || ext == "pdf" || ext == "zip")
+}
 
 // GetFileWithName returns a file with a given name.
 func GetFileWithName(db db.DBContext, problemID int, filename string) (*File, error) {

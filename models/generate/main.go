@@ -26,6 +26,9 @@ type TomlTables map[string]TomlTable
 // SnakeToGocase translates snake case to go-case.
 // If export is true, the returned value has the first character in uppercase.
 func SnakeToGocase(s string, export bool) string {
+	s, explicit_private := RipPrivate(s)
+	export = export && !explicit_private
+
 	parts := strings.Split(s, "_")
 	result := strings.Builder{}
 	for i, part := range parts {
@@ -42,6 +45,14 @@ func SnakeToGocase(s string, export bool) string {
 	return result.String()
 }
 
+// RipPrivate removes the "__" prefix from a string.
+func RipPrivate(s string) (string, bool) {
+	if strings.HasPrefix(s, "__") {
+		return s[len("__"):], true
+	}
+	return s, false
+}
+
 var t = template.New("main")
 
 func init() {
@@ -54,6 +65,7 @@ func init() {
 		"args":      JoinArguments,
 		"marks":     Marks,
 		"fkey":      ForeignKey,
+		"rppriv":    func(s string) string { s, _ = RipPrivate(s); return s },
 	})
 }
 
@@ -80,6 +92,7 @@ func JoinCondition(keys map[string]string, sep string) string {
 			s.WriteString(sep)
 		}
 		first = false
+		key, _ = RipPrivate(key)
 		s.WriteString(key + " = ?")
 	}
 	return s.String()
@@ -99,10 +112,13 @@ func sortKeys(k map[string]string) []string {
 func JoinArguments(keys map[string]string, structName string) string {
 	var s []string
 	for _, key := range sortKeys(keys) {
+		key, private := RipPrivate(key)
 		if structName == "" {
 			s = append(s, SnakeToGocase(key, false))
 		} else if structName == "-" {
 			s = append(s, key)
+		} else if private {
+			s = append(s, structName+"."+SnakeToGocase(key, true)+"()")	
 		} else {
 			s = append(s, structName+"."+SnakeToGocase(key, true))
 		}
@@ -196,7 +212,7 @@ const TableTemplate = `
 // {{$name}} is the struct generated from table "{{.Name}}".
 type {{$name}} struct {
 {{- range $field, $type := .Fields}}
-    {{$field | field}} {{$type}} {{$tick}}db:"{{$field}}"{{$tick}}
+    {{$field | field}} {{$type}} {{$tick}}db:"{{$field | rppriv}}"{{$tick}}
 {{- end}}
 }
 
