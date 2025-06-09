@@ -203,6 +203,14 @@ func (g *Group) ProblemAddFile(c echo.Context) error {
 	if rename != "" && len(files) == 1 {
 		files[0].Filename = rename
 	}
+	for _, file := range files {
+		if models.IsTextFile(file.Filename) {
+			file.Content, err = models.NormalizeEndingsUnix(file.Content)
+			if err != nil {
+				return err
+			}
+		}
+	}
 	if err := ctx.Problem.WriteFiles(g.db, files); err != nil {
 		return httperr.BadRequestf("cannot write files: %v", err)
 	}

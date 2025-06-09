@@ -90,7 +90,7 @@ _order_by = "priority DESC, id ASC"
 id = "int"
 problem_id = "int"
 filename = "string"
-content = "[]byte"
+__content = "[]byte"
 public = "bool"
 
 [announcements]
